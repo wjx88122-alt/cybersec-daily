@@ -28,7 +28,7 @@ export default function DigestCard({ item }: { item: DigestItem }) {
         <h3 className="font-bold text-[15px] leading-snug mb-2 text-white">
           {item.headline}
         </h3>
-        <p className="text-sm leading-relaxed text-[#999] mb-3">
+        <p className="text-sm leading-relaxed text-[#999] mb-3 line-clamp-6">
           {item.summary}
         </p>
         <p className="text-xs text-[#555] truncate">{item.sourceTitle}</p>

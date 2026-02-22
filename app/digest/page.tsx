@@ -58,16 +58,16 @@ export default function DigestPage() {
             <div className="bg-[#1a1a1a] border-l-4 border-[#e5ff00] p-5 mb-6">
               <div className="flex items-center gap-3 mb-2">
                 <span className="text-[11px] font-bold uppercase tracking-wide text-[#e5ff00]">
-                  今日新增威胁
+                  威胁态势综述
                 </span>
                 <span className="text-[11px] text-[#555]">{digest.date}</span>
               </div>
-              <p className="text-sm leading-relaxed text-[#ccc]">{digest.overview}</p>
+              <p className="text-sm leading-relaxed text-[#ccc] whitespace-pre-line">{digest.overview}</p>
             </div>
 
             {/* Legend + count */}
             <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-[#555]">今日新披露 · {digest.items.length} 条</p>
+              <p className="text-xs text-[#555]">重点事件 · {digest.items.length} 条</p>
               <div className="flex gap-4 text-xs text-[#555]">
                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500" />严重</span>
                 <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500" />高危</span>
