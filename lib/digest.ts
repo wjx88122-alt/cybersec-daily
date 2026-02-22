@@ -98,21 +98,31 @@ ${articlesText}
   // Strip markdown code fences if present
   jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
 
+  // First try standard JSON parse
   try {
     return JSON.parse(jsonText) as DailyDigest;
-  } catch {
-    // Fallback: return a minimal digest
-    return {
-      date: today,
-      overview: "今日安全资讯摘要生成失败，请直接浏览原始资讯。",
-      items: recent.slice(0, 8).map((item) => ({
-        headline: item.title.slice(0, 20),
-        summary: item.summary || item.title,
-        importance: "medium" as const,
-        category: item.category,
-        sourceTitle: item.title,
-        sourceLink: item.link,
-      })),
-    };
+  } catch { /* fall through to repair */ }
+
+  // Repair: find last complete item object and close the array
+  const lastItem = jsonText.lastIndexOf('},');
+  if (lastItem > 0) {
+    try {
+      const repaired = jsonText.slice(0, lastItem + 1) + ']}';
+      return JSON.parse(repaired) as DailyDigest;
+    } catch { /* fall through */ }
   }
+
+  // Last resort fallback
+  return {
+    date: today,
+    overview: "今日安全资讯摘要生成失败，请直接浏览原始资讯。",
+    items: recent.slice(0, 8).map((item) => ({
+      headline: item.title.slice(0, 20),
+      summary: item.summary || item.title,
+      importance: "medium" as const,
+      category: item.category,
+      sourceTitle: item.title,
+      sourceLink: item.link,
+    })),
+  };
 }
