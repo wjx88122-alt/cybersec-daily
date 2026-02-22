@@ -89,6 +89,24 @@ export const FEED_SOURCES_A = [
     category: "综合资讯",
     description: "Wired 安全频道，以深度报道覆盖黑客攻击、隐私政策和国家级网络战。",
   },
+  {
+    name: "Help Net Security",
+    url: "https://www.helpnetsecurity.com/feed/",
+    category: "综合资讯",
+    description: "每日多篇发布漏洞、数据泄露、产品安全和行业动态资讯。",
+  },
+  {
+    name: "Security Affairs",
+    url: "https://securityaffairs.com/feed",
+    category: "综合资讯",
+    description: "每日多篇报道黑客攻击、APT 和数据泄露事件的独立安全博客。",
+  },
+  {
+    name: "Hackread",
+    url: "https://www.hackread.com/feed/",
+    category: "综合资讯",
+    description: "专注于网络犯罪、黑客攻击、数据泄露和隐私安全的新闻网站。",
+  },
 ];
 
 export const FEED_SOURCES_B = [
@@ -181,6 +199,24 @@ export const FEED_SOURCES_B = [
     url: "https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss-analyzed.xml",
     category: "漏洞预警",
     description: "美国国家漏洞数据库最新 CVE 漏洞公告，覆盖所有已分析的安全漏洞。",
+  },
+  {
+    name: "ESET Research",
+    url: "https://feeds.feedburner.com/eset/blog",
+    category: "恶意软件",
+    description: "ESET 安全研究团队发布的恶意软件分析、APT 追踪和网络威胁报告。",
+  },
+  {
+    name: "Graham Cluley",
+    url: "https://grahamcluley.com/feed/",
+    category: "综合资讯",
+    description: "资深安全专家 Graham Cluley 的博客，每日报道网络安全新闻和评论。",
+  },
+  {
+    name: "Packet Storm",
+    url: "https://packetstormsecurity.com/headlines.xml",
+    category: "漏洞预警",
+    description: "每日发布最新漏洞利用、安全工具和安全公告的权威安全资源站。",
   },
 ];
 
