@@ -32,6 +32,7 @@ ${JSON.stringify(items)}
   for (const block of response.content) {
     if (block.type === "text") { text = block.text.trim(); break; }
   }
+  console.log("translateBatch raw:", text.slice(0, 200));
   const cleaned = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
   return JSON.parse(cleaned);
 }
