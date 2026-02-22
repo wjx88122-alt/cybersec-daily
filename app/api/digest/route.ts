@@ -2,7 +2,7 @@ import { fetchAllFeeds } from "@/lib/fetchFeeds";
 import { generateDigest } from "@/lib/digest";
 import { NextResponse } from "next/server";
 
-export const revalidate = 3600; // regenerate every hour
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
