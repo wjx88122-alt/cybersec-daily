@@ -66,10 +66,10 @@ export const FEED_SOURCES_A = [
     description: "面向企业安全专业人员的新闻平台，每日发布漏洞、数据泄露和网络攻击报道。",
   },
   {
-    name: "Threatpost",
-    url: "https://threatpost.com/feed/",
-    category: "综合资讯",
-    description: "专注于网络安全威胁的独立新闻网站，快速报道最新漏洞和攻击事件。",
+    name: "Lumen Black Lotus Labs",
+    url: "https://blog.lumen.com/feed/",
+    category: "威胁情报",
+    description: "Lumen Technologies 威胁研究团队，专注于僵尸网络追踪、路由器恶意软件和高级持续性威胁分析。",
   },
   {
     name: "SC Magazine",
