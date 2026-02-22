@@ -21,15 +21,15 @@ export async function GET(req: NextRequest) {
   }
 
   const allItems = [...feedA, ...feedB];
-  let translations;
+
   try {
-    translations = await translateItems(allItems);
+    const translations = await translateItems(allItems);
+    translations.forEach((t, i) => {
+      if (t.titleZh) allItems[i] = { ...allItems[i], titleZh: t.titleZh, summaryZh: t.summaryZh };
+    });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
   }
-  translations.forEach((t, i) => {
-    if (t.titleZh) allItems[i] = { ...allItems[i], titleZh: t.titleZh, summaryZh: t.summaryZh };
-  });
 
   const finalA = allItems.slice(0, feedA.length);
   const finalB = allItems.slice(feedA.length);
