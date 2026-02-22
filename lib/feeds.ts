@@ -59,6 +59,36 @@ export const FEED_SOURCES_A = [
     category: "综合资讯",
     description: "Ars Technica 安全频道，以深度技术报道覆盖漏洞披露、隐私政策与安全研究。",
   },
+  {
+    name: "SecurityWeek",
+    url: "https://feeds.feedburner.com/securityweek",
+    category: "综合资讯",
+    description: "面向企业安全专业人员的新闻平台，每日发布漏洞、数据泄露和网络攻击报道。",
+  },
+  {
+    name: "Threatpost",
+    url: "https://threatpost.com/feed/",
+    category: "综合资讯",
+    description: "专注于网络安全威胁的独立新闻网站，快速报道最新漏洞和攻击事件。",
+  },
+  {
+    name: "SC Magazine",
+    url: "https://www.scmagazine.com/feed",
+    category: "综合资讯",
+    description: "面向安全专业人员的行业媒体，覆盖企业安全、合规和威胁情报。",
+  },
+  {
+    name: "Cybersecurity Dive",
+    url: "https://www.cybersecuritydive.com/feeds/news/",
+    category: "综合资讯",
+    description: "专注于企业网络安全新闻，报道行业动态、政策法规和重大安全事件。",
+  },
+  {
+    name: "Wired Security",
+    url: "https://www.wired.com/feed/category/security/latest/rss",
+    category: "综合资讯",
+    description: "Wired 安全频道，以深度报道覆盖黑客攻击、隐私政策和国家级网络战。",
+  },
 ];
 
 export const FEED_SOURCES_B = [
@@ -121,6 +151,36 @@ export const FEED_SOURCES_B = [
     url: "https://www.recordedfuture.com/feed",
     category: "威胁情报",
     description: "Recorded Future 威胁情报平台博客，提供 APT 组织追踪、地缘政治网络威胁分析。",
+  },
+  {
+    name: "Palo Alto Unit 42",
+    url: "https://unit42.paloaltonetworks.com/feed/",
+    category: "威胁情报",
+    description: "Palo Alto Networks 威胁研究团队，发布 APT 分析、勒索软件追踪和漏洞研究。",
+  },
+  {
+    name: "Check Point Research",
+    url: "https://research.checkpoint.com/feed/",
+    category: "威胁情报",
+    description: "Check Point 安全研究团队发布的威胁分析、恶意软件研究和漏洞披露报告。",
+  },
+  {
+    name: "Crowdstrike Blog",
+    url: "https://www.crowdstrike.com/blog/feed/",
+    category: "威胁情报",
+    description: "CrowdStrike 威胁情报团队发布的 APT 追踪、勒索软件分析和端点安全研究。",
+  },
+  {
+    name: "Mandiant Blog",
+    url: "https://www.mandiant.com/resources/blog/rss.xml",
+    category: "威胁情报",
+    description: "Mandiant（Google 旗下）发布的高级威胁研究、APT 组织分析和事件响应报告。",
+  },
+  {
+    name: "NVD Recent CVEs",
+    url: "https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss-analyzed.xml",
+    category: "漏洞预警",
+    description: "美国国家漏洞数据库最新 CVE 漏洞公告，覆盖所有已分析的安全漏洞。",
   },
 ];
 
