@@ -27,7 +27,9 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
+  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
   const filtered = items.filter((item) => {
+    const matchTime = new Date(item.pubDate).getTime() >= cutoff;
     const matchCat = category === "全部" || item.category === category;
     const matchSearch =
       !search ||
@@ -35,7 +37,7 @@ export default function Home() {
       (item.titleZh || "").toLowerCase().includes(search.toLowerCase()) ||
       item.summary.toLowerCase().includes(search.toLowerCase()) ||
       (item.summaryZh || "").toLowerCase().includes(search.toLowerCase());
-    return matchCat && matchSearch;
+    return matchTime && matchCat && matchSearch;
   });
 
   const [hero, ...rest] = filtered;
@@ -87,12 +89,12 @@ export default function Home() {
         {error && <div className="text-center py-32 text-red-500 text-sm">{error}</div>}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="text-center py-32 text-sm text-[#666]">没有找到相关内容</div>
+          <div className="text-center py-32 text-sm text-[#666]">今日暂无新增资讯</div>
         )}
 
         {!loading && !error && filtered.length > 0 && (
           <>
-            <p className="text-xs mb-4 text-[#555]">共 {filtered.length} 条资讯</p>
+            <p className="text-xs mb-4 text-[#555]">今日新增 {filtered.length} 条</p>
             {hero && (
               <div className="mb-6">
                 <NewsCard item={hero} hero />
