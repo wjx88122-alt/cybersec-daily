@@ -5,6 +5,19 @@ import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useState } from "react";
 
+const CATEGORY_BG: Record<string, string> = {
+  综合资讯: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+  深度分析: "linear-gradient(135deg, #1a0a2e 0%, #2d1b69 100%)",
+  漏洞预警: "linear-gradient(135deg, #2e0a0a 0%, #6b1a1a 100%)",
+  威胁情报: "linear-gradient(135deg, #2e1a0a 0%, #6b3a1a 100%)",
+  恶意软件: "linear-gradient(135deg, #2e0a1a 0%, #6b1a3a 100%)",
+  "政府/监管": "linear-gradient(135deg, #0a2e0a 0%, #1a4a1a 100%)",
+};
+
+const CATEGORY_ICON: Record<string, string> = {
+  综合资讯: "🌐", 深度分析: "🔍", 漏洞预警: "⚠️", 威胁情报: "🎯", 恶意软件: "🦠", "政府/监管": "🏛️",
+};
+
 export default function NewsCard({ item, hero = false }: { item: FeedItem; hero?: boolean }) {
   const [imgError, setImgError] = useState(false);
 
@@ -35,12 +48,12 @@ export default function NewsCard({ item, hero = false }: { item: FeedItem; hero?
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-              <rect width="48" height="48" rx="4" fill="#333" />
-              <path d="M12 32l8-10 6 7 4-5 6 8H12z" fill="#444" />
-              <circle cx="32" cy="18" r="4" fill="#444" />
-            </svg>
+          <div
+            className="w-full h-full flex flex-col items-center justify-center gap-2"
+            style={{ background: CATEGORY_BG[item.category] ?? "linear-gradient(135deg, #1a1a1a 0%, #333 100%)" }}
+          >
+            <span className="text-4xl">{CATEGORY_ICON[item.category] ?? "📰"}</span>
+            <span className="text-xs text-[#666] font-medium">{item.source}</span>
           </div>
         )}
         <span
