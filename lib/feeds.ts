@@ -61,7 +61,7 @@ export const FEED_SOURCES_A = [
   },
   {
     name: "SecurityWeek",
-    url: "https://feeds.feedburner.com/securityweek",
+    url: "https://www.securityweek.com/rss",
     category: "综合资讯",
     description: "面向企业安全专业人员的新闻平台，每日发布漏洞、数据泄露和网络攻击报道。",
   },
@@ -115,9 +115,39 @@ export const FEED_SOURCES_A = [
   },
   {
     name: "Cloudflare Blog",
-    url: "https://blog.cloudflare.com/tag/security/rss/",
+    url: "https://blog.cloudflare.com/rss/",
     category: "深度分析",
     description: "Cloudflare 安全团队发布的 DDoS 防护、零信任架构和网络威胁深度分析。",
+  },
+  {
+    name: "CyberScoop",
+    url: "https://www.cyberscoop.com/feed/",
+    category: "综合资讯",
+    description: "专注于政府和企业网络安全的新闻媒体，深度报道国家级网络攻击和政策动态。",
+  },
+  {
+    name: "CSO Online",
+    url: "https://www.csoonline.com/feed",
+    category: "综合资讯",
+    description: "面向首席安全官的专业媒体，覆盖企业安全战略、数据泄露和合规管理。",
+  },
+  {
+    name: "The Record",
+    url: "https://therecord.media/feed/",
+    category: "综合资讯",
+    description: "Recorded Future 旗下新闻媒体，专注于网络犯罪、国家级黑客和政策报道。",
+  },
+  {
+    name: "Cybercrime Magazine",
+    url: "https://cybersecurityventures.com/feed/",
+    category: "综合资讯",
+    description: "网络安全行业数据与趋势报告，覆盖网络犯罪经济规模和行业动态。",
+  },
+  {
+    name: "Troy Hunt",
+    url: "https://www.troyhunt.com/rss/",
+    category: "深度分析",
+    description: "Have I Been Pwned 创始人 Troy Hunt 的博客，深度分析数据泄露和密码安全。",
   },
 ];
 
@@ -259,6 +289,24 @@ export const FEED_SOURCES_B = [
     url: "https://blog.qualys.com/feed",
     category: "漏洞预警",
     description: "Qualys 安全研究团队发布的漏洞管理、云安全和合规性深度分析报告。",
+  },
+  {
+    name: "Microsoft Security Blog",
+    url: "https://www.microsoft.com/en-us/security/blog/feed/",
+    category: "威胁情报",
+    description: "微软安全团队发布的威胁分析、攻击活动追踪和安全产品研究报告。",
+  },
+  {
+    name: "Rapid7 Blog",
+    url: "https://blog.rapid7.com/rss/",
+    category: "漏洞预警",
+    description: "Rapid7 安全研究团队发布的漏洞分析、渗透测试技术和攻击面管理研究。",
+  },
+  {
+    name: "Unsupervised Learning",
+    url: "https://danielmiessler.com/feed/",
+    category: "深度分析",
+    description: "安全专家 Daniel Miessler 的博客，聚焦 AI 安全、威胁情报和安全趋势分析。",
   },
 ];
 
