@@ -22,35 +22,20 @@ export default function DigestPage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--background)" }}>
-      <header
-        className="sticky top-0 z-10"
-        style={{
-          background: "var(--nav-bg)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid var(--separator)",
-        }}
-      >
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🛡️</span>
-            <span className="font-semibold text-base" style={{ color: "var(--foreground)" }}>
-              家兴的网络安全日报
-            </span>
-          </div>
-          <nav className="flex items-center gap-1">
+    <div className="min-h-screen bg-[#111]">
+      <header className="sticky top-0 z-10 bg-black border-b border-[#222]">
+        <div className="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
+          <span className="font-black text-white text-lg tracking-tight">网络安全日报</span>
+          <nav className="flex items-center">
             <Link
               href="/"
-              className="px-3 py-1.5 rounded-full text-sm font-medium"
-              style={{ color: "#007aff" }}
+              className="px-4 h-12 flex items-center text-sm font-semibold text-[#888] hover:text-white transition-colors border-b-2 border-transparent"
             >
               资讯
             </Link>
             <Link
               href="/digest"
-              className="px-3 py-1.5 rounded-full text-sm font-medium"
-              style={{ background: "#007aff", color: "#fff" }}
+              className="px-4 h-12 flex items-center text-sm font-semibold text-white border-b-2 border-[#e5ff00]"
             >
               简报
             </Link>
@@ -58,78 +43,47 @@ export default function DigestPage() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 py-6">
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 gap-3">
-            <div className="w-7 h-7 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm" style={{ color: "var(--secondary-text)" }}>
-              AI 正在深度分析今日安全态势...
-            </p>
+            <div className="w-7 h-7 border-2 border-[#e5ff00] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-[#666]">AI 正在深度分析今日安全态势...</p>
           </div>
         )}
 
-        {error && (
-          <div className="text-center py-32 text-red-500 text-sm">{error}</div>
-        )}
+        {error && <div className="text-center py-32 text-red-500 text-sm">{error}</div>}
 
         {digest && (
           <>
-            {/* Overview card */}
-            <div
-              className="rounded-2xl p-5 mb-5"
-              style={{
-                background: "linear-gradient(135deg, rgba(0,122,255,0.12), rgba(88,86,214,0.12))",
-                border: "1px solid rgba(0,122,255,0.2)",
-                backdropFilter: "blur(20px)",
-                WebkitBackdropFilter: "blur(20px)",
-              }}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                <span
-                  className="text-xs font-medium px-2 py-0.5 rounded-full"
-                  style={{ background: "rgba(0,122,255,0.15)", color: "#007aff" }}
-                >
+            {/* Overview */}
+            <div className="bg-[#1a1a1a] border-l-4 border-[#e5ff00] p-5 mb-6">
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-[11px] font-bold uppercase tracking-wide text-[#e5ff00]">
                   AI 态势分析
                 </span>
-                <span className="text-xs" style={{ color: "var(--secondary-text)" }}>
-                  {digest.date}
-                </span>
+                <span className="text-[11px] text-[#555]">{digest.date}</span>
               </div>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--foreground)" }}>
-                {digest.overview}
-              </p>
+              <p className="text-sm leading-relaxed text-[#ccc]">{digest.overview}</p>
             </div>
 
             {/* Legend + count */}
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-xs" style={{ color: "var(--secondary-text)" }}>
-                今日重点 · {digest.items.length} 条
-              </p>
-              <div className="flex gap-3 text-xs" style={{ color: "var(--secondary-text)" }}>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500" />严重
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />高危
-                </span>
-                <span className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-500" />中等
-                </span>
+            <div className="flex items-center justify-between mb-4">
+              <p className="text-xs text-[#555]">今日重点 · {digest.items.length} 条</p>
+              <div className="flex gap-4 text-xs text-[#555]">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500" />严重</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500" />高危</span>
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-yellow-500" />中等</span>
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {digest.items.map((item, i) => (
                 <DigestCard key={i} item={item} />
               ))}
             </div>
 
-            <div className="mt-6 text-center">
-              <Link
-                href="/"
-                className="text-sm"
-                style={{ color: "#007aff" }}
-              >
+            <div className="mt-8 text-center">
+              <Link href="/" className="text-sm text-[#e5ff00] hover:underline">
                 查看全部资讯 →
               </Link>
             </div>
