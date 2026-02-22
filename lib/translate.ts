@@ -33,7 +33,11 @@ ${JSON.stringify(items)}
     if (block.type === "text") { text = block.text.trim(); break; }
   }
   const cleaned = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
-  return JSON.parse(cleaned);
+  try {
+    return JSON.parse(cleaned);
+  } catch (e) {
+    throw new Error(`JSON parse failed at batch size ${items.length}. Raw: ${text.slice(0, 500)}`);
+  }
 }
 
 export async function translateItems(
