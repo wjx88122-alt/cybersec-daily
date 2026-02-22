@@ -5,6 +5,8 @@ import { DailyDigest } from "@/lib/digest";
 import DigestCard from "@/components/DigestCard";
 import Link from "next/link";
 
+import Image from "next/image";
+
 export default function DigestPage() {
   const [digest, setDigest] = useState<DailyDigest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,9 @@ export default function DigestPage() {
     <div className="min-h-screen bg-[#111]">
       <header className="sticky top-0 z-10 bg-black border-b border-[#222]">
         <div className="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
-          <span className="font-black text-white text-lg tracking-tight">网络安全日报</span>
+          <Link href="/">
+            <Image src="/logo.png" alt="网络安全日报" width={120} height={40} className="object-contain" />
+          </Link>
           <nav className="flex items-center">
             <Link
               href="/"
