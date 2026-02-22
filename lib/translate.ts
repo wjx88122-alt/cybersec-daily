@@ -10,7 +10,7 @@ async function translateBatch(
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
-    max_tokens: 8192,
+    max_tokens: 16000,
     system: `你是一位顶级网络安全分析师，负责将英文安全资讯本地化为中文，供中国安全从业者阅读。
 你的任务是将给定的标题和摘要翻译成专业的中文。
 要求：严格按照 JSON 格式输出，不要有任何额外文字。`,
@@ -35,8 +35,15 @@ ${JSON.stringify(items)}
   const cleaned = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
   try {
     return JSON.parse(cleaned);
-  } catch (e) {
-    throw new Error(`JSON parse failed at batch size ${items.length}. Raw: ${text.slice(0, 500)}`);
+  } catch {
+    // Try to extract complete objects from truncated JSON
+    const matches = cleaned.match(/\{"titleZh":[^}]+\}/g) ?? [];
+    if (matches.length > 0) {
+      return matches.map((m) => {
+        try { return JSON.parse(m); } catch { return { titleZh: "", summaryZh: "" }; }
+      });
+    }
+    throw new Error(`JSON parse failed. Raw[0:200]: ${text.slice(0, 200)}`);
   }
 }
 
