@@ -29,7 +29,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
   const filtered = items.filter((item) => {
     const matchTime = new Date(item.pubDate).getTime() >= cutoff;
     const matchCat = category === "全部" || item.category === category;
@@ -88,12 +88,12 @@ export default function Home() {
         {error && <div className="text-center py-32 text-red-500 text-sm">{error}</div>}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="text-center py-32 text-sm text-[#666]">今日暂无新增资讯</div>
+          <div className="text-center py-32 text-sm text-[#666]">近 48 小时暂无新增资讯</div>
         )}
 
         {!loading && !error && filtered.length > 0 && (
           <>
-            <p className="text-xs mb-4 text-[#555]">今日新增 {filtered.length} 条</p>
+            <p className="text-xs mb-4 text-[#555]">近 48 小时新增 {filtered.length} 条</p>
             {hero && (
               <div className="mb-6">
                 <NewsCard item={hero} hero />
