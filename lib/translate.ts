@@ -48,7 +48,8 @@ export async function translateItems(
       translateBatch(input.slice(mid)),
     ]);
     return [...first, ...second];
-  } catch {
+  } catch (e) {
+    console.error("translateItems error:", e);
     return items.map(() => ({ titleZh: "", summaryZh: "" }));
   }
 }
