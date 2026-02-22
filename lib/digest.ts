@@ -21,15 +21,15 @@ export type DailyDigest = {
 };
 
 export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
-  // Take top 40 most recent items for analysis
-  const recent = items.slice(0, 40);
+  // Take top 25 most recent items for analysis
+  const recent = items.slice(0, 25);
 
   const articlesText = recent
     .map(
       (item, i) =>
-        `[${i + 1}] 来源: ${item.source} | 分类: ${item.category}\n标题: ${item.title}\n摘要: ${item.summary}\n链接: ${item.link}`
+        `[${i + 1}] ${item.source}: ${item.title} — ${item.summary.slice(0, 100)} | ${item.link}`
     )
-    .join("\n\n---\n\n");
+    .join("\n");
 
   const today = new Date().toLocaleDateString("zh-CN", {
     year: "numeric",
@@ -39,7 +39,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
 
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
-    max_tokens: 6000,
+    max_tokens: 4000,
     system: `你是一位顶级网络安全分析师，为企业安全团队撰写每日威胁简报。
 你的读者是 CISO 和高级安全工程师，他们需要快速判断：今天发生了什么新变化、是否需要立即行动。
 
@@ -51,7 +51,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
     messages: [
       {
         role: "user",
-        content: `今天是 ${today}，以下是近48小时安全资讯，请生成专业威胁简报。
+        content: `今天是 ${today}，以下是近48小时安全资讯（格式：序号 来源: 标题 — 摘要 | 链接），请生成专业威胁简报。
 
 ${articlesText}
 
@@ -79,7 +79,7 @@ ${articlesText}
   ]
 }
 
-选取最重要的8-10条事件，按重要性排序。`,
+选取最重要的6-8条事件，按重要性排序。`,
       },
     ],
   });
