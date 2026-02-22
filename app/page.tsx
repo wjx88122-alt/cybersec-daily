@@ -32,41 +32,29 @@ export default function Home() {
     const matchSearch =
       !search ||
       item.title.toLowerCase().includes(search.toLowerCase()) ||
-      item.summary.toLowerCase().includes(search.toLowerCase());
+      (item.titleZh || "").toLowerCase().includes(search.toLowerCase()) ||
+      item.summary.toLowerCase().includes(search.toLowerCase()) ||
+      (item.summaryZh || "").toLowerCase().includes(search.toLowerCase());
     return matchCat && matchSearch;
   });
 
+  const [hero, ...rest] = filtered;
+
   return (
-    <div className="min-h-screen" style={{ background: "var(--background)" }}>
-      {/* iOS-style nav bar */}
-      <header
-        className="sticky top-0 z-10"
-        style={{
-          background: "var(--nav-bg)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
-          borderBottom: "1px solid var(--separator)",
-        }}
-      >
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">🛡️</span>
-            <span className="font-semibold text-base" style={{ color: "var(--foreground)" }}>
-              家兴的网络安全日报
-            </span>
-          </div>
-          <nav className="flex items-center gap-1">
+    <div className="min-h-screen bg-[#111]">
+      <header className="sticky top-0 z-10 bg-black border-b border-[#222]">
+        <div className="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
+          <span className="font-black text-white text-lg tracking-tight">网络安全日报</span>
+          <nav className="flex items-center">
             <Link
               href="/"
-              className="px-3 py-1.5 rounded-full text-sm font-medium"
-              style={{ background: "#007aff", color: "#fff" }}
+              className="px-4 h-12 flex items-center text-sm font-semibold text-white border-b-2 border-[#e5ff00]"
             >
               资讯
             </Link>
             <Link
               href="/digest"
-              className="px-3 py-1.5 rounded-full text-sm font-medium"
-              style={{ color: "#007aff" }}
+              className="px-4 h-12 flex items-center text-sm font-semibold text-[#888] hover:text-white transition-colors border-b-2 border-transparent"
             >
               简报
             </Link>
@@ -74,52 +62,44 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-3xl mx-auto px-4 py-6">
-        {/* Search */}
+      <main className="max-w-7xl mx-auto px-4 py-6">
         <div className="mb-4">
           <input
             type="text"
             placeholder="搜索资讯..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full px-4 py-2.5 rounded-xl text-sm focus:outline-none"
-            style={{
-              background: "var(--card)",
-              border: "1px solid var(--card-border)",
-              color: "var(--foreground)",
-            }}
+            className="w-full px-4 py-2.5 text-sm focus:outline-none bg-[#1a1a1a] border border-[#333] text-white placeholder-[#555]"
           />
         </div>
 
-        {/* Category filter */}
-        <div className="mb-5 overflow-x-auto pb-1">
+        <div className="mb-6 overflow-x-auto pb-1">
           <CategoryFilter active={category} onChange={setCategory} />
         </div>
 
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 gap-3">
-            <div className="w-7 h-7 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />
-            <p className="text-sm" style={{ color: "var(--secondary-text)" }}>正在抓取最新安全资讯...</p>
+            <div className="w-7 h-7 border-2 border-[#e5ff00] border-t-transparent rounded-full animate-spin" />
+            <p className="text-sm text-[#666]">正在抓取最新安全资讯...</p>
           </div>
         )}
 
-        {error && (
-          <div className="text-center py-32 text-red-500 text-sm">{error}</div>
-        )}
+        {error && <div className="text-center py-32 text-red-500 text-sm">{error}</div>}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="text-center py-32 text-sm" style={{ color: "var(--secondary-text)" }}>
-            没有找到相关内容
-          </div>
+          <div className="text-center py-32 text-sm text-[#666]">没有找到相关内容</div>
         )}
 
         {!loading && !error && filtered.length > 0 && (
           <>
-            <p className="text-xs mb-3" style={{ color: "var(--secondary-text)" }}>
-              共 {filtered.length} 条资讯
-            </p>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {filtered.map((item) => (
+            <p className="text-xs mb-4 text-[#555]">共 {filtered.length} 条资讯</p>
+            {hero && (
+              <div className="mb-6">
+                <NewsCard item={hero} hero />
+              </div>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((item) => (
                 <NewsCard key={item.id} item={item} />
               ))}
             </div>

@@ -134,4 +134,7 @@ export type FeedItem = {
   source: string;
   category: string;
   pubDate: string;
+  image?: string;
+  titleZh?: string;
+  summaryZh?: string;
 };
