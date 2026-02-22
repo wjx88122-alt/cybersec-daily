@@ -40,7 +40,6 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
     max_tokens: 4096,
-    thinking: { type: "adaptive" },
     system: `你是一位顶级网络安全分析师，负责为安全专业人员撰写每日简报。
 你的核心任务是识别并报告"今日新发生"的安全事件，而非持续性跟踪报道。
 要求：
