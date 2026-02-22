@@ -1,17 +1,19 @@
 import Parser from "rss-parser";
-import { FEED_SOURCES, FeedItem } from "./feeds";
+import { FEED_SOURCES_A, FEED_SOURCES_B, FeedItem } from "./feeds";
 import crypto from "crypto";
 
 const parser = new Parser({
-  timeout: 8000,
+  timeout: 5000,
   headers: { "User-Agent": "CybersecDaily/1.0" },
 });
 
-export async function fetchAllFeeds(): Promise<FeedItem[]> {
+type Source = { name: string; url: string; category: string };
+
+async function fetchSources(sources: Source[]): Promise<FeedItem[]> {
   const results = await Promise.allSettled(
-    FEED_SOURCES.map(async (source) => {
+    sources.map(async (source) => {
       const feed = await parser.parseURL(source.url);
-      return (feed.items || []).slice(0, 15).map((item) => ({
+      return (feed.items || []).slice(0, 10).map((item) => ({
         id: crypto
           .createHash("md5")
           .update(item.link || item.title || "")
@@ -28,16 +30,24 @@ export async function fetchAllFeeds(): Promise<FeedItem[]> {
 
   const items: FeedItem[] = [];
   for (const result of results) {
-    if (result.status === "fulfilled") {
-      items.push(...result.value);
-    }
+    if (result.status === "fulfilled") items.push(...result.value);
   }
-
-  items.sort(
-    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
-  );
-
   return items;
+}
+
+export async function fetchFeedsA(): Promise<FeedItem[]> {
+  const items = await fetchSources(FEED_SOURCES_A);
+  return items.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+}
+
+export async function fetchFeedsB(): Promise<FeedItem[]> {
+  const items = await fetchSources(FEED_SOURCES_B);
+  return items.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+}
+
+export async function fetchAllFeeds(): Promise<FeedItem[]> {
+  const [a, b] = await Promise.all([fetchFeedsA(), fetchFeedsB()]);
+  return [...a, ...b].sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 }
 
 function stripHtml(html: string): string {

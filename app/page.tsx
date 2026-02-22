@@ -14,11 +14,14 @@ export default function Home() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    fetch("/api/feed")
-      .then((r) => r.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error);
-        setItems(data.items);
+    Promise.all([
+      fetch("/api/feed-a").then((r) => r.json()),
+      fetch("/api/feed-b").then((r) => r.json()),
+    ])
+      .then(([dataA, dataB]) => {
+        const all = [...(dataA.items || []), ...(dataB.items || [])];
+        all.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+        setItems(all);
       })
       .catch(() => setError("加载失败，请稍后刷新重试"))
       .finally(() => setLoading(false));

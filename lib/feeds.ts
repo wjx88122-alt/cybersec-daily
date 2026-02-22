@@ -1,9 +1,27 @@
-export const FEED_SOURCES = [
+export const FEED_SOURCES_A = [
   {
     name: "The Hacker News",
     url: "https://feeds.feedburner.com/TheHackersNews",
     category: "综合资讯",
     description: "全球访问量最高的网络安全新闻网站之一，覆盖漏洞、数据泄露、恶意软件等热点事件。",
+  },
+  {
+    name: "Bleeping Computer",
+    url: "https://www.bleepingcomputer.com/feed/",
+    category: "综合资讯",
+    description: "专注于网络安全与技术支持的新闻网站，以快速报道勒索软件和恶意软件事件闻名。",
+  },
+  {
+    name: "Dark Reading",
+    url: "https://www.darkreading.com/rss.xml",
+    category: "综合资讯",
+    description: "面向安全专业人员的综合性新闻平台，涵盖威胁情报、漏洞、合规等多个领域。",
+  },
+  {
+    name: "CISA Advisories",
+    url: "https://www.cisa.gov/cybersecurity-advisories/all.xml",
+    category: "政府/监管",
+    description: "美国网络安全和基础设施安全局官方发布的安全公告与漏洞预警。",
   },
   {
     name: "Krebs on Security",
@@ -18,46 +36,10 @@ export const FEED_SOURCES = [
     description: "安全领域权威专家 Bruce Schneier 的个人博客，聚焦安全政策、密码学与技术评论。",
   },
   {
-    name: "CISA Advisories",
-    url: "https://www.cisa.gov/cybersecurity-advisories/all.xml",
-    category: "政府/监管",
-    description: "美国网络安全和基础设施安全局官方发布的安全公告与漏洞预警。",
-  },
-  {
-    name: "Dark Reading",
-    url: "https://www.darkreading.com/rss.xml",
-    category: "综合资讯",
-    description: "面向安全专业人员的综合性新闻平台，涵盖威胁情报、漏洞、合规等多个领域。",
-  },
-  {
-    name: "Bleeping Computer",
-    url: "https://www.bleepingcomputer.com/feed/",
-    category: "综合资讯",
-    description: "专注于网络安全与技术支持的新闻网站，以快速报道勒索软件和恶意软件事件闻名。",
-  },
-  {
-    name: "Microsoft Security Response Center",
-    url: "https://msrc.microsoft.com/blog/feed/",
-    category: "漏洞预警",
-    description: "微软安全响应中心官方博客，发布补丁公告、漏洞研究及安全更新指南。",
-  },
-  {
-    name: "Google Project Zero",
-    url: "https://googleprojectzero.blogspot.com/feeds/posts/default",
-    category: "漏洞预警",
-    description: "Google 精英漏洞研究团队发布的零日漏洞深度技术分析报告。",
-  },
-  {
     name: "Cisco Talos Intelligence",
     url: "https://blog.talosintelligence.com/feeds/posts/default",
     category: "威胁情报",
     description: "Cisco Talos 威胁情报团队发布的恶意软件分析、APT 追踪与漏洞研究。",
-  },
-  {
-    name: "Securelist by Kaspersky",
-    url: "https://securelist.com/feed/",
-    category: "威胁情报",
-    description: "卡巴斯基实验室的威胁研究博客，提供 APT 报告、恶意软件分析和全球威胁态势。",
   },
   {
     name: "SANS Internet Storm Center",
@@ -76,6 +58,27 @@ export const FEED_SOURCES = [
     url: "https://feeds.arstechnica.com/arstechnica/security",
     category: "综合资讯",
     description: "Ars Technica 安全频道，以深度技术报道覆盖漏洞披露、隐私政策与安全研究。",
+  },
+];
+
+export const FEED_SOURCES_B = [
+  {
+    name: "Microsoft Security Response Center",
+    url: "https://msrc.microsoft.com/blog/feed/",
+    category: "漏洞预警",
+    description: "微软安全响应中心官方博客，发布补丁公告、漏洞研究及安全更新指南。",
+  },
+  {
+    name: "Google Project Zero",
+    url: "https://googleprojectzero.blogspot.com/feeds/posts/default",
+    category: "漏洞预警",
+    description: "Google 精英漏洞研究团队发布的零日漏洞深度技术分析报告。",
+  },
+  {
+    name: "Securelist by Kaspersky",
+    url: "https://securelist.com/feed/",
+    category: "威胁情报",
+    description: "卡巴斯基实验室的威胁研究博客，提供 APT 报告、恶意软件分析和全球威胁态势。",
   },
   {
     name: "The Register Security",
@@ -120,6 +123,8 @@ export const FEED_SOURCES = [
     description: "Recorded Future 威胁情报平台博客，提供 APT 组织追踪、地缘政治网络威胁分析。",
   },
 ];
+
+export const FEED_SOURCES = [...FEED_SOURCES_A, ...FEED_SOURCES_B];
 
 export type FeedItem = {
   id: string;

@@ -1,6 +1,7 @@
 {
   "functions": {
-    "app/api/feed/route.ts": { "maxDuration": 60 },
-    "app/api/digest/route.ts": { "maxDuration": 120 }
+    "app/api/feed-a/route.ts": { "maxDuration": 10 },
+    "app/api/feed-b/route.ts": { "maxDuration": 10 },
+    "app/api/digest/route.ts": { "maxDuration": 10 }
   }
 }
