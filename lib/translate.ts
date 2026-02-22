@@ -50,7 +50,6 @@ export async function translateItems(
     ]);
     return [...first, ...second];
   } catch (e) {
-    console.error("translateItems error:", e);
-    return items.map(() => ({ titleZh: "", summaryZh: "" }));
+    throw e;
   }
 }

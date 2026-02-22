@@ -21,7 +21,12 @@ export async function GET(req: NextRequest) {
   }
 
   const allItems = [...feedA, ...feedB];
-  const translations = await translateItems(allItems);
+  let translations;
+  try {
+    translations = await translateItems(allItems);
+  } catch (e) {
+    return NextResponse.json({ error: String(e) }, { status: 500 });
+  }
   translations.forEach((t, i) => {
     if (t.titleZh) allItems[i] = { ...allItems[i], titleZh: t.titleZh, summaryZh: t.summaryZh };
   });
