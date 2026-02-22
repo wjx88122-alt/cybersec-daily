@@ -36,8 +36,15 @@ ${JSON.stringify(items)}
   try {
     return JSON.parse(cleaned);
   } catch {
-    // Try to extract complete objects from truncated JSON
-    const matches = cleaned.match(/\{"titleZh":[^}]+\}/g) ?? [];
+    // Try to repair truncated JSON by finding the last complete object
+    const lastBrace = cleaned.lastIndexOf('},');
+    if (lastBrace > 0) {
+      try {
+        return JSON.parse(cleaned.slice(0, lastBrace + 1) + ']');
+      } catch { /* fall through */ }
+    }
+    // Try to extract complete objects via regex
+    const matches = cleaned.match(/\{"titleZh":"[^"]*","summaryZh":"[^"]*"\}/g) ?? [];
     if (matches.length > 0) {
       return matches.map((m) => {
         try { return JSON.parse(m); } catch { return { titleZh: "", summaryZh: "" }; }
