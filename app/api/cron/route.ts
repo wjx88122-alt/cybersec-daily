@@ -1,6 +1,5 @@
 import { kv } from "@vercel/kv";
 import { fetchFeedsA, fetchFeedsB } from "@/lib/fetchFeeds";
-import { generateDigest } from "@/lib/digest";
 import { FeedItem } from "@/lib/feeds";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -38,13 +37,9 @@ export async function GET(req: NextRequest) {
   const mergedA = mergeWithExisting(feedA, prevA ?? []);
   const mergedB = mergeWithExisting(feedB, prevB ?? []);
 
-  const digest = await generateDigest(mergedA);
-  console.log(`digest: ${Date.now() - t0}ms`);
-
   await Promise.all([
     kv.set("feed-a", mergedA),
     kv.set("feed-b", mergedB),
-    kv.set("digest", digest),
   ]);
   console.log(`done: ${Date.now() - t0}ms`);
 

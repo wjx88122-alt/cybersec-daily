@@ -19,7 +19,7 @@ export default function DigestPage() {
         if (data.error) throw new Error(data.error);
         setDigest(data);
       })
-      .catch(() => setError("摘要生成失败，请稍后重试"))
+      .catch((e) => setError(e.message || "摘要加载失败，请稍后重试"))
       .finally(() => setLoading(false));
   }, []);
 

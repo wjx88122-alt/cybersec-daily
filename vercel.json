@@ -2,12 +2,13 @@
   "crons": [
     { "path": "/api/cron", "schedule": "0 17 * * *" },
     { "path": "/api/translate", "schedule": "5 17 * * *" },
-    { "path": "/api/images", "schedule": "10 17 * * *" }
+    { "path": "/api/images", "schedule": "10 17 * * *" },
+    { "path": "/api/digest", "schedule": "15 17 * * *" }
   ],
   "functions": {
     "app/api/feed-a/route.ts": { "maxDuration": 10 },
     "app/api/feed-b/route.ts": { "maxDuration": 10 },
-    "app/api/digest/route.ts": { "maxDuration": 10 },
+    "app/api/digest/route.ts": { "maxDuration": 60 },
     "app/api/cron/route.ts": { "maxDuration": 60 },
     "app/api/translate/route.ts": { "maxDuration": 60 },
     "app/api/images/route.ts": { "maxDuration": 60 }
