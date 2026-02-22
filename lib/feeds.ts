@@ -107,6 +107,36 @@ export const FEED_SOURCES_A = [
     category: "综合资讯",
     description: "专注于网络犯罪、黑客攻击、数据泄露和隐私安全的新闻网站。",
   },
+  {
+    name: "Google Security Blog",
+    url: "https://security.googleblog.com/feeds/posts/default",
+    category: "综合资讯",
+    description: "Google 官方安全博客，发布 Google 产品安全研究、漏洞披露和行业安全动态。",
+  },
+  {
+    name: "The Daily Swig",
+    url: "https://portswigger.net/daily-swig/rss",
+    category: "综合资讯",
+    description: "PortSwigger 旗下网络安全新闻媒体，每日报道漏洞、数据泄露和安全研究。",
+  },
+  {
+    name: "Cyware",
+    url: "https://cyware.com/cybersecurity-news-articles/feed/",
+    category: "综合资讯",
+    description: "每日多篇发布全球网络安全新闻，覆盖威胁情报、漏洞和攻击事件。",
+  },
+  {
+    name: "Cloudflare Blog",
+    url: "https://blog.cloudflare.com/tag/security/rss/",
+    category: "深度分析",
+    description: "Cloudflare 安全团队发布的 DDoS 防护、零信任架构和网络威胁深度分析。",
+  },
+  {
+    name: "Fortinet Blog",
+    url: "https://www.fortinet.com/blog/rss.xml",
+    category: "威胁情报",
+    description: "Fortinet FortiGuard 实验室发布的威胁研究、恶意软件分析和安全趋势报告。",
+  },
 ];
 
 export const FEED_SOURCES_B = [
@@ -217,6 +247,36 @@ export const FEED_SOURCES_B = [
     url: "https://packetstormsecurity.com/headlines.xml",
     category: "漏洞预警",
     description: "每日发布最新漏洞利用、安全工具和安全公告的权威安全资源站。",
+  },
+  {
+    name: "SentinelOne Blog",
+    url: "https://www.sentinelone.com/blog/feed/",
+    category: "威胁情报",
+    description: "SentinelOne 威胁研究团队发布的 APT 分析、勒索软件追踪和端点安全研究。",
+  },
+  {
+    name: "Tenable Blog",
+    url: "https://www.tenable.com/blog/feed",
+    category: "漏洞预警",
+    description: "Tenable 安全研究团队发布的漏洞分析、CVE 深度解读和风险管理指南。",
+  },
+  {
+    name: "Red Canary Blog",
+    url: "https://redcanary.com/blog/feed/",
+    category: "威胁情报",
+    description: "Red Canary 威胁检测团队发布的攻击技术分析、ATT&CK 映射和事件响应报告。",
+  },
+  {
+    name: "Elastic Security Labs",
+    url: "https://www.elastic.co/security-labs/rss/feed.xml",
+    category: "威胁情报",
+    description: "Elastic 安全研究团队发布的恶意软件分析、威胁狩猎技术和检测规则研究。",
+  },
+  {
+    name: "Qualys Blog",
+    url: "https://blog.qualys.com/feed",
+    category: "漏洞预警",
+    description: "Qualys 安全研究团队发布的漏洞管理、云安全和合规性深度分析报告。",
   },
 ];
 

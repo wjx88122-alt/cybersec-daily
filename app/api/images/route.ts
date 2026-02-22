@@ -21,11 +21,16 @@ export async function GET(req: NextRequest) {
   }
 
   const allItems = [...feedA, ...feedB];
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
 
-  // Extract images for all items concurrently (4s timeout each)
-  const images = await Promise.all(allItems.map((item) => extractOgImage(item.link)));
+  // Only extract images for recent items (48h) that don't already have one
+  const toProcess = allItems
+    .map((item, idx) => ({ item, idx }))
+    .filter(({ item }) => !item.image && new Date(item.pubDate).getTime() >= cutoff);
+
+  const images = await Promise.all(toProcess.map(({ item }) => extractOgImage(item.link)));
   images.forEach((img, i) => {
-    if (img) allItems[i] = { ...allItems[i], image: img };
+    if (img) allItems[toProcess[i].idx] = { ...allItems[toProcess[i].idx], image: img };
   });
 
   const finalA = allItems.slice(0, feedA.length);
