@@ -51,8 +51,8 @@ export async function translateItems(
   items: FeedItem[]
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
   const input = items.map((item) => ({ title: item.title, summary: item.summary }));
-  const size = Math.ceil(input.length / 6);
-  const batches = Array.from({ length: 6 }, (_, i) => input.slice(i * size, (i + 1) * size)).filter(b => b.length > 0);
+  const size = Math.ceil(input.length / 3);
+  const batches = [input.slice(0, size), input.slice(size, size * 2), input.slice(size * 2)].filter(b => b.length > 0);
   const results = await Promise.all(batches.map(translateBatch));
   return results.flat();
 }

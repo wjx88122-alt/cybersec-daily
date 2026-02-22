@@ -21,11 +21,23 @@ export async function GET(req: NextRequest) {
   }
 
   const allItems = [...feedA, ...feedB];
+  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+
+  // Only translate items without existing translation and within 48h
+  const toTranslate = allItems.filter(
+    (i) => !i.titleZh && new Date(i.pubDate).getTime() >= cutoff
+  );
+
+  if (toTranslate.length === 0) {
+    return NextResponse.json({ ok: true, withZh: allItems.filter((i) => i.titleZh).length, skipped: true });
+  }
 
   try {
-    const translations = await translateItems(allItems);
-    translations.forEach((t, i) => {
-      if (t.titleZh) allItems[i] = { ...allItems[i], titleZh: t.titleZh, summaryZh: t.summaryZh };
+    const translations = await translateItems(toTranslate);
+    const translationMap = new Map(toTranslate.map((item, i) => [item.id, translations[i]]));
+    allItems.forEach((item, i) => {
+      const t = translationMap.get(item.id);
+      if (t?.titleZh) allItems[i] = { ...item, titleZh: t.titleZh, summaryZh: t.summaryZh };
     });
   } catch (e) {
     return NextResponse.json({ error: String(e) }, { status: 500 });
@@ -40,5 +52,5 @@ export async function GET(req: NextRequest) {
     kv.set("feed-b", finalB),
   ]);
 
-  return NextResponse.json({ ok: true, withZh });
+  return NextResponse.json({ ok: true, withZh, translated: toTranslate.length });
 }
