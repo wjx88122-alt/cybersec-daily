@@ -1,11 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { FeedItem } from "./feeds";
 
-// DeepSeek uses OpenAI-compatible API
-const client = new Anthropic({
-  apiKey: process.env.DEEPSEEK_API_KEY || "",
-  baseURL: "https://api.deepseek.com",
-});
+const client = new Anthropic();
 
 export type DigestItem = {
   headline: string;
@@ -39,9 +35,10 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
     day: "numeric",
   });
 
-  const response = await client.messages.create({
-    model: "deepseek-chat",
+  const stream = client.messages.stream({
+    model: "claude-opus-4-6",
     max_tokens: 4096,
+    thinking: { type: "adaptive" },
     system: `你是一位顶级网络安全分析师，负责为安全专业人员撰写每日简报。
 你的任务是从大量安全资讯中提炼出最重要、最值得关注的内容。
 要求：
@@ -77,7 +74,9 @@ ${articlesText}
     ],
   });
 
-  // Extract text block
+  const response = await stream.finalMessage();
+
+  // Extract text from response (skip thinking blocks)
   let jsonText = "";
   for (const block of response.content) {
     if (block.type === "text") {
