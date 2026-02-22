@@ -35,14 +35,16 @@ export async function GET(req: NextRequest) {
   ]);
 
   const allItems = [...enrichedA, ...enrichedB];
-  const translations = await translateItems(allItems);
+  const [translations, digest] = await Promise.all([
+    translateItems(allItems),
+    generateDigest(enrichedA),
+  ]);
   translations.forEach((t, i) => {
     if (t.titleZh) allItems[i] = { ...allItems[i], titleZh: t.titleZh, summaryZh: t.summaryZh };
   });
 
   const finalA = allItems.slice(0, enrichedA.length);
   const finalB = allItems.slice(enrichedA.length);
-  const digest = await generateDigest(finalA);
   const imagesFound = allItems.filter((item) => item.image).length;
 
   await Promise.all([
