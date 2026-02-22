@@ -1,6 +1,6 @@
 "use client";
 
-const CATEGORIES = ["全部", "综合", "深度分析", "漏洞预警"];
+const CATEGORIES = ["全部", "综合资讯", "深度分析", "漏洞预警", "威胁情报", "恶意软件", "政府/监管"];
 
 export default function CategoryFilter({
   active,
@@ -15,11 +15,12 @@ export default function CategoryFilter({
         <button
           key={cat}
           onClick={() => onChange(cat)}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium border transition-all duration-150 ${
+          className="px-3 py-1 rounded-full text-sm font-medium transition-all duration-150"
+          style={
             active === cat
-              ? "bg-blue-600 border-blue-500 text-white"
-              : "bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200"
-          }`}
+              ? { background: "#007aff", color: "#fff" }
+              : { background: "var(--label-bg)", color: "var(--secondary-text)" }
+          }
         >
           {cat}
         </button>

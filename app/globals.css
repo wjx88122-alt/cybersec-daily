@@ -1,26 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --background: #f2f2f7;
+  --foreground: #1c1c1e;
+  --card: rgba(255, 255, 255, 0.72);
+  --card-border: rgba(0, 0, 0, 0.08);
+  --nav-bg: rgba(242, 242, 247, 0.85);
+  --label-bg: rgba(0, 0, 0, 0.06);
+  --secondary-text: #6e6e73;
+  --separator: rgba(0, 0, 0, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1c1c1e;
+    --foreground: #f2f2f7;
+    --card: rgba(44, 44, 46, 0.72);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --nav-bg: rgba(28, 28, 30, 0.85);
+    --label-bg: rgba(255, 255, 255, 0.08);
+    --secondary-text: #98989d;
+    --separator: rgba(255, 255, 255, 0.1);
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
