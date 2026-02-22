@@ -46,22 +46,17 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#111]">
-      <header className="sticky top-0 z-10 bg-black border-b border-[#222]">
-        <div className="max-w-7xl mx-auto px-4 h-12 flex items-center justify-between">
-          <Link href="/">
-            <Image src="/logo.png" alt="网络安全日报" width={120} height={40} className="object-contain" />
+      <header className="sticky top-0 z-10 bg-[#111] border-b border-[#222]">
+        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <Image src="/logo.png" alt="网络安全日报" width={40} height={40} className="object-contain" />
+            <span className="text-white font-bold text-lg tracking-tight leading-none">网络安全日报</span>
           </Link>
-          <nav className="flex items-center">
-            <Link
-              href="/"
-              className="px-4 h-12 flex items-center text-sm font-semibold text-white border-b-2 border-[#e5ff00]"
-            >
+          <nav className="flex items-center h-full">
+            <Link href="/" className="px-4 h-full flex items-center text-sm font-semibold text-white border-b-2 border-[#e5ff00]">
               资讯
             </Link>
-            <Link
-              href="/digest"
-              className="px-4 h-12 flex items-center text-sm font-semibold text-[#888] hover:text-white transition-colors border-b-2 border-transparent"
-            >
+            <Link href="/digest" className="px-4 h-full flex items-center text-sm font-semibold text-[#888] hover:text-white transition-colors border-b-2 border-transparent hover:border-[#e5ff00]/40">
               简报
             </Link>
           </nav>
