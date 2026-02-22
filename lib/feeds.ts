@@ -114,28 +114,10 @@ export const FEED_SOURCES_A = [
     description: "Google 官方安全博客，发布 Google 产品安全研究、漏洞披露和行业安全动态。",
   },
   {
-    name: "The Daily Swig",
-    url: "https://portswigger.net/daily-swig/rss",
-    category: "综合资讯",
-    description: "PortSwigger 旗下网络安全新闻媒体，每日报道漏洞、数据泄露和安全研究。",
-  },
-  {
-    name: "Cyware",
-    url: "https://cyware.com/cybersecurity-news-articles/feed/",
-    category: "综合资讯",
-    description: "每日多篇发布全球网络安全新闻，覆盖威胁情报、漏洞和攻击事件。",
-  },
-  {
     name: "Cloudflare Blog",
     url: "https://blog.cloudflare.com/tag/security/rss/",
     category: "深度分析",
     description: "Cloudflare 安全团队发布的 DDoS 防护、零信任架构和网络威胁深度分析。",
-  },
-  {
-    name: "Fortinet Blog",
-    url: "https://www.fortinet.com/blog/rss.xml",
-    category: "威胁情报",
-    description: "Fortinet FortiGuard 实验室发布的威胁研究、恶意软件分析和安全趋势报告。",
   },
 ];
 
