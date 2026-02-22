@@ -54,25 +54,36 @@ export default function DigestPage() {
 
         {digest && (
           <>
-            {/* Overview */}
-            <div className="bg-[#1a1a1a] border-l-4 border-[#e5ff00] p-5 mb-6">
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-[11px] font-bold uppercase tracking-wide text-[#e5ff00]">
-                  威胁态势综述
-                </span>
+            {/* Overview — full-width editorial block */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#e5ff00]">威胁态势综述</span>
+                <span className="flex-1 h-px bg-[#222]" />
                 <span className="text-[11px] text-[#555]">{digest.date}</span>
               </div>
-              <p className="text-sm leading-relaxed text-[#ccc] whitespace-pre-line">{digest.overview}</p>
+              <div className="bg-[#161616] border border-[#2a2a2a] p-6">
+                <p className="text-base leading-8 text-[#ddd] font-light tracking-wide">{digest.overview}</p>
+              </div>
+              {/* Threat summary stats */}
+              <div className="grid grid-cols-3 border-x border-b border-[#2a2a2a]">
+                {[
+                  { label: "严重", count: digest.items.filter(i => i.importance === "critical").length, color: "text-red-400", bar: "bg-red-500" },
+                  { label: "高危", count: digest.items.filter(i => i.importance === "high").length, color: "text-orange-400", bar: "bg-orange-500" },
+                  { label: "中等", count: digest.items.filter(i => i.importance === "medium").length, color: "text-yellow-400", bar: "bg-yellow-500" },
+                ].map(({ label, count, color, bar }) => (
+                  <div key={label} className="flex flex-col items-center py-3 border-r border-[#2a2a2a] last:border-r-0">
+                    <span className={`text-2xl font-bold ${color}`}>{count}</span>
+                    <span className="text-[11px] text-[#555] mt-0.5">{label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            {/* Legend + count */}
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-[#555]">重点事件 · {digest.items.length} 条</p>
-              <div className="flex gap-4 text-xs text-[#555]">
-                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-red-500" />严重</span>
-                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-orange-500" />高危</span>
-                <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-yellow-500" />中等</span>
-              </div>
+            {/* Items */}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-[11px] font-bold uppercase tracking-widest text-[#555]">重点事件</span>
+              <span className="flex-1 h-px bg-[#222]" />
+              <span className="text-[11px] text-[#555]">{digest.items.length} 条</span>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
