@@ -33,18 +33,20 @@ ${JSON.stringify(items)}
     if (block.type === "text") { text = block.text.trim(); break; }
   }
   const cleaned = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+  // Replace Chinese curly quotes inside JSON strings with straight quotes
+  const sanitized = cleaned.replace(/[\u201c\u201d]/g, '\\"');
   try {
-    return JSON.parse(cleaned);
+    return JSON.parse(sanitized);
   } catch {
     // Try to repair truncated JSON by finding the last complete object
-    const lastBrace = cleaned.lastIndexOf('},');
+    const lastBrace = sanitized.lastIndexOf('},');
     if (lastBrace > 0) {
       try {
-        return JSON.parse(cleaned.slice(0, lastBrace + 1) + ']');
+        return JSON.parse(sanitized.slice(0, lastBrace + 1) + ']');
       } catch { /* fall through */ }
     }
     // Try to extract complete objects via regex
-    const matches = cleaned.match(/\{"titleZh":"[^"]*","summaryZh":"[^"]*"\}/g) ?? [];
+    const matches = sanitized.match(/\{"titleZh":"[^"]*","summaryZh":"[^"]*"\}/g) ?? [];
     if (matches.length > 0) {
       return matches.map((m) => {
         try { return JSON.parse(m); } catch { return { titleZh: "", summaryZh: "" }; }
