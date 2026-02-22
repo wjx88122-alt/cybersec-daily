@@ -1,7 +1,9 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { FeedItem } from "./feeds";
 
-const client = new Anthropic();
+const client = new Anthropic({
+  baseURL: "https://yunyi.rdzhvip.com/claude",
+});
 
 export type DigestItem = {
   headline: string;
