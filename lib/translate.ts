@@ -33,27 +33,32 @@ ${JSON.stringify(items)}
     if (block.type === "text") { text = block.text.trim(); break; }
   }
   const cleaned = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
-  // Replace Chinese curly quotes inside JSON strings with straight quotes
-  const sanitized = cleaned.replace(/[\u201c\u201d]/g, '\\"');
+  // First try standard JSON parse
   try {
-    return JSON.parse(sanitized);
-  } catch {
-    // Try to repair truncated JSON by finding the last complete object
-    const lastBrace = sanitized.lastIndexOf('},');
-    if (lastBrace > 0) {
-      try {
-        return JSON.parse(sanitized.slice(0, lastBrace + 1) + ']');
-      } catch { /* fall through */ }
+    return JSON.parse(cleaned);
+  } catch { /* fall through to tolerant extraction */ }
+  // Tolerant extraction: handles unescaped quotes inside string values
+  // by finding closing quote only when followed by , or }
+  function extractField(str: string, key: string): string {
+    const start = str.indexOf(`"${key}":`);
+    if (start === -1) return "";
+    const valueStart = str.indexOf('"', start + key.length + 3) + 1;
+    let i = valueStart;
+    while (i < str.length) {
+      if (str[i] === '"' && (str[i + 1] === ',' || str[i + 1] === '}')) return str.slice(valueStart, i);
+      i++;
     }
-    // Try to extract complete objects via regex
-    const matches = sanitized.match(/\{"titleZh":"[^"]*","summaryZh":"[^"]*"\}/g) ?? [];
-    if (matches.length > 0) {
-      return matches.map((m) => {
-        try { return JSON.parse(m); } catch { return { titleZh: "", summaryZh: "" }; }
-      });
-    }
-    throw new Error(`JSON parse failed. Raw[0:200]: ${text.slice(0, 200)}`);
+    return "";
   }
+  // Split on object boundaries
+  const objects = cleaned.match(/\{[^[\]]*?\}/g) ?? [];
+  if (objects.length > 0) {
+    return objects.map((obj) => ({
+      titleZh: extractField(obj, "titleZh"),
+      summaryZh: extractField(obj, "summaryZh"),
+    }));
+  }
+  throw new Error(`JSON parse failed. Raw[0:200]: ${text.slice(0, 200)}`);
 }
 
 export async function translateItems(
