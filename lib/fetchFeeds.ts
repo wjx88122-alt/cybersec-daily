@@ -13,7 +13,7 @@ async function fetchSources(sources: Source[]): Promise<FeedItem[]> {
   const results = await Promise.allSettled(
     sources.map(async (source) => {
       const feed = await parser.parseURL(source.url);
-      return (feed.items || []).slice(0, 10).map((item) => ({
+      return (feed.items || []).slice(0, 20).map((item) => ({
         id: crypto
           .createHash("sha256")
           .update(item.link || item.title || "")
