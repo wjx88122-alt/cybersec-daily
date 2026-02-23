@@ -23,7 +23,7 @@ export async function summarizeItems(
 
   try {
     const stream = client.messages.stream({
-      model: "claude-haiku-4-5",
+      model: "claude-opus-4-6",
       max_tokens: 3000,
       system: `你是网络安全新闻编辑，为每篇文章生成简洁的中文摘要。
 摘要要求：

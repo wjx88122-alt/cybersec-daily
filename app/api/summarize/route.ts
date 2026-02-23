@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
   );
 
   // Process in batches of 10
-  const BATCH_SIZE = 10;
+  const BATCH_SIZE = 5;
   let summarized = 0;
 
   for (let i = 0; i < toProcess.length; i += BATCH_SIZE) {
