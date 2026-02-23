@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FeedItem } from "@/lib/feeds";
+import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
 import NewsCard from "@/components/NewsCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import Link from "next/link";
@@ -33,7 +33,7 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const cutoff = Date.now() - CUTOFF_MS;
   const filtered = items.filter((item) => {
     const t = new Date(item.pubDate).getTime();
     const matchTime = !isNaN(t) && t >= cutoff;

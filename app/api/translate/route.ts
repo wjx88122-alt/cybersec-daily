@@ -1,6 +1,6 @@
 import { kv } from "@vercel/kv";
 import { translateItems } from "@/lib/translate";
-import { FeedItem } from "@/lib/feeds";
+import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   }
 
   const allItems = [...feedA, ...feedB];
-  const cutoff = Date.now() - 48 * 60 * 60 * 1000;
+  const cutoff = Date.now() - CUTOFF_MS;
 
   // Only translate items without existing translation and within 48h
   const toTranslate = allItems.filter(

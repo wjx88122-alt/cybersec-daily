@@ -13,7 +13,7 @@ export async function GET() {
 
     const items = [...(feedA ?? []), ...(feedB ?? [])];
     return NextResponse.json({ items, updatedAt: new Date().toISOString() });
-  } catch (e) {
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch feeds" },
       { status: 500 },
