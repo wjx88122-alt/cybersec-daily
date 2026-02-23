@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
   ]);
 
   if (!feedA || !feedB) {
-    return NextResponse.json({ error: "No feed data, run cron first" }, { status: 400 });
+    return NextResponse.json(
+      { error: "No feed data, run cron first" },
+      { status: 400 },
+    );
   }
 
   const allItems = [...feedA, ...feedB];
@@ -26,21 +29,23 @@ export async function GET(req: NextRequest) {
   // Only extract images for recent items (48h) that don't already have one
   const toProcess = allItems
     .map((item, idx) => ({ item, idx }))
-    .filter(({ item }) => !item.image && new Date(item.pubDate).getTime() >= cutoff);
+    .filter(
+      ({ item }) => !item.image && new Date(item.pubDate).getTime() >= cutoff,
+    );
 
-  const images = await Promise.all(toProcess.map(({ item }) => extractOgImage(item.link)));
-  images.forEach((img, i) => {
-    if (img) allItems[toProcess[i].idx] = { ...allItems[toProcess[i].idx], image: img };
+  const images = await Promise.all(
+    toProcess.map(({ item }) => extractOgImage(item.link)),
+  );
+  const updatedItems = allItems.map((item, idx) => {
+    const pos = toProcess.findIndex((p) => p.idx === idx);
+    return pos !== -1 && images[pos] ? { ...item, image: images[pos] } : item;
   });
 
-  const finalA = allItems.slice(0, feedA.length);
-  const finalB = allItems.slice(feedA.length);
-  const imagesFound = allItems.filter((i) => i.image).length;
+  const finalA = updatedItems.slice(0, feedA.length);
+  const finalB = updatedItems.slice(feedA.length);
+  const imagesFound = updatedItems.filter((i) => i.image).length;
 
-  await Promise.all([
-    kv.set("feed-a", finalA),
-    kv.set("feed-b", finalB),
-  ]);
+  await Promise.all([kv.set("feed-a", finalA), kv.set("feed-b", finalB)]);
 
   return NextResponse.json({ ok: true, imagesFound });
 }

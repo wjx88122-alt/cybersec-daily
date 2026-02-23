@@ -27,7 +27,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   const articlesText = recent
     .map(
       (item, i) =>
-        `[${i + 1}] ${item.source}: ${item.title} — ${item.summary.slice(0, 100)} | ${item.link}`
+        `[${i + 1}] ${item.source}: ${item.title} — ${item.summary.slice(0, 100)} | ${item.link}`,
     )
     .join("\n");
 
@@ -37,6 +37,8 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
     day: "numeric",
   });
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 50000);
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
     max_tokens: 4000,
@@ -85,6 +87,7 @@ ${articlesText}
   });
 
   const response = await stream.finalMessage();
+  clearTimeout(timeout);
 
   // Extract text from response (skip thinking blocks)
   let jsonText = "";
@@ -96,20 +99,27 @@ ${articlesText}
   }
 
   // Strip markdown code fences if present
-  jsonText = jsonText.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+  jsonText = jsonText
+    .replace(/^```json\s*/i, "")
+    .replace(/```\s*$/, "")
+    .trim();
 
   // First try standard JSON parse
   try {
     return JSON.parse(jsonText) as DailyDigest;
-  } catch { /* fall through to repair */ }
+  } catch {
+    /* fall through to repair */
+  }
 
   // Repair: find last complete item object and close the array
-  const lastItem = jsonText.lastIndexOf('},');
+  const lastItem = jsonText.lastIndexOf("},");
   if (lastItem > 0) {
     try {
-      const repaired = jsonText.slice(0, lastItem + 1) + ']}';
+      const repaired = jsonText.slice(0, lastItem + 1) + "]}";
       return JSON.parse(repaired) as DailyDigest;
-    } catch { /* fall through */ }
+    } catch {
+      /* fall through */
+    }
   }
 
   // Last resort fallback

@@ -22,7 +22,11 @@ export default function Home() {
     ])
       .then(([dataA, dataB]) => {
         const all = [...(dataA.items || []), ...(dataB.items || [])];
-        all.sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+        all.sort((a, b) => {
+          const ta = new Date(a.pubDate).getTime();
+          const tb = new Date(b.pubDate).getTime();
+          return (isNaN(tb) ? 0 : tb) - (isNaN(ta) ? 0 : ta);
+        });
         setItems(all);
       })
       .catch(() => setError("加载失败，请稍后刷新重试"))
@@ -31,7 +35,8 @@ export default function Home() {
 
   const cutoff = Date.now() - 48 * 60 * 60 * 1000;
   const filtered = items.filter((item) => {
-    const matchTime = new Date(item.pubDate).getTime() >= cutoff;
+    const t = new Date(item.pubDate).getTime();
+    const matchTime = !isNaN(t) && t >= cutoff;
     const matchCat = category === "全部" || item.category === category;
     const matchSearch =
       !search ||
@@ -49,14 +54,28 @@ export default function Home() {
       <header className="sticky top-0 z-10 bg-[#111] border-b border-[#222]">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/logo.png" alt="网络安全日报" width={40} height={40} className="object-contain" />
-            <span className="text-white font-bold text-lg tracking-tight leading-none">网络安全日报</span>
+            <Image
+              src="/logo.png"
+              alt="网络安全日报"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
+            <span className="text-white font-bold text-lg tracking-tight leading-none">
+              网络安全日报
+            </span>
           </Link>
           <nav className="flex items-center h-full">
-            <Link href="/" className="px-4 h-full flex items-center text-sm font-semibold text-white border-b-2 border-[#e5ff00]">
+            <Link
+              href="/"
+              className="px-4 h-full flex items-center text-sm font-semibold text-white border-b-2 border-[#e5ff00]"
+            >
               资讯
             </Link>
-            <Link href="/digest" className="px-4 h-full flex items-center text-sm font-semibold text-[#888] hover:text-white transition-colors border-b-2 border-transparent hover:border-[#e5ff00]/40">
+            <Link
+              href="/digest"
+              className="px-4 h-full flex items-center text-sm font-semibold text-[#888] hover:text-white transition-colors border-b-2 border-transparent hover:border-[#e5ff00]/40"
+            >
               简报
             </Link>
           </nav>
@@ -85,15 +104,21 @@ export default function Home() {
           </div>
         )}
 
-        {error && <div className="text-center py-32 text-red-500 text-sm">{error}</div>}
+        {error && (
+          <div className="text-center py-32 text-red-500 text-sm">{error}</div>
+        )}
 
         {!loading && !error && filtered.length === 0 && (
-          <div className="text-center py-32 text-sm text-[#666]">近 48 小时暂无新增资讯</div>
+          <div className="text-center py-32 text-sm text-[#666]">
+            近 48 小时暂无新增资讯
+          </div>
         )}
 
         {!loading && !error && filtered.length > 0 && (
           <>
-            <p className="text-xs mb-4 text-[#555]">近 48 小时新增 {filtered.length} 条</p>
+            <p className="text-xs mb-4 text-[#555]">
+              近 48 小时新增 {filtered.length} 条
+            </p>
             {hero && (
               <div className="mb-6">
                 <NewsCard item={hero} hero />

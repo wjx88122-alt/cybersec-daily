@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
 const client = new Anthropic({
@@ -6,8 +7,10 @@ const client = new Anthropic({
 });
 
 async function translateBatch(
-  items: { title: string; summary: string }[]
+  items: { title: string; summary: string }[],
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 50000);
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
     max_tokens: 16000,
@@ -28,45 +31,39 @@ ${JSON.stringify(items)}
   });
 
   const response = await stream.finalMessage();
+  clearTimeout(timeout);
   let text = "";
   for (const block of response.content) {
-    if (block.type === "text") { text = block.text.trim(); break; }
+    if (block.type === "text") {
+      text = block.text.trim();
+      break;
+    }
   }
-  const cleaned = text.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+  const cleaned = text
+    .replace(/^```json\s*/i, "")
+    .replace(/```\s*$/, "")
+    .trim();
   // First try standard JSON parse
   try {
     return JSON.parse(cleaned);
-  } catch { /* fall through to tolerant extraction */ }
-  // Tolerant extraction: handles unescaped quotes inside string values
-  // by finding closing quote only when followed by , or }
-  function extractField(str: string, key: string): string {
-    const start = str.indexOf(`"${key}":`);
-    if (start === -1) return "";
-    const valueStart = str.indexOf('"', start + key.length + 3) + 1;
-    let i = valueStart;
-    while (i < str.length) {
-      if (str[i] === '"' && (str[i + 1] === ',' || str[i + 1] === '}')) return str.slice(valueStart, i);
-      i++;
-    }
-    return "";
+  } catch {
+    return JSON.parse(jsonrepair(cleaned));
   }
-  // Split on object boundaries
-  const objects = cleaned.match(/\{[^[\]]*?\}/g) ?? [];
-  if (objects.length > 0) {
-    return objects.map((obj) => ({
-      titleZh: extractField(obj, "titleZh"),
-      summaryZh: extractField(obj, "summaryZh"),
-    }));
-  }
-  throw new Error(`JSON parse failed. Raw[0:200]: ${text.slice(0, 200)}`);
 }
 
 export async function translateItems(
-  items: FeedItem[]
+  items: FeedItem[],
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
-  const input = items.map((item) => ({ title: item.title, summary: item.summary }));
+  const input = items.map((item) => ({
+    title: item.title,
+    summary: item.summary,
+  }));
   const size = Math.ceil(input.length / 3);
-  const batches = [input.slice(0, size), input.slice(size, size * 2), input.slice(size * 2)].filter(b => b.length > 0);
+  const batches = [
+    input.slice(0, size),
+    input.slice(size, size * 2),
+    input.slice(size * 2),
+  ].filter((b) => b.length > 0);
   const results = await Promise.all(batches.map(translateBatch));
   return results.flat();
 }
