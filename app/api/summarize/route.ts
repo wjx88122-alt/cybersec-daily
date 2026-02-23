@@ -27,13 +27,14 @@ export async function GET(req: NextRequest) {
   const allItems = [...feedA, ...feedB];
   const cutoff = Date.now() - CUTOFF_MS;
 
-  // Only process recent items without an AI summary
+  // Only process recent items without an AI summary, cap at 50 per run
   const toProcess = allItems
     .map((item, idx) => ({ item, idx }))
     .filter(
       ({ item }) =>
         !item.summaryAi && new Date(item.pubDate).getTime() >= cutoff,
-    );
+    )
+    .slice(0, 50);
 
   if (toProcess.length === 0) {
     return NextResponse.json({

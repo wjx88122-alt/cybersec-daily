@@ -20,6 +20,7 @@ function mergeWithExisting(
       image: prev.image || item.image,
       titleZh: prev.titleZh || item.titleZh,
       summaryZh: prev.summaryZh || item.summaryZh,
+      summaryAi: prev.summaryAi || item.summaryAi,
     };
   });
 }

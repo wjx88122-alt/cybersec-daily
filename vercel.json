@@ -11,7 +11,7 @@
     "app/api/feed-b/route.ts": { "maxDuration": 10 },
     "app/api/digest/route.ts": { "maxDuration": 300 },
     "app/api/cron/route.ts": { "maxDuration": 60 },
-    "app/api/translate/route.ts": { "maxDuration": 60 },
+    "app/api/translate/route.ts": { "maxDuration": 300 },
     "app/api/images/route.ts": { "maxDuration": 60 },
     "app/api/summarize/route.ts": { "maxDuration": 300 }
   }
