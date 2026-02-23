@@ -68,7 +68,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   const timeout = setTimeout(() => controller.abort(), 240000);
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
-    max_tokens: 6000,
+    max_tokens: 8000,
     system: `你是一位顶级网络安全分析师，为企业安全团队撰写每日威胁简报。
 你的读者是 CISO 和高级安全工程师，他们需要快速掌握：今天各个安全领域发生了什么、整体威胁态势如何、是否需要立即行动。
 
@@ -142,6 +142,7 @@ ${articlesText}
   try {
     return JSON.parse(jsonrepair(jsonText)) as DailyDigest;
   } catch {
+    console.error("DIGEST JSON PARSE FAILED, raw:", jsonText.slice(0, 500));
     /* fall through to fallback */
   }
 
