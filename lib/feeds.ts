@@ -413,4 +413,5 @@ export type FeedItem = {
   image?: string;
   titleZh?: string;
   summaryZh?: string;
+  summaryAi?: string;
 };

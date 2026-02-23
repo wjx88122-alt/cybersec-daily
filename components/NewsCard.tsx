@@ -24,24 +24,41 @@ const CATEGORY_ACCENT: Record<string, string> = {
 };
 
 const CATEGORY_ICON: Record<string, string> = {
-  综合资讯: "🌐", 深度分析: "🔍", 漏洞预警: "⚠️", 威胁情报: "🎯", 恶意软件: "🦠", "政府/监管": "🏛️",
+  综合资讯: "🌐",
+  深度分析: "🔍",
+  漏洞预警: "⚠️",
+  威胁情报: "🎯",
+  恶意软件: "🦠",
+  "政府/监管": "🏛️",
 };
 
-export default function NewsCard({ item, hero = false }: { item: FeedItem; hero?: boolean }) {
+export default function NewsCard({
+  item,
+  hero = false,
+}: {
+  item: FeedItem;
+  hero?: boolean;
+}) {
   const [imgError, setImgError] = useState(false);
 
   let timeAgo = "";
   try {
-    timeAgo = formatDistanceToNow(new Date(item.pubDate), { addSuffix: true, locale: zhCN });
+    timeAgo = formatDistanceToNow(new Date(item.pubDate), {
+      addSuffix: true,
+      locale: zhCN,
+    });
   } catch {
     timeAgo = item.pubDate;
   }
 
   const title = item.titleZh || item.title;
-  const summary = item.summaryZh || item.summary;
+  const summary = item.summaryAi || item.summaryZh || item.summary;
   const imgSrc = !imgError && item.image ? item.image : null;
-  const catAccent = CATEGORY_ACCENT[item.category] ?? "bg-white/10 text-white/60 border-white/10";
-  const catGradient = CATEGORY_GRADIENT[item.category] ?? "from-gray-900 to-gray-800";
+  const catAccent =
+    CATEGORY_ACCENT[item.category] ??
+    "bg-white/10 text-white/60 border-white/10";
+  const catGradient =
+    CATEGORY_GRADIENT[item.category] ?? "from-gray-900 to-gray-800";
 
   return (
     <a
@@ -51,7 +68,9 @@ export default function NewsCard({ item, hero = false }: { item: FeedItem; hero?
       className="group block rounded-xl overflow-hidden border border-white/[0.06] bg-[#0d1117] hover:border-white/[0.12] hover:bg-[#111820] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40"
     >
       {/* Image / Placeholder */}
-      <div className={`relative overflow-hidden ${hero ? "aspect-[16/7]" : "aspect-[16/9]"}`}>
+      <div
+        className={`relative overflow-hidden ${hero ? "aspect-[16/7]" : "aspect-[16/9]"}`}
+      >
         {imgSrc ? (
           <img
             src={imgSrc}
@@ -60,30 +79,44 @@ export default function NewsCard({ item, hero = false }: { item: FeedItem; hero?
             onError={() => setImgError(true)}
           />
         ) : (
-          <div className={`w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br ${catGradient}`}>
-            <span className="text-4xl opacity-60">{CATEGORY_ICON[item.category] ?? "📰"}</span>
-            <span className="text-xs text-white/30 font-medium tracking-wide">{item.source}</span>
+          <div
+            className={`w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br ${catGradient}`}
+          >
+            <span className="text-4xl opacity-60">
+              {CATEGORY_ICON[item.category] ?? "📰"}
+            </span>
+            <span className="text-xs text-white/30 font-medium tracking-wide">
+              {item.source}
+            </span>
           </div>
         )}
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         {/* Category badge */}
-        <span className={`absolute bottom-2.5 left-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${catAccent} backdrop-blur-sm`}>
+        <span
+          className={`absolute bottom-2.5 left-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${catAccent} backdrop-blur-sm`}
+        >
           {item.category}
         </span>
       </div>
 
       {/* Content */}
       <div className="p-4">
-        <h2 className={`font-semibold leading-snug mb-2 line-clamp-2 text-[#f0f6fc] group-hover:text-white transition-colors ${hero ? "text-xl" : "text-[14px]"}`}>
+        <h2
+          className={`font-semibold leading-snug mb-2 line-clamp-2 text-[#f0f6fc] group-hover:text-white transition-colors ${hero ? "text-xl" : "text-[14px]"}`}
+        >
           {title}
         </h2>
         {summary && (
-          <p className="text-[13px] leading-relaxed line-clamp-2 text-[#8b949e]">{summary}</p>
+          <p className="text-[13px] leading-relaxed line-clamp-4 text-[#8b949e]">
+            {summary}
+          </p>
         )}
         <div className="flex items-center gap-2 mt-3 text-[11px] text-[#484f58]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#e5ff00]/40 shrink-0" />
-          <span className="truncate font-medium text-[#6e7681]">{item.source}</span>
+          <span className="truncate font-medium text-[#6e7681]">
+            {item.source}
+          </span>
           <span className="shrink-0 ml-auto">{timeAgo}</span>
         </div>
       </div>
