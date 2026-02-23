@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { kv } from "@/lib/kv";
 import { generateDigest, DailyDigest } from "@/lib/digest";
 import { FeedItem } from "@/lib/feeds";
 import { NextRequest, NextResponse } from "next/server";

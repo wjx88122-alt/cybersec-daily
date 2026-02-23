@@ -1,4 +1,4 @@
-import { kv } from "@vercel/kv";
+import { kv } from "@/lib/kv";
 import { FeedItem } from "@/lib/feeds";
 import { NextResponse } from "next/server";
 
