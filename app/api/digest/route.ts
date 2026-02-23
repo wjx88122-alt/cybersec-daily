@@ -3,7 +3,7 @@ import { generateDigest, DailyDigest } from "@/lib/digest";
 import { FeedItem } from "@/lib/feeds";
 import { NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization");

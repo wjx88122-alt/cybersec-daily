@@ -64,7 +64,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   });
 
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 50000);
+  const timeout = setTimeout(() => controller.abort(), 240000);
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
     max_tokens: 6000,
