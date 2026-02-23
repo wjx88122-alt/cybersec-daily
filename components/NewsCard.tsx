@@ -5,13 +5,22 @@ import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useState } from "react";
 
-const CATEGORY_BG: Record<string, string> = {
-  综合资讯: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
-  深度分析: "linear-gradient(135deg, #1a0a2e 0%, #2d1b69 100%)",
-  漏洞预警: "linear-gradient(135deg, #2e0a0a 0%, #6b1a1a 100%)",
-  威胁情报: "linear-gradient(135deg, #2e1a0a 0%, #6b3a1a 100%)",
-  恶意软件: "linear-gradient(135deg, #2e0a1a 0%, #6b1a3a 100%)",
-  "政府/监管": "linear-gradient(135deg, #0a2e0a 0%, #1a4a1a 100%)",
+const CATEGORY_GRADIENT: Record<string, string> = {
+  综合资讯: "from-blue-950 to-blue-900",
+  深度分析: "from-purple-950 to-purple-900",
+  漏洞预警: "from-red-950 to-red-900",
+  威胁情报: "from-orange-950 to-orange-900",
+  恶意软件: "from-pink-950 to-pink-900",
+  "政府/监管": "from-green-950 to-green-900",
+};
+
+const CATEGORY_ACCENT: Record<string, string> = {
+  综合资讯: "bg-blue-500/20 text-blue-300 border-blue-500/30",
+  深度分析: "bg-purple-500/20 text-purple-300 border-purple-500/30",
+  漏洞预警: "bg-red-500/20 text-red-300 border-red-500/30",
+  威胁情报: "bg-orange-500/20 text-orange-300 border-orange-500/30",
+  恶意软件: "bg-pink-500/20 text-pink-300 border-pink-500/30",
+  "政府/监管": "bg-green-500/20 text-green-300 border-green-500/30",
 };
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -31,50 +40,51 @@ export default function NewsCard({ item, hero = false }: { item: FeedItem; hero?
   const title = item.titleZh || item.title;
   const summary = item.summaryZh || item.summary;
   const imgSrc = !imgError && item.image ? item.image : null;
+  const catAccent = CATEGORY_ACCENT[item.category] ?? "bg-white/10 text-white/60 border-white/10";
+  const catGradient = CATEGORY_GRADIENT[item.category] ?? "from-gray-900 to-gray-800";
 
   return (
     <a
       href={item.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="block group overflow-hidden bg-[#1a1a1a] hover:bg-[#222] transition-colors"
+      className="group block rounded-xl overflow-hidden border border-white/[0.06] bg-[#0d1117] hover:border-white/[0.12] hover:bg-[#111820] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40"
     >
-      <div className={`relative overflow-hidden bg-[#222] ${hero ? "aspect-[16/7]" : "aspect-[16/9]"}`}>
+      {/* Image / Placeholder */}
+      <div className={`relative overflow-hidden ${hero ? "aspect-[16/7]" : "aspect-[16/9]"}`}>
         {imgSrc ? (
           <img
             src={imgSrc}
             alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
             onError={() => setImgError(true)}
           />
         ) : (
-          <div
-            className="w-full h-full flex flex-col items-center justify-center gap-2"
-            style={{ background: CATEGORY_BG[item.category] ?? "linear-gradient(135deg, #1a1a1a 0%, #333 100%)" }}
-          >
-            <span className="text-4xl">{CATEGORY_ICON[item.category] ?? "📰"}</span>
-            <span className="text-xs text-[#666] font-medium">{item.source}</span>
+          <div className={`w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br ${catGradient}`}>
+            <span className="text-4xl opacity-60">{CATEGORY_ICON[item.category] ?? "📰"}</span>
+            <span className="text-xs text-white/30 font-medium tracking-wide">{item.source}</span>
           </div>
         )}
-        <span
-          className="absolute bottom-2 left-2 text-[11px] font-bold px-2 py-0.5 uppercase tracking-wide"
-          style={{ background: "#e5ff00", color: "#000" }}
-        >
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+        {/* Category badge */}
+        <span className={`absolute bottom-2.5 left-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${catAccent} backdrop-blur-sm`}>
           {item.category}
         </span>
       </div>
 
-      <div className="p-3">
-        <h2 className={`font-bold leading-snug mb-1.5 line-clamp-2 text-white ${hero ? "text-xl" : "text-[15px]"}`}>
+      {/* Content */}
+      <div className="p-4">
+        <h2 className={`font-semibold leading-snug mb-2 line-clamp-2 text-[#f0f6fc] group-hover:text-white transition-colors ${hero ? "text-xl" : "text-[14px]"}`}>
           {title}
         </h2>
         {summary && (
-          <p className="text-sm leading-relaxed line-clamp-2 text-[#999]">{summary}</p>
+          <p className="text-[13px] leading-relaxed line-clamp-2 text-[#8b949e]">{summary}</p>
         )}
-        <div className="flex items-center gap-2 mt-2 text-xs text-[#666]">
-          <span className="truncate">{item.source}</span>
-          <span>·</span>
-          <span className="shrink-0">{timeAgo}</span>
+        <div className="flex items-center gap-2 mt-3 text-[11px] text-[#484f58]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#e5ff00]/40 shrink-0" />
+          <span className="truncate font-medium text-[#6e7681]">{item.source}</span>
+          <span className="shrink-0 ml-auto">{timeAgo}</span>
         </div>
       </div>
     </a>
