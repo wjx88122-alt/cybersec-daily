@@ -6,6 +6,13 @@ import DigestCard from "@/components/DigestCard";
 import Link from "next/link";
 import Image from "next/image";
 
+const IMPORTANCE_ORDER = ["critical", "high", "medium"] as const;
+const SECTION_CONFIG = {
+  critical: { label: "严重威胁", dot: "bg-red-500", text: "text-red-400" },
+  high: { label: "高危事件", dot: "bg-orange-500", text: "text-orange-400" },
+  medium: { label: "中等风险", dot: "bg-yellow-500", text: "text-yellow-400" },
+};
+
 export default function DigestPage() {
   const [digest, setDigest] = useState<DailyDigest | null>(null);
   const [loading, setLoading] = useState(true);
@@ -22,31 +29,60 @@ export default function DigestPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const critical = digest?.items.filter((i) => i.importance === "critical").length ?? 0;
-  const high = digest?.items.filter((i) => i.importance === "high").length ?? 0;
-  const medium = digest?.items.filter((i) => i.importance === "medium").length ?? 0;
+  const grouped = digest
+    ? {
+        critical: digest.items.filter((i) => i.importance === "critical"),
+        high: digest.items.filter((i) => i.importance === "high"),
+        medium: digest.items.filter((i) => i.importance === "medium"),
+      }
+    : null;
+
+  const critical = grouped?.critical.length ?? 0;
+  const high = grouped?.high.length ?? 0;
+  const medium = grouped?.medium.length ?? 0;
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-white/[0.06]" style={{ background: "rgba(8,12,20,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}>
-        <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
+      <header
+        className="sticky top-0 z-10 border-b border-white/[0.06]"
+        style={{
+          background: "rgba(8,12,20,0.85)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+        }}
+      >
+        <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5">
-            <Image src="/logo.png" alt="网络安全日报" width={32} height={32} className="object-contain" />
-            <span className="text-white font-bold text-base tracking-tight">网络安全日报</span>
+            <Image
+              src="/logo.png"
+              alt="网络安全日报"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
+            <span className="text-white font-bold text-base tracking-tight">
+              网络安全日报
+            </span>
           </Link>
           <nav className="flex items-center gap-1">
-            <Link href="/" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[#8b949e] hover:text-white hover:bg-white/[0.05] transition-all">
+            <Link
+              href="/"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-[#8b949e] hover:text-white hover:bg-white/[0.05] transition-all"
+            >
               资讯
             </Link>
-            <Link href="/digest" className="px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-white/[0.08] border border-white/[0.1]">
+            <Link
+              href="/digest"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-white/[0.08] border border-white/[0.1]"
+            >
               简报
             </Link>
           </nav>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-5xl mx-auto px-4 py-8">
         {/* Loading */}
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
@@ -54,7 +90,9 @@ export default function DigestPage() {
               <div className="absolute inset-0 rounded-full border-2 border-[#e5ff00]/20" />
               <div className="absolute inset-0 rounded-full border-2 border-[#e5ff00] border-t-transparent animate-spin" />
             </div>
-            <p className="text-sm text-[#484f58]">AI 正在深度分析今日安全态势...</p>
+            <p className="text-sm text-[#484f58]">
+              AI 正在深度分析今日安全态势...
+            </p>
           </div>
         )}
 
@@ -65,34 +103,62 @@ export default function DigestPage() {
           </div>
         )}
 
-        {digest && (
+        {digest && grouped && (
           <>
-            {/* Overview block */}
-            <div className="mb-8">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#e5ff00]">威胁态势综述</span>
-                <span className="flex-1 h-px bg-white/[0.06]" />
-                <span className="text-[11px] text-[#484f58]">{digest.date}</span>
+            {/* Page title */}
+            <div className="mb-6">
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#e5ff00]">
+                  每日威胁简报
+                </span>
+                <span className="text-[11px] text-[#484f58]">
+                  {digest.date}
+                </span>
               </div>
+              <h1 className="text-2xl font-bold text-white tracking-tight">
+                今日安全态势综述
+              </h1>
+            </div>
 
-              {/* Overview text */}
-              <div className="rounded-xl border border-white/[0.06] bg-[#0d1117] p-6 mb-px">
-                <p className="text-[15px] leading-8 text-[#c9d1d9] font-light tracking-wide">
+            {/* Overview + stats */}
+            <div className="rounded-xl border border-white/[0.06] bg-[#0d1117] overflow-hidden mb-8">
+              <div className="p-6">
+                <p className="text-[14px] leading-8 text-[#c9d1d9] font-light">
                   {digest.overview}
                 </p>
               </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-3 rounded-b-xl overflow-hidden border border-t-0 border-white/[0.06]">
+              <div className="grid grid-cols-3 border-t border-white/[0.06]">
                 {[
-                  { label: "严重", count: critical, color: "text-red-400", dot: "bg-red-500" },
-                  { label: "高危", count: high, color: "text-orange-400", dot: "bg-orange-500" },
-                  { label: "中等", count: medium, color: "text-yellow-400", dot: "bg-yellow-500" },
+                  {
+                    label: "严重",
+                    count: critical,
+                    color: "text-red-400",
+                    dot: "bg-red-500",
+                  },
+                  {
+                    label: "高危",
+                    count: high,
+                    color: "text-orange-400",
+                    dot: "bg-orange-500",
+                  },
+                  {
+                    label: "中等",
+                    count: medium,
+                    color: "text-yellow-400",
+                    dot: "bg-yellow-500",
+                  },
                 ].map(({ label, count, color, dot }, i) => (
-                  <div key={label} className={`flex flex-col items-center py-4 gap-1 bg-white/[0.02] ${i < 2 ? "border-r border-white/[0.06]" : ""}`}>
+                  <div
+                    key={label}
+                    className={`flex flex-col items-center py-4 gap-1 bg-white/[0.02] ${i < 2 ? "border-r border-white/[0.06]" : ""}`}
+                  >
                     <div className="flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${dot}`} />
-                      <span className={`text-2xl font-bold tabular-nums ${color}`}>{count}</span>
+                      <span
+                        className={`text-2xl font-bold tabular-nums ${color}`}
+                      >
+                        {count}
+                      </span>
                     </div>
                     <span className="text-[11px] text-[#484f58]">{label}</span>
                   </div>
@@ -100,22 +166,54 @@ export default function DigestPage() {
               </div>
             </div>
 
-            {/* Items header */}
-            <div className="flex items-center gap-3 mb-4">
-              <span className="text-[11px] font-bold uppercase tracking-widest text-[#484f58]">重点事件</span>
-              <span className="flex-1 h-px bg-white/[0.06]" />
-              <span className="text-[11px] text-[#484f58]">{digest.items.length} 条</span>
-            </div>
+            {/* Grouped sections */}
+            {IMPORTANCE_ORDER.map((level) => {
+              const items = grouped[level];
+              if (items.length === 0) return null;
+              const sec = SECTION_CONFIG[level];
+              const isCritical = level === "critical";
 
-            {/* Items grid */}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {digest.items.map((item) => (
-                <DigestCard key={item.sourceLink || item.headline} item={item} />
-              ))}
-            </div>
+              return (
+                <section key={level} className="mb-8">
+                  {/* Section header */}
+                  <div className="flex items-center gap-2.5 mb-4">
+                    <span className={`w-2 h-2 rounded-full ${sec.dot}`} />
+                    <span
+                      className={`text-[11px] font-bold uppercase tracking-widest ${sec.text}`}
+                    >
+                      {sec.label}
+                    </span>
+                    <span className="flex-1 h-px bg-white/[0.06]" />
+                    <span className="text-[11px] text-[#484f58]">
+                      {items.length} 条
+                    </span>
+                  </div>
 
-            <div className="mt-10 text-center">
-              <Link href="/" className="text-sm text-[#e5ff00]/70 hover:text-[#e5ff00] transition-colors">
+                  {/* Cards grid */}
+                  <div
+                    className={`grid gap-3 ${
+                      isCritical
+                        ? "sm:grid-cols-2"
+                        : "sm:grid-cols-2 lg:grid-cols-3"
+                    }`}
+                  >
+                    {items.map((item) => (
+                      <DigestCard
+                        key={item.sourceLink || item.headline}
+                        item={item}
+                        featured={isCritical}
+                      />
+                    ))}
+                  </div>
+                </section>
+              );
+            })}
+
+            <div className="mt-6 text-center">
+              <Link
+                href="/"
+                className="text-sm text-[#e5ff00]/70 hover:text-[#e5ff00] transition-colors"
+              >
                 查看全部资讯 →
               </Link>
             </div>
