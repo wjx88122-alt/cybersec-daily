@@ -54,7 +54,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   const articlesText = recent
     .map(
       (item, i) =>
-        `[${i + 1}] [${item.category}] ${item.source}: ${item.title} — ${item.summary.slice(0, 120)} | ${item.link}`,
+        `[${i + 1}] [${item.category}] ${item.source}: ${item.title} — ${(item.summaryAi || item.summary).slice(0, 200)} | ${item.link}`,
     )
     .join("\n");
 
