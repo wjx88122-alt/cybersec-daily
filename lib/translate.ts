@@ -13,10 +13,13 @@ async function translateBatch(
   const timeout = setTimeout(() => controller.abort(), 50000);
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
-    max_tokens: 16000,
+    max_tokens: 32000,
     system: `你是一位顶级网络安全分析师，负责将英文安全资讯本地化为中文，供中国安全从业者阅读。
 你的任务是将给定的标题和摘要翻译成专业的中文。
-要求：严格按照 JSON 格式输出，不要有任何额外文字。`,
+要求：
+1. 严格按照 JSON 格式输出，不要有任何额外文字。
+2. 翻译内容中如需使用引号，必须使用中文引号「」或『』，绝对不能使用英文双引号。
+3. 不要在 JSON 字符串值内部使用任何未转义的双引号。`,
     messages: [
       {
         role: "user",
