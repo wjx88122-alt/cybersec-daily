@@ -350,6 +350,52 @@ export const FEED_SOURCES_B = [
     description:
       "安全专家 Daniel Miessler 的博客，聚焦 AI 安全、威胁情报和安全趋势分析。",
   },
+  {
+    name: "Cybereason Blog",
+    url: "https://www.cybereason.com/blog/rss.xml",
+    category: "威胁情报",
+    description:
+      "Cybereason 安全研究团队发布的恶意软件分析、APT 追踪和企业安全研究。",
+  },
+  {
+    name: "Proofpoint Blog",
+    url: "https://www.proofpoint.com/us/rss.xml",
+    category: "威胁情报",
+    description:
+      "Proofpoint 安全团队发布的电子邮件安全、钓鱼攻击和人为中心威胁分析。",
+  },
+  {
+    name: "TechRepublic Security",
+    url: "https://www.techrepublic.com/rssfeeds/topic/cybersecurity/",
+    category: "综合资讯",
+    description:
+      "TechRepublic 网络安全频道，覆盖企业安全新闻、最佳实践和技术分析。",
+  },
+  {
+    name: "CyberInsider",
+    url: "https://cyberinsider.com/security/feed/",
+    category: "综合资讯",
+    description: "网络安全新闻聚合，覆盖漏洞警报、数据泄露和威胁分析。",
+  },
+  {
+    name: "Exploit-DB",
+    url: "https://www.exploit-db.com/rss.xml",
+    category: "漏洞预警",
+    description: "公开漏洞利用代码数据库，每日更新最新安全漏洞和 PoC 代码。",
+  },
+  {
+    name: "The DFIR Report",
+    url: "https://thedfirreport.com/feed/",
+    category: "威胁情报",
+    description: "数字取证与事件响应团队发布的真实攻击案例深度分析报告。",
+  },
+  {
+    name: "Huntress Blog",
+    url: "https://www.huntress.com/blog/rss.xml",
+    category: "威胁情报",
+    description:
+      "Huntress 安全研究团队发布的中小企业威胁分析和攻击活动追踪报告。",
+  },
 ];
 
 export const FEED_SOURCES = [...FEED_SOURCES_A, ...FEED_SOURCES_B];
