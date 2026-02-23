@@ -51,19 +51,38 @@ export default function Home() {
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
       {/* Header */}
-      <header className="sticky top-0 z-10 border-b border-white/[0.06]" style={{ background: "rgba(8,12,20,0.85)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)" }}>
+      <header
+        className="sticky top-0 z-10 border-b border-white/[0.06]"
+        style={{
+          background: "rgba(8,12,20,0.85)",
+          backdropFilter: "blur(16px)",
+          WebkitBackdropFilter: "blur(16px)",
+        }}
+      >
         <div className="max-w-7xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <Image src="/logo.png" alt="网络安全日报" width={32} height={32} className="object-contain" />
+            <Image
+              src="/logo.png"
+              alt="网络安全日报"
+              width={32}
+              height={32}
+              className="object-contain"
+            />
             <span className="text-white font-bold text-base tracking-tight">
               网络安全日报
             </span>
           </Link>
           <nav className="flex items-center gap-1">
-            <Link href="/" className="px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-white/[0.08] border border-white/[0.1]">
+            <Link
+              href="/"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-white bg-white/[0.08] border border-white/[0.1]"
+            >
               资讯
             </Link>
-            <Link href="/digest" className="px-3 py-1.5 rounded-lg text-sm font-medium text-[#8b949e] hover:text-white hover:bg-white/[0.05] transition-all">
+            <Link
+              href="/digest"
+              className="px-3 py-1.5 rounded-lg text-sm font-medium text-[#8b949e] hover:text-white hover:bg-white/[0.05] transition-all"
+            >
               简报
             </Link>
           </nav>
@@ -73,8 +92,18 @@ export default function Home() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Search */}
         <div className="mb-4 relative">
-          <svg className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#484f58]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#484f58]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
           </svg>
           <input
             type="text"
@@ -119,7 +148,11 @@ export default function Home() {
         {!loading && !error && filtered.length > 0 && (
           <>
             <p className="text-xs mb-4 text-[#484f58]">
-              近 48 小时 <span className="text-[#6e7681] font-medium">{filtered.length}</span> 条资讯
+              近 48 小时{" "}
+              <span className="text-[#6e7681] font-medium">
+                {filtered.length}
+              </span>{" "}
+              条资讯
             </p>
 
             {/* Hero */}
@@ -130,7 +163,7 @@ export default function Home() {
             )}
 
             {/* Grid */}
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 items-start">
               {rest.map((item) => (
                 <NewsCard key={item.id} item={item} />
               ))}

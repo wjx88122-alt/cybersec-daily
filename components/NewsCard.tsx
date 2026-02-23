@@ -108,7 +108,7 @@ export default function NewsCard({
           {title}
         </h2>
         {summary && (
-          <p className="text-[13px] leading-relaxed line-clamp-4 text-[#8b949e]">
+          <p className="text-[13px] leading-relaxed text-[#8b949e]">
             {summary}
           </p>
         )}
