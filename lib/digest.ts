@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
 const client = new Anthropic({
@@ -131,22 +132,17 @@ ${articlesText}
     .replace(/```\s*$/, "")
     .trim();
 
-  // First try standard JSON parse
+  // Try standard parse, then jsonrepair
   try {
     return JSON.parse(jsonText) as DailyDigest;
   } catch {
     /* fall through to repair */
   }
 
-  // Repair: find last complete item object and close the array
-  const lastItem = jsonText.lastIndexOf("},");
-  if (lastItem > 0) {
-    try {
-      const repaired = jsonText.slice(0, lastItem + 1) + "]}";
-      return JSON.parse(repaired) as DailyDigest;
-    } catch {
-      /* fall through */
-    }
+  try {
+    return JSON.parse(jsonrepair(jsonText)) as DailyDigest;
+  } catch {
+    /* fall through to fallback */
   }
 
   // Last resort fallback
