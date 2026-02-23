@@ -102,7 +102,7 @@ export default function Home() {
         {/* Empty */}
         {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-32">
-            <p className="text-sm text-[#484f58]">近 48 小时暂无新增资讯</p>
+            <p className="text-sm text-[#484f58]">近 24 小时暂无新增资讯</p>
           </div>
         )}
 
@@ -110,7 +110,7 @@ export default function Home() {
         {!loading && !error && filtered.length > 0 && (
           <>
             <p className="text-xs mb-4 text-[#484f58]">
-              近 48 小时{" "}
+              近 24 小时{" "}
               <span className="text-[#6e7681] font-medium">
                 {filtered.length}
               </span>{" "}

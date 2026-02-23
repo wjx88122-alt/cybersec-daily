@@ -6,7 +6,6 @@ import Image from "next/image";
 const NAV_ITEMS = [
   { label: "资讯", href: "/" },
   { label: "简报", href: "/digest" },
-  { label: "趋势", href: "/trends" },
 ];
 
 export default function NavBar({ active }: { active: string }) {

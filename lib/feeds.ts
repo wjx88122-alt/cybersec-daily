@@ -400,7 +400,7 @@ export const FEED_SOURCES_B = [
 
 export const FEED_SOURCES = [...FEED_SOURCES_A, ...FEED_SOURCES_B];
 
-export const CUTOFF_MS = 7 * 24 * 60 * 60 * 1000;
+export const CUTOFF_MS = 24 * 60 * 60 * 1000;
 
 export type FeedItem = {
   id: string;
