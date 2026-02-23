@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
   ]);
 
   if (!feedA || !feedB) {
-    return NextResponse.json({ error: "No feed data, run cron first" }, { status: 400 });
+    return NextResponse.json(
+      { error: "No feed data, run cron first" },
+      { status: 400 },
+    );
   }
 
   const allItems = [...feedA, ...feedB];
@@ -25,32 +28,41 @@ export async function GET(req: NextRequest) {
 
   // Only translate items without existing translation and within 48h
   const toTranslate = allItems.filter(
-    (i) => !i.titleZh && new Date(i.pubDate).getTime() >= cutoff
+    (i) => !i.titleZh && new Date(i.pubDate).getTime() >= cutoff,
   );
 
   if (toTranslate.length === 0) {
-    return NextResponse.json({ ok: true, withZh: allItems.filter((i) => i.titleZh).length, skipped: true });
+    return NextResponse.json({
+      ok: true,
+      withZh: allItems.filter((i) => i.titleZh).length,
+      skipped: true,
+    });
   }
 
   try {
     const translations = await translateItems(toTranslate);
-    const translationMap = new Map(toTranslate.map((item, i) => [item.id, translations[i]]));
+    const translationMap = new Map(
+      toTranslate.map((item, i) => [item.id, translations[i]]),
+    );
     allItems.forEach((item, i) => {
       const t = translationMap.get(item.id);
-      if (t?.titleZh) allItems[i] = { ...item, titleZh: t.titleZh, summaryZh: t.summaryZh };
+      if (t?.titleZh)
+        allItems[i] = { ...item, titleZh: t.titleZh, summaryZh: t.summaryZh };
     });
   } catch (e) {
-    return NextResponse.json({ error: String(e) }, { status: 500 });
+    console.error(e);
+    return NextResponse.json({ error: "Translation failed" }, { status: 500 });
   }
 
   const finalA = allItems.slice(0, feedA.length);
   const finalB = allItems.slice(feedA.length);
   const withZh = allItems.filter((i) => i.titleZh).length;
 
-  await Promise.all([
-    kv.set("feed-a", finalA),
-    kv.set("feed-b", finalB),
-  ]);
+  await Promise.all([kv.set("feed-a", finalA), kv.set("feed-b", finalB)]);
 
-  return NextResponse.json({ ok: true, withZh, translated: toTranslate.length });
+  return NextResponse.json({
+    ok: true,
+    withZh,
+    translated: toTranslate.length,
+  });
 }

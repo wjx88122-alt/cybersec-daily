@@ -8,10 +8,15 @@ const IMPORTANCE_CONFIG = {
 
 export default function DigestCard({ item }: { item: DigestItem }) {
   const cfg = IMPORTANCE_CONFIG[item.importance] || IMPORTANCE_CONFIG.medium;
+  const safeHref =
+    item.sourceLink?.startsWith("http://") ||
+    item.sourceLink?.startsWith("https://")
+      ? item.sourceLink
+      : "#";
 
   return (
     <a
-      href={item.sourceLink}
+      href={safeHref}
       target="_blank"
       rel="noopener noreferrer"
       className="block bg-[#1a1a1a] hover:bg-[#222] transition-colors overflow-hidden"
@@ -19,7 +24,9 @@ export default function DigestCard({ item }: { item: DigestItem }) {
       <div className={`h-1 w-full ${cfg.bar}`} />
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
-          <span className={`text-[11px] font-bold uppercase tracking-wide ${cfg.text}`}>
+          <span
+            className={`text-[11px] font-bold uppercase tracking-wide ${cfg.text}`}
+          >
             {cfg.label}
           </span>
           <span className="text-[11px] text-[#555]">·</span>
