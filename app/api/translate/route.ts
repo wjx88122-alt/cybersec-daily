@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
   // Only translate items without existing translation and within 48h, cap at 50 per run
   const toTranslate = allItems
     .filter((i) => !i.titleZh && new Date(i.pubDate).getTime() >= cutoff)
-    .slice(0, 50);
+    .slice(0, 100);
 
   if (toTranslate.length === 0) {
     return NextResponse.json({
