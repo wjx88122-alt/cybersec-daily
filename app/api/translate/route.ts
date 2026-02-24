@@ -34,11 +34,11 @@ export async function GET(req: NextRequest) {
   // Only translate items without existing translation and within cutoff
   const toTranslate = allItems
     .filter((i) => !i.titleZh && new Date(i.pubDate).getTime() >= cutoff)
-    .slice(0, 100);
+    .slice(0, 50);
 
   const toTranslateAI = aiItems
     .filter((i) => !i.titleZh && !isChinese(i.title) && new Date(i.pubDate).getTime() >= cutoff)
-    .slice(0, 100);
+    .slice(0, 50);
 
   // Auto-fill Chinese sources with original text as titleZh/summaryZh
   aiItems.forEach((item, i) => {
@@ -61,18 +61,22 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const BATCH_SIZE = 15;
+    const BATCH_SIZE = 10;
     const translationMap = new Map<
       string,
       { titleZh: string; summaryZh: string }
     >();
 
     for (let i = 0; i < allToTranslate.length; i += BATCH_SIZE) {
-      const batch = allToTranslate.slice(i, i + BATCH_SIZE);
-      const results = await translateItems(batch);
-      batch.forEach((item, j) => {
-        if (results[j]?.titleZh) translationMap.set(item.id, results[j]);
-      });
+      try {
+        const batch = allToTranslate.slice(i, i + BATCH_SIZE);
+        const results = await translateItems(batch);
+        batch.forEach((item, j) => {
+          if (results[j]?.titleZh) translationMap.set(item.id, results[j]);
+        });
+      } catch (batchErr) {
+        console.error(`Batch ${i} failed, continuing:`, batchErr);
+      }
     }
 
     allItems.forEach((item, i) => {
