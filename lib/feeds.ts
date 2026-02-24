@@ -398,6 +398,44 @@ export const FEED_SOURCES_B = [
   },
 ];
 
+export const FEED_SOURCES_AI = [
+  // 官方一手
+  { name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml", category: "AI 产品", description: "OpenAI 官方博客，发布模型更新、产品动态和安全研究。" },
+  { name: "Google AI Blog", url: "https://blog.google/technology/ai/rss/", category: "AI 产品", description: "Google AI 产品与技术动态。" },
+  { name: "DeepMind Blog", url: "https://deepmind.google/blog/rss.xml", category: "AI 研究", description: "Google DeepMind 前沿 AI 研究成果。" },
+  { name: "Microsoft AI Blog", url: "https://blogs.microsoft.com/ai/feed/", category: "AI 产品", description: "微软 AI 战略与产品动态。" },
+  { name: "NVIDIA AI Blog", url: "https://blogs.nvidia.com/feed/", category: "AI 产品", description: "NVIDIA AI 硬件与应用生态。" },
+  { name: "Apple ML Research", url: "https://machinelearning.apple.com/rss.xml", category: "AI 研究", description: "苹果机器学习研究团队发布的论文与技术报告。" },
+  { name: "Hugging Face Blog", url: "https://huggingface.co/blog/feed.xml", category: "AI 开发", description: "Hugging Face 开源模型生态与工具更新。" },
+  // 专业媒体
+  { name: "MIT Tech Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed", category: "AI 洞察", description: "MIT 科技评论 AI 深度报道。" },
+  { name: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", category: "AI 产品", description: "The Verge AI 产品与行业动态。" },
+  { name: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/", category: "AI 商业", description: "TechCrunch AI 创投与产品报道。" },
+  { name: "Ars Technica AI", url: "https://feeds.arstechnica.com/arstechnica/technology-lab", category: "AI 洞察", description: "Ars Technica 技术深度分析。" },
+  { name: "VentureBeat AI", url: "https://venturebeat.com/category/ai/feed/", category: "AI 商业", description: "VentureBeat 企业 AI 报道。" },
+  { name: "Wired AI", url: "https://www.wired.com/feed/tag/ai/latest/rss", category: "AI 洞察", description: "Wired AI 科技文化报道。" },
+  { name: "Bloomberg Tech", url: "https://feeds.bloomberg.com/technology/news.rss", category: "AI 商业", description: "Bloomberg 科技商业视角。" },
+  { name: "The Register", url: "https://www.theregister.com/headlines.atom", category: "AI 产品", description: "英国老牌科技媒体，犀利风格报道。" },
+  { name: "ZDNet AI", url: "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", category: "AI 产品", description: "ZDNet AI 实用技术报道。" },
+  { name: "Marktechpost", url: "https://www.marktechpost.com/feed/", category: "AI 研究", description: "AI 研究论文速报与技术解读。" },
+  // 深度分析/独立博客
+  { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/", category: "AI 开发", description: "LLM 实践专家 Simon Willison 的博客。" },
+  { name: "One Useful Thing", url: "https://www.oneusefulthing.org/feed", category: "AI 洞察", description: "Ethan Mollick 的 AI 应用洞察。" },
+  { name: "Import AI", url: "https://importai.substack.com/feed", category: "AI 政策", description: "Jack Clark 的 AI 政策与研究周报。" },
+  { name: "Latent Space", url: "https://www.latent.space/feed", category: "AI 开发", description: "AI 工程深度访谈与分析。" },
+  { name: "AI Snake Oil", url: "https://www.aisnakeoil.com/feed", category: "AI 政策", description: "AI 批判性思考与政策分析。" },
+  { name: "Interconnects", url: "https://www.interconnects.ai/feed", category: "AI 研究", description: "Nathan Lambert 的开源模型深度分析。" },
+  { name: "The Gradient", url: "https://thegradient.pub/rss/", category: "AI 研究", description: "学术与产业交叉的 AI 深度文章。" },
+  { name: "Ahead of AI", url: "https://magazine.sebastianraschka.com/feed", category: "AI 研究", description: "Sebastian Raschka 的 LLM 技术解读。" },
+  // 工具/平台
+  { name: "LangChain Blog", url: "https://blog.langchain.dev/rss/", category: "AI 开发", description: "LangChain AI 开发框架动态。" },
+  { name: "Replicate Blog", url: "https://replicate.com/blog/rss", category: "AI 开发", description: "Replicate 模型部署平台博客。" },
+  // 中文源
+  { name: "机器之心", url: "https://www.jiqizhixin.com/rss", category: "AI 产品", description: "国内最专业的 AI 媒体。" },
+  { name: "量子位", url: "https://www.qbitai.com/feed", category: "AI 产品", description: "AI 快讯与深度报道。" },
+  { name: "36kr", url: "https://36kr.com/feed", category: "AI 商业", description: "科技商业媒体，覆盖 AI 创投动态。" },
+];
+
 export const FEED_SOURCES = [...FEED_SOURCES_A, ...FEED_SOURCES_B];
 
 export const CUTOFF_MS = 24 * 60 * 60 * 1000;

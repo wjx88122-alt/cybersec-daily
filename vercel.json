@@ -9,6 +9,7 @@
   "functions": {
     "app/api/feed-a/route.ts": { "maxDuration": 10 },
     "app/api/feed-b/route.ts": { "maxDuration": 10 },
+    "app/api/feed-ai/route.ts": { "maxDuration": 10 },
     "app/api/digest/route.ts": { "maxDuration": 300 },
     "app/api/cron/route.ts": { "maxDuration": 60 },
     "app/api/translate/route.ts": { "maxDuration": 300 },

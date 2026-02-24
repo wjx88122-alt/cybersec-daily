@@ -12,6 +12,12 @@ const CATEGORY_GRADIENT: Record<string, string> = {
   威胁情报: "from-orange-950 to-orange-900",
   恶意软件: "from-pink-950 to-pink-900",
   "政府/监管": "from-green-950 to-green-900",
+  "AI 产品": "from-cyan-950 to-cyan-900",
+  "AI 研究": "from-indigo-950 to-indigo-900",
+  "AI 商业": "from-amber-950 to-amber-900",
+  "AI 开发": "from-emerald-950 to-emerald-900",
+  "AI 政策": "from-slate-800 to-slate-700",
+  "AI 洞察": "from-yellow-950 to-yellow-900",
 };
 
 const CATEGORY_ACCENT: Record<string, string> = {
@@ -21,6 +27,12 @@ const CATEGORY_ACCENT: Record<string, string> = {
   威胁情报: "bg-orange-500/20 text-orange-300 border-orange-500/30",
   恶意软件: "bg-pink-500/20 text-pink-300 border-pink-500/30",
   "政府/监管": "bg-green-500/20 text-green-300 border-green-500/30",
+  "AI 产品": "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
+  "AI 研究": "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
+  "AI 商业": "bg-amber-500/20 text-amber-300 border-amber-500/30",
+  "AI 开发": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
+  "AI 政策": "bg-slate-500/20 text-slate-300 border-slate-500/30",
+  "AI 洞察": "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
 };
 
 const CATEGORY_ICON: Record<string, string> = {
@@ -30,6 +42,12 @@ const CATEGORY_ICON: Record<string, string> = {
   威胁情报: "🎯",
   恶意软件: "🦠",
   "政府/监管": "🏛️",
+  "AI 产品": "🤖",
+  "AI 研究": "🧪",
+  "AI 商业": "💼",
+  "AI 开发": "🛠️",
+  "AI 政策": "📜",
+  "AI 洞察": "💡",
 };
 
 export default function NewsCard({

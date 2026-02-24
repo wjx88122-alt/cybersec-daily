@@ -1,5 +1,5 @@
 import Parser from "rss-parser";
-import { FEED_SOURCES_A, FEED_SOURCES_B, FeedItem } from "./feeds";
+import { FEED_SOURCES_A, FEED_SOURCES_B, FEED_SOURCES_AI, FeedItem } from "./feeds";
 import crypto from "crypto";
 
 const parser = new Parser({
@@ -59,6 +59,13 @@ export async function fetchFeedsB(): Promise<FeedItem[]> {
 export async function fetchAllFeeds(): Promise<FeedItem[]> {
   const [a, b] = await Promise.all([fetchFeedsA(), fetchFeedsB()]);
   return [...a, ...b].sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime(),
+  );
+}
+
+export async function fetchFeedsAI(): Promise<FeedItem[]> {
+  const items = await fetchSources(FEED_SOURCES_AI);
+  return items.sort(
     (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime(),
   );
 }

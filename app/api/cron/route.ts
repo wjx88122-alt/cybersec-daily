@@ -1,5 +1,5 @@
 import { kv } from "@/lib/kv";
-import { fetchFeedsA, fetchFeedsB } from "@/lib/fetchFeeds";
+import { fetchFeedsA, fetchFeedsB, fetchFeedsAI } from "@/lib/fetchFeeds";
 import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
@@ -32,20 +32,27 @@ export async function GET(req: NextRequest) {
   }
 
   const t0 = Date.now();
-  const [feedA, feedB, prevA, prevB] = await Promise.all([
+  const [feedA, feedB, feedAI, prevA, prevB, prevAI] = await Promise.all([
     fetchFeedsA(),
     fetchFeedsB(),
+    fetchFeedsAI(),
     kv.get<FeedItem[]>("feed-a"),
     kv.get<FeedItem[]>("feed-b"),
+    kv.get<FeedItem[]>("feed-ai"),
   ]);
   console.log(
-    `fetch: ${Date.now() - t0}ms feedA=${feedA.length} feedB=${feedB.length}`,
+    `fetch: ${Date.now() - t0}ms feedA=${feedA.length} feedB=${feedB.length} feedAI=${feedAI.length}`,
   );
 
   const mergedA = mergeWithExisting(feedA, prevA ?? []);
   const mergedB = mergeWithExisting(feedB, prevB ?? []);
+  const mergedAI = mergeWithExisting(feedAI, prevAI ?? []);
 
-  await Promise.all([kv.set("feed-a", mergedA), kv.set("feed-b", mergedB)]);
+  await Promise.all([
+    kv.set("feed-a", mergedA),
+    kv.set("feed-b", mergedB),
+    kv.set("feed-ai", mergedAI),
+  ]);
 
   // Generate daily snapshot (best-effort, don't block on failure)
   try {
@@ -66,5 +73,6 @@ export async function GET(req: NextRequest) {
     ok: true,
     feedA: mergedA.length,
     feedB: mergedB.length,
+    feedAI: mergedAI.length,
   });
 }

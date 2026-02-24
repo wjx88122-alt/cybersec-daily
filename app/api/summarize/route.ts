@@ -12,9 +12,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const [feedA, feedB] = await Promise.all([
+  const [feedA, feedB, feedAI] = await Promise.all([
     kv.get<FeedItem[]>("feed-a"),
     kv.get<FeedItem[]>("feed-b"),
+    kv.get<FeedItem[]>("feed-ai"),
   ]);
 
   if (!feedA || !feedB) {
@@ -25,9 +26,10 @@ export async function GET(req: NextRequest) {
   }
 
   const allItems = [...feedA, ...feedB];
+  const aiItems = feedAI ?? [];
   const cutoff = Date.now() - CUTOFF_MS;
 
-  // Only process recent items without an AI summary, cap at 50 per run
+  // Only process recent items without an AI summary
   const toProcess = allItems
     .map((item, idx) => ({ item, idx }))
     .filter(
@@ -36,7 +38,15 @@ export async function GET(req: NextRequest) {
     )
     .slice(0, 50);
 
-  if (toProcess.length === 0) {
+  const toProcessAI = aiItems
+    .map((item, idx) => ({ item, idx }))
+    .filter(
+      ({ item }) =>
+        !item.summaryAi && new Date(item.pubDate).getTime() >= cutoff,
+    )
+    .slice(0, 50);
+
+  if (toProcess.length === 0 && toProcessAI.length === 0) {
     return NextResponse.json({
       ok: true,
       summarized: 0,
@@ -44,17 +54,20 @@ export async function GET(req: NextRequest) {
     });
   }
 
+  const allToProcess = [...toProcess, ...toProcessAI.map(({ item, idx }) => ({ item, idx: idx + allItems.length }))];
+  const combinedItems = [...allItems, ...aiItems];
+
   // Fetch article text in parallel (best-effort)
   const articleTexts = await Promise.all(
-    toProcess.map(({ item }) => extractArticleText(item.link)),
+    allToProcess.map(({ item }) => extractArticleText(item.link)),
   );
 
-  // Process in batches of 10
+  // Process in batches of 5
   const BATCH_SIZE = 5;
   let summarized = 0;
 
-  for (let i = 0; i < toProcess.length; i += BATCH_SIZE) {
-    const batchEntries = toProcess.slice(i, i + BATCH_SIZE);
+  for (let i = 0; i < allToProcess.length; i += BATCH_SIZE) {
+    const batchEntries = allToProcess.slice(i, i + BATCH_SIZE);
     const batchTexts = articleTexts.slice(i, i + BATCH_SIZE);
 
     const batch = batchEntries.map(({ item }, j) => ({
@@ -67,16 +80,21 @@ export async function GET(req: NextRequest) {
     batchEntries.forEach(({ idx }, j) => {
       const ai = results[j]?.summaryAi;
       if (ai) {
-        allItems[idx] = { ...allItems[idx], summaryAi: ai };
+        combinedItems[idx] = { ...combinedItems[idx], summaryAi: ai };
         summarized++;
       }
     });
   }
 
-  const finalA = allItems.slice(0, feedA.length);
-  const finalB = allItems.slice(feedA.length);
+  const finalA = combinedItems.slice(0, feedA.length);
+  const finalB = combinedItems.slice(feedA.length, feedA.length + feedB.length);
+  const finalAI = combinedItems.slice(feedA.length + feedB.length);
 
-  await Promise.all([kv.set("feed-a", finalA), kv.set("feed-b", finalB)]);
+  await Promise.all([
+    kv.set("feed-a", finalA),
+    kv.set("feed-b", finalB),
+    kv.set("feed-ai", finalAI),
+  ]);
 
-  return NextResponse.json({ ok: true, summarized, total: toProcess.length });
+  return NextResponse.json({ ok: true, summarized, total: allToProcess.length });
 }
