@@ -1,9 +1,9 @@
 {
   "crons": [
-    { "path": "/api/cron", "schedule": "0 17 * * *" },
-    { "path": "/api/translate", "schedule": "5 17 * * *" },
-    { "path": "/api/images", "schedule": "10 17 * * *" },
-    { "path": "/api/summarize", "schedule": "15 17 * * *" },
+    { "path": "/api/cron", "schedule": "0 1,5,9,13,17,21 * * *" },
+    { "path": "/api/translate", "schedule": "5 1,5,9,13,17,21 * * *" },
+    { "path": "/api/images", "schedule": "10 1,5,9,13,17,21 * * *" },
+    { "path": "/api/summarize", "schedule": "15 1,5,9,13,17,21 * * *" },
     { "path": "/api/digest", "schedule": "30 17 * * *" }
   ],
   "functions": {
