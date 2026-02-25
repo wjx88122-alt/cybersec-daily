@@ -1,12 +1,10 @@
 import { kv } from "@/lib/kv";
 import { translateItems } from "@/lib/translate";
-import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
+import { FeedItem } from "@/lib/feeds";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
 
-// Use 2x CUTOFF so yesterday's untranslated items also get picked up
-const TRANSLATE_CUTOFF_MS = CUTOFF_MS * 2;
 // Stop translating at 270s to leave time for final save
 const TIME_BUDGET_MS = 270_000;
 const BATCH_SIZE = 10;
@@ -48,7 +46,6 @@ export async function GET(req: NextRequest) {
 
   const allItems = [...feedA, ...feedB];
   const aiItems = feedAI ?? [];
-  const cutoff = Date.now() - TRANSLATE_CUTOFF_MS;
 
   // Auto-fill Chinese sources with original text as titleZh/summaryZh
   aiItems.forEach((item, i) => {
@@ -57,12 +54,11 @@ export async function GET(req: NextRequest) {
     }
   });
 
-  // Collect ALL untranslated items (no hard cap)
-  const toTranslate = allItems.filter(
-    (i) => !i.titleZh && new Date(i.pubDate).getTime() >= cutoff,
-  );
+  // Collect ALL untranslated items — no time filter here
+  // (time filtering is only for frontend display, not translation eligibility)
+  const toTranslate = allItems.filter((i) => !i.titleZh);
   const toTranslateAI = aiItems.filter(
-    (i) => !i.titleZh && !isChinese(i.title) && new Date(i.pubDate).getTime() >= cutoff,
+    (i) => !i.titleZh && !isChinese(i.title),
   );
   const allToTranslate = [...toTranslate, ...toTranslateAI];
 
