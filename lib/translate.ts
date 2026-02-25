@@ -10,7 +10,7 @@ async function translateBatch(
   items: { title: string; summary: string }[],
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 50000);
+  const timeout = setTimeout(() => controller.abort(), 90000);
   const stream = client.messages.stream({
     model: "claude-opus-4-6",
     max_tokens: 32000,
@@ -61,12 +61,15 @@ export async function translateItems(
     title: item.title,
     summary: item.summary,
   }));
-  const size = Math.ceil(input.length / 3);
-  const batches = [
-    input.slice(0, size),
-    input.slice(size, size * 2),
-    input.slice(size * 2),
-  ].filter((b) => b.length > 0);
-  const results = await Promise.all(batches.map(translateBatch));
-  return results.flat();
+
+  // Single batch — caller already controls batch size (BATCH_SIZE=10)
+  // No need to split further; this avoids index misalignment from parallel sub-batches
+  const results = await translateBatch(input);
+
+  // Validate result length matches input; pad with empty if LLM returned fewer
+  const validated: { titleZh: string; summaryZh: string }[] = [];
+  for (let i = 0; i < input.length; i++) {
+    validated.push(results[i] ?? { titleZh: "", summaryZh: "" });
+  }
+  return validated;
 }
