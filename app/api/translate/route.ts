@@ -118,14 +118,28 @@ export async function GET(req: NextRequest) {
 
   const withZh = allItems.filter((i) => i.titleZh).length;
   const withZhAI = aiItems.filter((i) => i.titleZh).length;
+  const pending = allToTranslate.length - translationMap.size;
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+
+  // Self-chain: if there are still pending items, fire another translate run
+  // Uses fire-and-forget fetch so this response returns immediately
+  // Limit chain depth to prevent infinite loops
+  const chainCount = parseInt(req.nextUrl.searchParams.get("chain") ?? "0");
+  const MAX_CHAINS = 3;
+  if (pending > 0 && chainCount < MAX_CHAINS) {
+    const selfUrl = `${req.nextUrl.origin}/api/translate?chain=${chainCount + 1}`;
+    fetch(selfUrl, {
+      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+    }).catch(() => {});
+    console.log(`translate: ${pending} items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`);
+  }
 
   return NextResponse.json({
     ok: true,
     withZh,
     withZhAI,
     translated: translationMap.size,
-    pending: allToTranslate.length - translationMap.size,
+    pending,
     batchesDone,
     batchesFailed,
     elapsedSec: elapsed,
