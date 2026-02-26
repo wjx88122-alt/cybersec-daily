@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import NavBar from "@/components/NavBar";
+import NetworkTopology from "@/components/NetworkTopology";
 import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
   DEVICE_TYPE_LABELS, DEVICE_TYPE_ICONS, TIER_LABELS, TIER_COLORS,
@@ -246,30 +247,8 @@ export default function NetworkPage() {
                     ))}
                   </div>
                 </div>
-                {/* Network topology hint */}
-                <div className="glass rounded-xl p-4">
-                  <div className="text-xs text-[#64748b] font-medium mb-3">🗺️ 网络区域拓扑</div>
-                  <div className="flex flex-wrap gap-2">
-                    {[...new Set(devices.map((d) => d.zone))].map((zone) => {
-                      const zDevices = devices.filter((d) => d.zone === zone);
-                      const worst = zDevices.some((d) => d.status === "critical") ? "critical" : zDevices.some((d) => d.status === "warning") ? "warning" : zDevices.some((d) => d.status === "offline") ? "offline" : "online";
-                      return (
-                        <div key={zone} className="glass rounded-lg p-3 min-w-[120px]">
-                          <div className="flex items-center gap-1.5 mb-1">
-                            <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[worst]}`} />
-                            <span className="text-xs font-medium text-[#1a1a2e]">{zone}</span>
-                          </div>
-                          <div className="text-[10px] text-[#94a3b8]">{zDevices.length} 台设备</div>
-                          <div className="flex gap-1 mt-1 flex-wrap">
-                            {zDevices.map((d) => (
-                              <span key={d.id} title={`${d.name} (${d.ip})`} className="text-sm cursor-default">{DEVICE_TYPE_ICONS[d.type]}</span>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                {/* Network topology */}
+                <NetworkTopology devices={devices} />
                 {/* Recent alerts */}
                 {alerts.filter((a) => !a.acknowledged).length > 0 && (
                   <div>
