@@ -363,6 +363,9 @@ export default function MDRPage() {
             <span className="w-4 h-4 rounded bg-gradient-to-br from-[#65A637] to-[#4B8A2A] flex items-center justify-center text-white text-[8px] font-bold">S</span>
             Splunk 对接配置
           </a>
+          <a href="/mdr/network" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-all">
+            🌐 客户网络运维
+          </a>
         </div>
 
         {/* Sub-tabs */}
