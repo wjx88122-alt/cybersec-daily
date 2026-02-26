@@ -10,6 +10,7 @@ import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
   type DeviceStatus,
 } from "@/lib/network-mock";
+import ThreatMap from "@/components/ThreatMap";
 
 /* ── Helpers ── */
 function timeStr() {
@@ -200,7 +201,7 @@ export default function DashboardPage() {
         <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
       </header>
 
-      <main className="p-4 grid grid-cols-12 gap-3 h-[calc(100vh-64px)]">
+      <main className="p-4 grid grid-cols-12 gap-3">
         {/* KPI Cards */}
         <div className="col-span-12 grid grid-cols-6 gap-3">
           {[
@@ -225,6 +226,11 @@ export default function DashboardPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Global Threat Map */}
+        <div className="col-span-12">
+          <ThreatMap />
         </div>
 
         {/* Threat Distribution */}
