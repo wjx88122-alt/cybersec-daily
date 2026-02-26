@@ -13,6 +13,23 @@ const SEV_SVG: Record<string, string> = {
   critical: "#ef4444", high: "#f97316", medium: "#eab308", low: "#3b82f6",
 };
 
+// Vendor logo mapping based on firmware string
+function getVendorLogo(firmware: string): { url: string; name: string } | null {
+  const fw = firmware.toLowerCase();
+  if (fw.includes("fortios")) return { url: "https://www.fortinet.com/favicon.ico", name: "Fortinet" };
+  if (fw.includes("cisco") || fw.includes("ios-xe") || fw.includes("isr")) return { url: "https://www.cisco.com/favicon.ico", name: "Cisco" };
+  if (fw.includes("pan-os")) return { url: "https://www.paloaltonetworks.com/favicon.ico", name: "Palo Alto" };
+  if (fw.includes("windows")) return { url: "https://www.microsoft.com/favicon.ico", name: "Microsoft" };
+  if (fw.includes("ubuntu")) return { url: "https://assets.ubuntu.com/v1/49a1a858-favicon-32x32.png", name: "Ubuntu" };
+  if (fw.includes("centos")) return { url: "https://www.centos.org/favicon.ico", name: "CentOS" };
+  if (fw.includes("hillstone")) return { url: "https://www.hillstonenet.com/favicon.ico", name: "Hillstone" };
+  if (fw.includes("h3c")) return { url: "https://www.h3c.com/favicon.ico", name: "H3C" };
+  if (fw.includes("suricata")) return { url: "https://suricata.io/favicon.ico", name: "Suricata" };
+  if (fw.includes("openvpn")) return { url: "https://openvpn.net/favicon.ico", name: "OpenVPN" };
+  if (fw.includes("modsecurity")) return { url: "https://owasp.org/favicon.ico", name: "ModSecurity" };
+  return null;
+}
+
 interface TopoNode {
   id: string;
   device: NetworkDevice;
@@ -159,6 +176,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
             || unacked.find((a) => a.severity === "medium")?.severity
             || unacked[0]?.severity;
           const hasAlerts = unacked.length > 0;
+          const vendor = getVendorLogo(n.device.firmware);
           // Tooltip height depends on alerts
           const tipBaseH = 50;
           const tipAlertH = Math.min(unacked.length, 3) * 14;
@@ -196,6 +214,13 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
               )}
               {/* Icon text */}
               <text x={n.x} y={n.y + 5} textAnchor="middle" fontSize={18}>{DEVICE_TYPE_ICONS[n.device.type]}</text>
+              {/* Vendor logo */}
+              {vendor && (
+                <g>
+                  <rect x={n.x + 22} y={n.y - 8} width={18} height={18} rx={4} fill="#ffffff" stroke="#e2e8f0" strokeWidth={0.5} />
+                  <image href={vendor.url} x={n.x + 24} y={n.y - 6} width={14} height={14} />
+                </g>
+              )}
               {/* Label */}
               <text x={n.x} y={n.y + 30} textAnchor="middle" fontSize={9} fill="#64748b" fontWeight={500}>{n.device.name}</text>
               <text x={n.x} y={n.y + 41} textAnchor="middle" fontSize={8} fill="#94a3b8">{n.device.ip}</text>
@@ -213,7 +238,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
                     CPU: {n.device.cpu}% · 内存: {n.device.memory}% · ⏱ {n.device.uptime}
                   </text>
                   <text x={n.x} y={n.y - tipH + 20} textAnchor="middle" fontSize={8} fill="#78859b">
-                    {n.device.firmware}
+                    {vendor ? `${vendor.name} · ` : ""}{n.device.firmware}
                   </text>
                   {/* Alert list in tooltip */}
                   {hasAlerts && (
