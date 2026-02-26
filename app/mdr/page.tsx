@@ -359,6 +359,10 @@ export default function MDRPage() {
         <div className="mb-6">
           <h1 className="text-xl font-bold text-white">MDR 工单派发系统</h1>
           <p className="text-xs text-[#484f58] mt-1">Managed Detection & Response · 告警分诊 → 智能派发 → SLA 追踪 → 闭环处置</p>
+          <a href="/mdr/splunk" className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#65A637]/10 text-[#65A637] border border-[#65A637]/20 hover:bg-[#65A637]/20 transition-all">
+            <span className="w-4 h-4 rounded bg-gradient-to-br from-[#65A637] to-[#4B8A2A] flex items-center justify-center text-white text-[8px] font-bold">S</span>
+            Splunk 对接配置
+          </a>
         </div>
 
         {/* Sub-tabs */}
