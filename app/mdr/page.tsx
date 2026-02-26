@@ -366,6 +366,9 @@ export default function MDRPage() {
           <a href="/mdr/network" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-all">
             🌐 客户网络运维
           </a>
+          <a href="/mdr/dashboard" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-all">
+            📺 运营大屏
+          </a>
         </div>
 
         {/* Sub-tabs */}
