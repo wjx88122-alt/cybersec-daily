@@ -13,9 +13,9 @@ const NAV_ITEMS = [
 export default function NavBar({ active }: { active: string }) {
   return (
     <header
-      className="sticky top-0 z-10 border-b border-white/[0.06]"
+      className="sticky top-0 z-10 border-b border-black/[0.06]"
       style={{
-        background: "rgba(8,12,20,0.85)",
+        background: "rgba(245,247,250,0.9)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
       }}
@@ -29,7 +29,7 @@ export default function NavBar({ active }: { active: string }) {
             height={32}
             className="object-contain"
           />
-          <span className="text-white font-bold text-base tracking-tight">
+          <span className="text-[#1a1a2e] font-bold text-base tracking-tight">
             网络安全日报
           </span>
         </Link>
@@ -40,8 +40,8 @@ export default function NavBar({ active }: { active: string }) {
               href={href}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
                 active === label
-                  ? "text-white bg-white/[0.08] border border-white/[0.1]"
-                  : "text-[#8b949e] hover:text-white hover:bg-white/[0.05]"
+                  ? "text-[#1a1a2e] bg-black/[0.06] border border-black/[0.08]"
+                  : "text-[#64748b] hover:text-[#1a1a2e] hover:bg-black/[0.04]"
               }`}
             >
               {label}

@@ -53,7 +53,7 @@ export default function AIPage() {
         {/* Search */}
         <div className="mb-4 relative">
           <svg
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#484f58]"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -70,7 +70,7 @@ export default function AIPage() {
             placeholder="搜索 AI 资讯..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-white/[0.04] border border-white/[0.06] text-white placeholder-[#484f58] focus:outline-none focus:border-white/[0.15] focus:bg-white/[0.06] transition-all"
+            className="w-full pl-10 pr-4 py-2.5 text-sm rounded-xl bg-black/[0.03] border border-black/[0.06] text-[#1a1a2e] placeholder-[#484f58] focus:outline-none focus:border-black/[0.12] focus:bg-black/[0.04] transition-all"
           />
         </div>
 
@@ -83,10 +83,10 @@ export default function AIPage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="relative w-10 h-10">
-              <div className="absolute inset-0 rounded-full border-2 border-[#e5ff00]/20" />
-              <div className="absolute inset-0 rounded-full border-2 border-[#e5ff00] border-t-transparent animate-spin" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#2563eb]/20" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#2563eb] border-t-transparent animate-spin" />
             </div>
-            <p className="text-sm text-[#484f58]">正在抓取最新 AI 资讯...</p>
+            <p className="text-sm text-[#94a3b8]">正在抓取最新 AI 资讯...</p>
           </div>
         )}
 
@@ -100,16 +100,16 @@ export default function AIPage() {
         {/* Empty */}
         {!loading && !error && filtered.length === 0 && (
           <div className="text-center py-32">
-            <p className="text-sm text-[#484f58]">近 24 小时暂无新增 AI 资讯</p>
+            <p className="text-sm text-[#94a3b8]">近 24 小时暂无新增 AI 资讯</p>
           </div>
         )}
 
         {/* Content */}
         {!loading && !error && filtered.length > 0 && (
           <>
-            <p className="text-xs mb-4 text-[#484f58]">
+            <p className="text-xs mb-4 text-[#94a3b8]">
               近 24 小时{" "}
-              <span className="text-[#6e7681] font-medium">
+              <span className="text-[#78859b] font-medium">
                 {filtered.length}
               </span>{" "}
               条 AI 资讯

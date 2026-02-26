@@ -74,7 +74,7 @@ export default function NewsCard({
   const imgSrc = !imgError && item.image ? item.image : null;
   const catAccent =
     CATEGORY_ACCENT[item.category] ??
-    "bg-white/10 text-white/60 border-white/10";
+    "bg-white/10 text-[#1a1a2e]/60 border-white/10";
   const catGradient =
     CATEGORY_GRADIENT[item.category] ?? "from-gray-900 to-gray-800";
 
@@ -83,7 +83,7 @@ export default function NewsCard({
       href={item.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-xl overflow-hidden border border-white/[0.06] bg-[#0d1117] hover:border-white/[0.12] hover:bg-[#111820] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40"
+      className="group block rounded-xl overflow-hidden border border-black/[0.06] bg-white hover:border-black/[0.1] hover:bg-[#f0f2f5] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/8"
     >
       {/* Image / Placeholder */}
       <div
@@ -103,7 +103,7 @@ export default function NewsCard({
             <span className="text-4xl opacity-60">
               {CATEGORY_ICON[item.category] ?? "📰"}
             </span>
-            <span className="text-xs text-white/30 font-medium tracking-wide">
+            <span className="text-xs text-[#1a1a2e]/30 font-medium tracking-wide">
               {item.source}
             </span>
           </div>
@@ -121,18 +121,18 @@ export default function NewsCard({
       {/* Content */}
       <div className="p-4">
         <h2
-          className={`font-semibold leading-snug mb-2 line-clamp-2 text-[#f0f6fc] group-hover:text-white transition-colors ${hero ? "text-xl" : "text-[14px]"}`}
+          className={`font-semibold leading-snug mb-2 line-clamp-2 text-[#f0f6fc] group-hover:text-[#1a1a2e] transition-colors ${hero ? "text-xl" : "text-[14px]"}`}
         >
           {title}
         </h2>
         {summary && (
-          <p className="text-[13px] leading-relaxed text-[#8b949e]">
+          <p className="text-[13px] leading-relaxed text-[#64748b]">
             {summary}
           </p>
         )}
-        <div className="flex items-center gap-2 mt-3 text-[11px] text-[#484f58]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#e5ff00]/40 shrink-0" />
-          <span className="truncate font-medium text-[#6e7681]">
+        <div className="flex items-center gap-2 mt-3 text-[11px] text-[#94a3b8]">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#2563eb]/40 shrink-0" />
+          <span className="truncate font-medium text-[#78859b]">
             {item.source}
           </span>
           <span className="shrink-0 ml-auto">{timeAgo}</span>

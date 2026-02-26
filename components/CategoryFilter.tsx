@@ -4,7 +4,7 @@ const SEC_CATEGORIES = ["全部", "综合资讯", "深度分析", "漏洞预警"
 const AI_CATEGORIES = ["全部", "AI 产品", "AI 研究", "AI 商业", "AI 开发", "AI 政策", "AI 洞察"];
 
 const CATEGORY_ACTIVE: Record<string, string> = {
-  全部: "bg-[#e5ff00]/10 text-[#e5ff00] border-[#e5ff00]/30",
+  全部: "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30",
   综合资讯: "bg-blue-500/15 text-blue-300 border-blue-500/30",
   深度分析: "bg-purple-500/15 text-purple-300 border-purple-500/30",
   漏洞预警: "bg-red-500/15 text-red-300 border-red-500/30",
@@ -39,8 +39,8 @@ export default function CategoryFilter({
           onClick={() => onChange(cat)}
           className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-all duration-150 ${
             active === cat
-              ? CATEGORY_ACTIVE[cat] ?? "bg-[#e5ff00]/10 text-[#e5ff00] border-[#e5ff00]/30"
-              : "bg-white/[0.04] text-[#6e7681] border-white/[0.06] hover:bg-white/[0.08] hover:text-[#8b949e] hover:border-white/[0.1]"
+              ? CATEGORY_ACTIVE[cat] ?? "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30"
+              : "bg-black/[0.03] text-[#78859b] border-black/[0.06] hover:bg-black/[0.05] hover:text-[#64748b] hover:border-black/[0.08]"
           }`}
         >
           {cat}

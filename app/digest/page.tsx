@@ -50,10 +50,10 @@ export default function DigestPage() {
         {loading && (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
             <div className="relative w-10 h-10">
-              <div className="absolute inset-0 rounded-full border-2 border-[#e5ff00]/20" />
-              <div className="absolute inset-0 rounded-full border-2 border-[#e5ff00] border-t-transparent animate-spin" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#2563eb]/20" />
+              <div className="absolute inset-0 rounded-full border-2 border-[#2563eb] border-t-transparent animate-spin" />
             </div>
-            <p className="text-sm text-[#484f58]">
+            <p className="text-sm text-[#94a3b8]">
               AI 正在深度分析今日安全态势...
             </p>
           </div>
@@ -71,26 +71,26 @@ export default function DigestPage() {
             {/* Page title */}
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-1">
-                <span className="text-[11px] font-bold uppercase tracking-widest text-[#e5ff00]">
+                <span className="text-[11px] font-bold uppercase tracking-widest text-[#2563eb]">
                   每日威胁简报
                 </span>
-                <span className="text-[11px] text-[#484f58]">
+                <span className="text-[11px] text-[#94a3b8]">
                   {digest.date}
                 </span>
               </div>
-              <h1 className="text-2xl font-bold text-white tracking-tight">
+              <h1 className="text-2xl font-bold text-[#1a1a2e] tracking-tight">
                 今日安全态势综述
               </h1>
             </div>
 
             {/* Overview + stats */}
-            <div className="rounded-xl border border-white/[0.06] bg-[#0d1117] overflow-hidden mb-8">
+            <div className="rounded-xl border border-black/[0.06] bg-white overflow-hidden mb-8">
               <div className="p-6">
                 <p className="text-[14px] leading-8 text-[#c9d1d9] font-light">
                   {digest.overview}
                 </p>
               </div>
-              <div className="grid grid-cols-3 border-t border-white/[0.06]">
+              <div className="grid grid-cols-3 border-t border-black/[0.06]">
                 {[
                   {
                     label: "严重",
@@ -113,7 +113,7 @@ export default function DigestPage() {
                 ].map(({ label, count, color, dot }, i) => (
                   <div
                     key={label}
-                    className={`flex flex-col items-center py-4 gap-1 bg-white/[0.02] ${i < 2 ? "border-r border-white/[0.06]" : ""}`}
+                    className={`flex flex-col items-center py-4 gap-1 bg-white/[0.02] ${i < 2 ? "border-r border-black/[0.06]" : ""}`}
                   >
                     <div className="flex items-center gap-1.5">
                       <span className={`w-2 h-2 rounded-full ${dot}`} />
@@ -123,7 +123,7 @@ export default function DigestPage() {
                         {count}
                       </span>
                     </div>
-                    <span className="text-[11px] text-[#484f58]">{label}</span>
+                    <span className="text-[11px] text-[#94a3b8]">{label}</span>
                   </div>
                 ))}
               </div>
@@ -146,8 +146,8 @@ export default function DigestPage() {
                     >
                       {sec.label}
                     </span>
-                    <span className="flex-1 h-px bg-white/[0.06]" />
-                    <span className="text-[11px] text-[#484f58]">
+                    <span className="flex-1 h-px bg-black/[0.04]" />
+                    <span className="text-[11px] text-[#94a3b8]">
                       {items.length} 条
                     </span>
                   </div>
@@ -175,7 +175,7 @@ export default function DigestPage() {
             <div className="mt-6 text-center">
               <Link
                 href="/"
-                className="text-sm text-[#e5ff00]/70 hover:text-[#e5ff00] transition-colors"
+                className="text-sm text-[#2563eb]/70 hover:text-[#2563eb] transition-colors"
               >
                 查看全部资讯 →
               </Link>

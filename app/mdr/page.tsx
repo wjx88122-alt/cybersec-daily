@@ -66,7 +66,7 @@ function StatsBar({ tickets, alerts }: { tickets: Ticket[]; alerts: Alert[] }) {
   }).length;
   const unassigned = tickets.filter((t) => !t.assignee && t.status === "pending").length;
   const stats = [
-    { label: "待处理告警", value: alerts.length, icon: "🔔", color: "text-[#e5ff00]" },
+    { label: "待处理告警", value: alerts.length, icon: "🔔", color: "text-[#2563eb]" },
     { label: "活跃工单", value: open, icon: "📋", color: "text-cyan-400" },
     { label: "严重工单", value: critical, icon: "🔴", color: "text-red-400" },
     { label: "SLA 超时", value: breached, icon: "⏰", color: breached > 0 ? "text-red-400" : "text-green-400" },
@@ -78,7 +78,7 @@ function StatsBar({ tickets, alerts }: { tickets: Ticket[]; alerts: Alert[] }) {
         <div key={s.label} className="glass rounded-xl p-4 text-center">
           <div className="text-2xl mb-1">{s.icon}</div>
           <div className={`text-2xl font-bold ${s.color}`}>{s.value}</div>
-          <div className="text-xs text-[#8b949e] mt-1">{s.label}</div>
+          <div className="text-xs text-[#64748b] mt-1">{s.label}</div>
         </div>
       ))}
     </div>
@@ -88,18 +88,18 @@ function StatsBar({ tickets, alerts }: { tickets: Ticket[]; alerts: Alert[] }) {
 /* ── Alert Row ── */
 function AlertRow({ alert, onCreateTicket }: { alert: Alert; onCreateTicket: (a: Alert) => void }) {
   return (
-    <div className="glass rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 group hover:border-white/[0.15] transition-all">
+    <div className="glass rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 group hover:border-black/[0.12] transition-all">
       <div className="flex items-center gap-2 shrink-0">
         <span className={`w-2 h-2 rounded-full ${sevDot[alert.severity]} ${alert.severity === "critical" ? "animate-pulse" : ""}`} />
         <span className={`text-[10px] px-2 py-0.5 rounded-full border ${sevColor[alert.severity]}`}>
           {SEVERITY_LABELS[alert.severity]}
         </span>
-        <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.06] text-[#8b949e]">{alert.source}</span>
+        <span className="text-[10px] px-2 py-0.5 rounded-full bg-black/[0.04] text-[#64748b]">{alert.source}</span>
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-white truncate">{alert.titleZh}</div>
-        <div className="text-xs text-[#6e7681] truncate mt-0.5">{alert.title}</div>
-        <div className="flex gap-3 mt-1 text-[10px] text-[#484f58]">
+        <div className="text-sm font-medium text-[#1a1a2e] truncate">{alert.titleZh}</div>
+        <div className="text-xs text-[#78859b] truncate mt-0.5">{alert.title}</div>
+        <div className="flex gap-3 mt-1 text-[10px] text-[#94a3b8]">
           <span>🖥 {alert.host}</span>
           <span>⚔️ {alert.mitreTactic} ({alert.mitreId})</span>
           <span>🕐 {timeAgo(alert.timestamp)}</span>
@@ -107,7 +107,7 @@ function AlertRow({ alert, onCreateTicket }: { alert: Alert; onCreateTicket: (a:
       </div>
       <button
         onClick={() => onCreateTicket(alert)}
-        className="shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#e5ff00]/10 text-[#e5ff00] border border-[#e5ff00]/20 hover:bg-[#e5ff00]/20 transition-all"
+        className="shrink-0 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/20 hover:bg-[#2563eb]/20 transition-all"
       >
         创建工单 →
       </button>
@@ -132,11 +132,11 @@ function TicketCard({ ticket, onStatusChange }: { ticket: Ticket; onStatusChange
     resolved: "关闭工单",
   };
   return (
-    <div className="glass rounded-xl p-4 hover:border-white/[0.15] transition-all">
+    <div className="glass rounded-xl p-4 hover:border-black/[0.12] transition-all">
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[10px] text-[#484f58] font-mono">{ticket.id}</span>
+            <span className="text-[10px] text-[#94a3b8] font-mono">{ticket.id}</span>
             <span className={`text-[10px] px-2 py-0.5 rounded-full border ${sevColor[ticket.severity]}`}>
               {SEVERITY_LABELS[ticket.severity]}
             </span>
@@ -144,15 +144,15 @@ function TicketCard({ ticket, onStatusChange }: { ticket: Ticket; onStatusChange
               {STATUS_LABELS[ticket.status]}
             </span>
           </div>
-          <div className="text-sm font-medium text-white mt-1.5">{ticket.titleZh}</div>
-          <div className="text-xs text-[#6e7681] mt-0.5">{ticket.title}</div>
+          <div className="text-sm font-medium text-[#1a1a2e] mt-1.5">{ticket.titleZh}</div>
+          <div className="text-xs text-[#78859b] mt-0.5">{ticket.title}</div>
         </div>
         <div className="text-right shrink-0">
-          <div className={`text-xs font-mono ${sla.urgent ? "text-red-400 animate-pulse" : "text-[#8b949e]"}`}>
+          <div className={`text-xs font-mono ${sla.urgent ? "text-red-400 animate-pulse" : "text-[#64748b]"}`}>
             SLA: {sla.text}
           </div>
           {ticket.assignee && (
-            <div className="text-xs text-[#6e7681] mt-1">
+            <div className="text-xs text-[#78859b] mt-1">
               {ticket.assignee.avatar} {ticket.assignee.name} (T{ticket.assignee.tier})
             </div>
           )}
@@ -160,7 +160,7 @@ function TicketCard({ ticket, onStatusChange }: { ticket: Ticket; onStatusChange
         </div>
       </div>
 
-      <div className="flex items-center gap-3 mt-3 text-[10px] text-[#484f58]">
+      <div className="flex items-center gap-3 mt-3 text-[10px] text-[#94a3b8]">
         <span>🖥 {ticket.host}</span>
         <span>📡 {ticket.source}</span>
         <span>⚔️ {ticket.mitreId}</span>
@@ -178,33 +178,33 @@ function TicketCard({ ticket, onStatusChange }: { ticket: Ticket; onStatusChange
         )}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="px-3 py-1 text-[11px] rounded-lg bg-white/[0.04] text-[#8b949e] hover:bg-white/[0.08] transition-all"
+          className="px-3 py-1 text-[11px] rounded-lg bg-black/[0.03] text-[#64748b] hover:bg-black/[0.05] transition-all"
         >
           {expanded ? "收起" : "详情"}
         </button>
       </div>
 
       {expanded && (
-        <div className="mt-4 space-y-3 border-t border-white/[0.06] pt-3">
+        <div className="mt-4 space-y-3 border-t border-black/[0.06] pt-3">
           {/* Actions */}
           <div>
-            <div className="text-[11px] text-[#8b949e] font-medium mb-1.5">📋 处置建议</div>
+            <div className="text-[11px] text-[#64748b] font-medium mb-1.5">📋 处置建议</div>
             <div className="space-y-1">
               {ticket.actions.map((a, i) => (
-                <div key={i} className="text-xs text-[#6e7681] flex items-start gap-1.5">
-                  <span className="text-[#e5ff00] mt-0.5">▸</span> {a}
+                <div key={i} className="text-xs text-[#78859b] flex items-start gap-1.5">
+                  <span className="text-[#2563eb] mt-0.5">▸</span> {a}
                 </div>
               ))}
             </div>
           </div>
           {/* Timeline */}
           <div>
-            <div className="text-[11px] text-[#8b949e] font-medium mb-1.5">📜 时间线</div>
+            <div className="text-[11px] text-[#64748b] font-medium mb-1.5">📜 时间线</div>
             <div className="space-y-1.5">
               {ticket.timeline.map((t, i) => (
                 <div key={i} className="flex gap-2 text-xs">
-                  <span className="text-[#484f58] shrink-0 font-mono text-[10px]">{timeAgo(t.time)}</span>
-                  <span className="text-[#8b949e]">{t.event}</span>
+                  <span className="text-[#94a3b8] shrink-0 font-mono text-[10px]">{timeAgo(t.time)}</span>
+                  <span className="text-[#64748b]">{t.event}</span>
                 </div>
               ))}
             </div>
@@ -224,21 +224,21 @@ function AnalystCard({ analyst }: { analyst: Analyst }) {
       <div className="flex items-center gap-3">
         <span className="text-2xl">{analyst.avatar}</span>
         <div>
-          <div className="text-sm font-medium text-white">{analyst.name}</div>
-          <div className="text-[10px] text-[#484f58]">Tier {analyst.tier} · {analyst.region}</div>
+          <div className="text-sm font-medium text-[#1a1a2e]">{analyst.name}</div>
+          <div className="text-[10px] text-[#94a3b8]">Tier {analyst.tier} · {analyst.region}</div>
         </div>
       </div>
       <div className="mt-3 flex flex-wrap gap-1">
         {analyst.skills.map((s) => (
-          <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-[#8b949e]">{s}</span>
+          <span key={s} className="text-[10px] px-1.5 py-0.5 rounded bg-black/[0.04] text-[#64748b]">{s}</span>
         ))}
       </div>
       <div className="mt-3">
-        <div className="flex justify-between text-[10px] text-[#484f58] mb-1">
+        <div className="flex justify-between text-[10px] text-[#94a3b8] mb-1">
           <span>工单负载</span>
           <span>{analyst.activeTickets}/{analyst.maxTickets}</span>
         </div>
-        <div className="h-1.5 rounded-full bg-white/[0.06] overflow-hidden">
+        <div className="h-1.5 rounded-full bg-black/[0.04] overflow-hidden">
           <div className={`h-full rounded-full ${barColor} transition-all`} style={{ width: `${load * 100}%` }} />
         </div>
       </div>
@@ -253,11 +253,11 @@ function DispatchToast({ alert, analyst, onDone }: { alert: Alert; analyst: Anal
     return () => clearTimeout(t);
   }, [onDone]);
   return (
-    <div className="fixed bottom-6 right-6 z-50 glass rounded-xl p-4 border-[#e5ff00]/30 glow-accent animate-bounce max-w-sm">
-      <div className="text-xs text-[#e5ff00] font-medium mb-1">🚀 工单已创建并自动派发</div>
-      <div className="text-sm text-white">{alert.titleZh}</div>
+    <div className="fixed bottom-6 right-6 z-50 glass rounded-xl p-4 border-[#2563eb]/30 glow-accent animate-bounce max-w-sm">
+      <div className="text-xs text-[#2563eb] font-medium mb-1">🚀 工单已创建并自动派发</div>
+      <div className="text-sm text-[#1a1a2e]">{alert.titleZh}</div>
       {analyst ? (
-        <div className="text-xs text-[#8b949e] mt-1">
+        <div className="text-xs text-[#64748b] mt-1">
           派发至 {analyst.avatar} {analyst.name} (Tier {analyst.tier}, {alert.source}专家)
         </div>
       ) : (
@@ -357,10 +357,10 @@ export default function MDRPage() {
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-xl font-bold text-white">MDR 工单派发系统</h1>
-          <p className="text-xs text-[#484f58] mt-1">Managed Detection & Response · 告警分诊 → 智能派发 → SLA 追踪 → 闭环处置</p>
+          <h1 className="text-xl font-bold text-[#1a1a2e]">MDR 工单派发系统</h1>
+          <p className="text-xs text-[#94a3b8] mt-1">Managed Detection & Response · 告警分诊 → 智能派发 → SLA 追踪 → 闭环处置</p>
           <a href="/mdr/splunk" className="inline-flex items-center gap-1.5 mt-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-[#65A637]/10 text-[#65A637] border border-[#65A637]/20 hover:bg-[#65A637]/20 transition-all">
-            <span className="w-4 h-4 rounded bg-gradient-to-br from-[#65A637] to-[#4B8A2A] flex items-center justify-center text-white text-[8px] font-bold">S</span>
+            <span className="w-4 h-4 rounded bg-gradient-to-br from-[#65A637] to-[#4B8A2A] flex items-center justify-center text-[#1a1a2e] text-[8px] font-bold">S</span>
             Splunk 对接配置
           </a>
           <a href="/mdr/network" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 transition-all">
@@ -376,8 +376,8 @@ export default function MDRPage() {
               onClick={() => setTab(t.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 tab === t.key
-                  ? "text-white bg-white/[0.08] border border-white/[0.1]"
-                  : "text-[#8b949e] hover:text-white hover:bg-white/[0.05]"
+                  ? "text-[#1a1a2e] bg-black/[0.05] border border-black/[0.08]"
+                  : "text-[#64748b] hover:text-[#1a1a2e] hover:bg-black/[0.04]"
               }`}
             >
               {t.icon} {t.label}
@@ -391,7 +391,7 @@ export default function MDRPage() {
             <StatsBar tickets={tickets} alerts={alerts} />
             {/* Workflow diagram */}
             <div className="glass rounded-xl p-4 mb-6">
-              <div className="text-xs text-[#8b949e] font-medium mb-3">🔄 MDR 工单生命周期</div>
+              <div className="text-xs text-[#64748b] font-medium mb-3">🔄 MDR 工单生命周期</div>
               <div className="flex items-center gap-2 overflow-x-auto pb-2 text-[11px]">
                 {[
                   { icon: "🔔", label: "告警采集", sub: "EDR/NDR/SIEM/Cloud" },
@@ -403,24 +403,24 @@ export default function MDRPage() {
                   { icon: "✅", label: "解决关闭", sub: "闭环归档" },
                 ].map((step, i, arr) => (
                   <div key={i} className="flex items-center gap-2 shrink-0">
-                    <div className="flex flex-col items-center gap-1 px-2 py-2 rounded-lg bg-white/[0.03] border border-white/[0.06] min-w-[80px]">
+                    <div className="flex flex-col items-center gap-1 px-2 py-2 rounded-lg bg-black/[0.02] border border-black/[0.06] min-w-[80px]">
                       <span className="text-lg">{step.icon}</span>
-                      <span className="text-white font-medium">{step.label}</span>
-                      <span className="text-[9px] text-[#484f58]">{step.sub}</span>
+                      <span className="text-[#1a1a2e] font-medium">{step.label}</span>
+                      <span className="text-[9px] text-[#94a3b8]">{step.sub}</span>
                     </div>
-                    {i < arr.length - 1 && <span className="text-[#484f58]">→</span>}
+                    {i < arr.length - 1 && <span className="text-[#94a3b8]">→</span>}
                   </div>
                 ))}
               </div>
             </div>
             {/* Recent critical tickets */}
-            <div className="text-xs text-[#8b949e] font-medium mb-3">🔴 活跃严重工单</div>
+            <div className="text-xs text-[#64748b] font-medium mb-3">🔴 活跃严重工单</div>
             <div className="space-y-3 mb-6">
               {openTickets.filter((t) => t.severity === "critical").map((t) => (
                 <TicketCard key={t.id} ticket={t} onStatusChange={handleStatusChange} />
               ))}
               {openTickets.filter((t) => t.severity === "critical").length === 0 && (
-                <div className="text-xs text-[#484f58] text-center py-8">暂无严重工单 ✅</div>
+                <div className="text-xs text-[#94a3b8] text-center py-8">暂无严重工单 ✅</div>
               )}
             </div>
           </>
@@ -429,7 +429,7 @@ export default function MDRPage() {
         {/* Alerts */}
         {tab === "alerts" && (
           <>
-            <div className="text-xs text-[#8b949e] mb-3">
+            <div className="text-xs text-[#64748b] mb-3">
               {alerts.length > 0 ? `${alerts.length} 条待处理告警` : "所有告警已处理 ✅"}
             </div>
             <div className="space-y-3">
@@ -443,7 +443,7 @@ export default function MDRPage() {
         {/* Tickets */}
         {tab === "tickets" && (
           <>
-            <div className="text-xs text-[#8b949e] mb-3">活跃工单 ({openTickets.length})</div>
+            <div className="text-xs text-[#64748b] mb-3">活跃工单 ({openTickets.length})</div>
             <div className="space-y-3 mb-6">
               {openTickets.map((t) => (
                 <TicketCard key={t.id} ticket={t} onStatusChange={handleStatusChange} />
@@ -451,7 +451,7 @@ export default function MDRPage() {
             </div>
             {closedTickets.length > 0 && (
               <>
-                <div className="text-xs text-[#484f58] mb-3">已关闭 ({closedTickets.length})</div>
+                <div className="text-xs text-[#94a3b8] mb-3">已关闭 ({closedTickets.length})</div>
                 <div className="space-y-3 opacity-60">
                   {closedTickets.map((t) => (
                     <TicketCard key={t.id} ticket={t} onStatusChange={handleStatusChange} />
@@ -465,7 +465,7 @@ export default function MDRPage() {
         {/* Analysts */}
         {tab === "analysts" && (
           <>
-            <div className="text-xs text-[#8b949e] mb-3">SOC 分析师团队 ({analysts.length})</div>
+            <div className="text-xs text-[#64748b] mb-3">SOC 分析师团队 ({analysts.length})</div>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {analysts.map((a) => (
                 <AnalystCard key={a.id} analyst={a} />
@@ -473,8 +473,8 @@ export default function MDRPage() {
             </div>
             {/* Dispatch rules */}
             <div className="glass rounded-xl p-4 mt-6">
-              <div className="text-xs text-[#8b949e] font-medium mb-2">⚙️ 派发规则</div>
-              <div className="space-y-1.5 text-xs text-[#6e7681]">
+              <div className="text-xs text-[#64748b] font-medium mb-2">⚙️ 派发规则</div>
+              <div className="space-y-1.5 text-xs text-[#78859b]">
                 <div>▸ 技能匹配：告警来源 (EDR/NDR/SIEM/Cloud/Identity) 匹配分析师技能标签</div>
                 <div>▸ 负载均衡：优先派发给当前负载最低的分析师</div>
                 <div>▸ Tier 优先：严重/高危告警优先派发给高 Tier 分析师</div>

@@ -113,14 +113,14 @@ const sevColor: Record<string, string> = {
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
     <div>
-      <label className="block text-xs text-[#8b949e] mb-1.5">{label}</label>
+      <label className="block text-xs text-[#64748b] mb-1.5">{label}</label>
       {children}
-      {hint && <p className="text-[10px] text-[#484f58] mt-1">{hint}</p>}
+      {hint && <p className="text-[10px] text-[#94a3b8] mt-1">{hint}</p>}
     </div>
   );
 }
 
-const inputCls = "w-full px-3 py-2 text-sm rounded-lg bg-white/[0.04] border border-white/[0.08] text-white placeholder-[#484f58] focus:outline-none focus:border-white/[0.2] focus:bg-white/[0.06] transition-all";
+const inputCls = "w-full px-3 py-2 text-sm rounded-lg bg-black/[0.03] border border-black/[0.06] text-[#1a1a2e] placeholder-[#484f58] focus:outline-none focus:border-black/[0.1] focus:bg-black/[0.04] transition-all";
 const selectCls = inputCls + " appearance-none";
 
 /* ── Connection Panel ── */
@@ -131,7 +131,7 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
   return (
     <div className="space-y-6">
       <div className="glass rounded-xl p-5">
-        <div className="text-sm font-medium text-white mb-4">🔌 Splunk 连接配置</div>
+        <div className="text-sm font-medium text-[#1a1a2e] mb-4">🔌 Splunk 连接配置</div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Splunk 地址" hint="Splunk Enterprise/Cloud 管理地址">
             <input className={inputCls} placeholder="splunk.example.com" value={config.host} onChange={(e) => upd("host", e.target.value)} />
@@ -154,7 +154,7 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
             <div className="flex gap-3">
               {(["token", "basic"] as const).map((t) => (
                 <button key={t} onClick={() => upd("authType", t)}
-                  className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${config.authType === t ? "bg-[#e5ff00]/10 text-[#e5ff00] border-[#e5ff00]/30" : "bg-white/[0.04] text-[#8b949e] border-white/[0.08] hover:bg-white/[0.06]"}`}>
+                  className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${config.authType === t ? "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30" : "bg-black/[0.03] text-[#64748b] border-black/[0.06] hover:bg-black/[0.04]"}`}>
                   {t === "token" ? "Bearer Token" : "用户名/密码"}
                 </button>
               ))}
@@ -181,32 +181,32 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
 
         <div className="mt-4 flex items-center gap-2">
           <input type="checkbox" id="ssl" checked={config.verifySsl} onChange={(e) => upd("verifySsl", e.target.checked)}
-            className="w-3.5 h-3.5 rounded border-white/[0.2] bg-white/[0.04] accent-[#e5ff00]" />
-          <label htmlFor="ssl" className="text-xs text-[#8b949e]">验证 SSL 证书</label>
+            className="w-3.5 h-3.5 rounded border-black/[0.1] bg-black/[0.03] accent-[#2563eb]" />
+          <label htmlFor="ssl" className="text-xs text-[#64748b]">验证 SSL 证书</label>
         </div>
       </div>
 
       {/* Test Connection */}
       <div className="glass rounded-xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm font-medium text-white">🧪 连接测试</div>
+          <div className="text-sm font-medium text-[#1a1a2e]">🧪 连接测试</div>
           <button onClick={onTest} disabled={testResult.status === "testing"}
-            className="px-4 py-1.5 text-xs font-medium rounded-lg bg-[#e5ff00]/10 text-[#e5ff00] border border-[#e5ff00]/20 hover:bg-[#e5ff00]/20 disabled:opacity-50 transition-all">
+            className="px-4 py-1.5 text-xs font-medium rounded-lg bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/20 hover:bg-[#2563eb]/20 disabled:opacity-50 transition-all">
             {testResult.status === "testing" ? "测试中..." : "测试连接"}
           </button>
         </div>
         {testResult.status !== "idle" && (
-          <div className={`rounded-lg p-3 text-xs ${testResult.status === "success" ? "bg-green-500/10 border border-green-500/20" : testResult.status === "error" ? "bg-red-500/10 border border-red-500/20" : "bg-white/[0.04] border border-white/[0.06]"}`}>
+          <div className={`rounded-lg p-3 text-xs ${testResult.status === "success" ? "bg-green-500/10 border border-green-500/20" : testResult.status === "error" ? "bg-red-500/10 border border-red-500/20" : "bg-black/[0.03] border border-black/[0.06]"}`}>
             {testResult.status === "testing" && (
-              <div className="flex items-center gap-2 text-[#8b949e]">
-                <div className="w-3 h-3 rounded-full border-2 border-[#e5ff00] border-t-transparent animate-spin" />
+              <div className="flex items-center gap-2 text-[#64748b]">
+                <div className="w-3 h-3 rounded-full border-2 border-[#2563eb] border-t-transparent animate-spin" />
                 正在连接 Splunk...
               </div>
             )}
             {testResult.status === "success" && (
               <div className="space-y-1">
                 <div className="text-green-400 font-medium">✅ 连接成功</div>
-                <div className="text-[#8b949e]">服务器: {testResult.serverName} · 版本: {testResult.version} · 延迟: {testResult.latency}ms</div>
+                <div className="text-[#64748b]">服务器: {testResult.serverName} · 版本: {testResult.version} · 延迟: {testResult.latency}ms</div>
               </div>
             )}
             {testResult.status === "error" && (
@@ -216,8 +216,8 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
         )}
 
         {/* API Endpoints Reference */}
-        <div className="mt-4 text-[10px] text-[#484f58] space-y-0.5">
-          <div className="text-[#6e7681] font-medium mb-1">使用的 Splunk REST API 端点：</div>
+        <div className="mt-4 text-[10px] text-[#94a3b8] space-y-0.5">
+          <div className="text-[#78859b] font-medium mb-1">使用的 Splunk REST API 端点：</div>
           <div>▸ GET /services/server/info — 服务器信息与连接验证</div>
           <div>▸ POST /services/search/jobs — 创建搜索任务</div>
           <div>▸ GET /services/search/jobs/{"{sid}"}/results — 获取搜索结果</div>
@@ -237,8 +237,8 @@ function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSourc
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-white">📡 数据源配置</div>
-        <div className="text-[10px] text-[#484f58]">配置 Splunk 告警拉取方式</div>
+        <div className="text-sm font-medium text-[#1a1a2e]">📡 数据源配置</div>
+        <div className="text-[10px] text-[#94a3b8]">配置 Splunk 告警拉取方式</div>
       </div>
       {sources.map((src) => (
         <div key={src.id} className={`glass rounded-xl p-4 transition-all ${src.enabled ? "" : "opacity-50"}`}>
@@ -246,13 +246,13 @@ function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSourc
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
                 <span>{typeIcons[src.type]}</span>
-                <span className="text-sm font-medium text-white">{src.name}</span>
-                <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-[#8b949e]">{typeLabels[src.type]}</span>
+                <span className="text-sm font-medium text-[#1a1a2e]">{src.name}</span>
+                <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/[0.04] text-[#64748b]">{typeLabels[src.type]}</span>
               </div>
-              <div className="font-mono text-[11px] text-[#6e7681] bg-white/[0.03] rounded-lg p-2 mt-2 overflow-x-auto">
+              <div className="font-mono text-[11px] text-[#78859b] bg-black/[0.02] rounded-lg p-2 mt-2 overflow-x-auto">
                 {src.query}
               </div>
-              <div className="flex gap-4 mt-2 text-[10px] text-[#484f58]">
+              <div className="flex gap-4 mt-2 text-[10px] text-[#94a3b8]">
                 <span>⏱ 每 {src.interval}s 拉取</span>
                 <span>severity: {src.severity_field}</span>
                 <span>host: {src.host_field}</span>
@@ -260,13 +260,13 @@ function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSourc
               </div>
             </div>
             <button onClick={() => toggle(src.id)}
-              className={`shrink-0 w-10 h-5 rounded-full transition-all relative ${src.enabled ? "bg-[#e5ff00]/30" : "bg-white/[0.08]"}`}>
-              <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all ${src.enabled ? "left-5 bg-[#e5ff00]" : "left-0.5 bg-[#484f58]"}`} />
+              className={`shrink-0 w-10 h-5 rounded-full transition-all relative ${src.enabled ? "bg-[#2563eb]/30" : "bg-black/[0.05]"}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all ${src.enabled ? "left-5 bg-[#2563eb]" : "left-0.5 bg-[#484f58]"}`} />
             </button>
           </div>
         </div>
       ))}
-      <button className="w-full glass rounded-xl p-4 text-center text-xs text-[#484f58] hover:text-[#8b949e] hover:border-white/[0.12] transition-all border border-dashed border-white/[0.08]">
+      <button className="w-full glass rounded-xl p-4 text-center text-xs text-[#94a3b8] hover:text-[#64748b] hover:border-black/[0.1] transition-all border border-dashed border-black/[0.06]">
         + 添加数据源
       </button>
     </div>
@@ -278,25 +278,25 @@ function MappingPanel({ mappings }: { mappings: FieldMapping[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-white">🔀 字段映射规则</div>
-        <div className="text-[10px] text-[#484f58]">Splunk 字段 → MDR 工单字段</div>
+        <div className="text-sm font-medium text-[#1a1a2e]">🔀 字段映射规则</div>
+        <div className="text-[10px] text-[#94a3b8]">Splunk 字段 → MDR 工单字段</div>
       </div>
       <div className="glass rounded-xl overflow-hidden">
-        <div className="grid grid-cols-3 gap-px bg-white/[0.06] text-[10px] font-medium text-[#8b949e]">
+        <div className="grid grid-cols-3 gap-px bg-black/[0.04] text-[10px] font-medium text-[#64748b]">
           <div className="bg-[var(--bg-card)] px-4 py-2.5">Splunk 字段</div>
           <div className="bg-[var(--bg-card)] px-4 py-2.5">MDR 字段</div>
           <div className="bg-[var(--bg-card)] px-4 py-2.5">转换规则</div>
         </div>
         {mappings.map((m, i) => (
-          <div key={i} className="grid grid-cols-3 gap-px bg-white/[0.04] text-xs">
+          <div key={i} className="grid grid-cols-3 gap-px bg-black/[0.03] text-xs">
             <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono text-cyan-400/80">{m.splunkField}</div>
-            <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono text-[#e5ff00]/80">{m.mdrField}</div>
-            <div className="bg-[var(--bg-card)] px-4 py-2.5 text-[#6e7681]">{m.transform}</div>
+            <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono text-[#2563eb]/80">{m.mdrField}</div>
+            <div className="bg-[var(--bg-card)] px-4 py-2.5 text-[#78859b]">{m.transform}</div>
           </div>
         ))}
       </div>
       <div className="glass rounded-xl p-4">
-        <div className="text-xs text-[#8b949e] font-medium mb-2">📊 严重等级映射</div>
+        <div className="text-xs text-[#64748b] font-medium mb-2">📊 严重等级映射</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             { splunk: "critical / urgent", mdr: "critical", color: "text-red-400" },
@@ -304,10 +304,10 @@ function MappingPanel({ mappings }: { mappings: FieldMapping[] }) {
             { splunk: "medium / notable", mdr: "medium", color: "text-yellow-400" },
             { splunk: "low / informational", mdr: "low", color: "text-blue-400" },
           ].map((s) => (
-            <div key={s.mdr} className="bg-white/[0.03] rounded-lg p-2.5 text-center">
-              <div className="text-[10px] text-[#484f58] mb-1">Splunk</div>
-              <div className="text-xs font-mono text-[#8b949e]">{s.splunk}</div>
-              <div className="text-[#484f58] my-1">↓</div>
+            <div key={s.mdr} className="bg-black/[0.02] rounded-lg p-2.5 text-center">
+              <div className="text-[10px] text-[#94a3b8] mb-1">Splunk</div>
+              <div className="text-xs font-mono text-[#64748b]">{s.splunk}</div>
+              <div className="text-[#94a3b8] my-1">↓</div>
               <div className={`text-xs font-medium ${s.color}`}>{s.mdr.toUpperCase()}</div>
             </div>
           ))}
@@ -324,7 +324,7 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-white">👁 告警拉取预览</div>
+        <div className="text-sm font-medium text-[#1a1a2e]">👁 告警拉取预览</div>
         <button onClick={handleSync} disabled={syncing}
           className="px-3 py-1.5 text-xs font-medium rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 disabled:opacity-50 transition-all">
           {syncing ? "同步中..." : "🔄 模拟拉取"}
@@ -332,7 +332,7 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
       </div>
       {syncing && (
         <div className="glass rounded-xl p-4 text-center">
-          <div className="flex items-center justify-center gap-2 text-xs text-[#8b949e]">
+          <div className="flex items-center justify-center gap-2 text-xs text-[#64748b]">
             <div className="w-3 h-3 rounded-full border-2 border-cyan-400 border-t-transparent animate-spin" />
             正在从 Splunk 拉取告警...
           </div>
@@ -340,17 +340,17 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
       )}
       <div className="space-y-3">
         {alerts.map((a, i) => (
-          <div key={i} className="glass rounded-xl p-4 hover:border-white/[0.15] transition-all">
+          <div key={i} className="glass rounded-xl p-4 hover:border-black/[0.12] transition-all">
             <div className="flex items-center gap-2 mb-1.5">
               <span className={`text-[10px] px-2 py-0.5 rounded-full border ${sevColor[a.severity] || sevColor.low}`}>
                 {a.severity.toUpperCase()}
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/[0.06] text-[#8b949e]">{a.source}</span>
-              <span className="text-[10px] text-[#484f58] ml-auto">{a._time.slice(11, 19)}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/[0.04] text-[#64748b]">{a.source}</span>
+              <span className="text-[10px] text-[#94a3b8] ml-auto">{a._time.slice(11, 19)}</span>
             </div>
-            <div className="text-sm text-white font-medium">{a.description}</div>
-            <div className="text-xs text-[#484f58] mt-0.5">🖥 {a.host}</div>
-            <div className="font-mono text-[10px] text-[#6e7681] bg-white/[0.03] rounded-lg p-2 mt-2 overflow-x-auto">
+            <div className="text-sm text-[#1a1a2e] font-medium">{a.description}</div>
+            <div className="text-xs text-[#94a3b8] mt-0.5">🖥 {a.host}</div>
+            <div className="font-mono text-[10px] text-[#78859b] bg-black/[0.02] rounded-lg p-2 mt-2 overflow-x-auto">
               {a.raw}
             </div>
             <div className="flex gap-2 mt-2">
@@ -397,13 +397,13 @@ export default function SplunkPage() {
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-1">
-            <a href="/mdr" className="text-xs text-[#484f58] hover:text-[#8b949e] transition-colors">← MDR 工单系统</a>
+            <a href="/mdr" className="text-xs text-[#94a3b8] hover:text-[#64748b] transition-colors">← MDR 工单系统</a>
           </div>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#65A637] to-[#4B8A2A] flex items-center justify-center text-white font-bold text-lg">S</div>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#65A637] to-[#4B8A2A] flex items-center justify-center text-[#1a1a2e] font-bold text-lg">S</div>
             <div>
-              <h1 className="text-xl font-bold text-white">Splunk 对接配置</h1>
-              <p className="text-xs text-[#484f58]">Splunk Enterprise / Cloud → MDR 告警采集管道</p>
+              <h1 className="text-xl font-bold text-[#1a1a2e]">Splunk 对接配置</h1>
+              <p className="text-xs text-[#94a3b8]">Splunk Enterprise / Cloud → MDR 告警采集管道</p>
             </div>
           </div>
         </div>
@@ -412,14 +412,14 @@ export default function SplunkPage() {
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${testResult.status === "success" ? "bg-green-500 animate-pulse" : "bg-[#484f58]"}`} />
-              <span className="text-[#8b949e]">{testResult.status === "success" ? "已连接" : "未连接"}</span>
+              <span className="text-[#64748b]">{testResult.status === "success" ? "已连接" : "未连接"}</span>
             </div>
-            <div className="text-[#484f58]">数据源: {sources.filter((s) => s.enabled).length}/{sources.length} 启用</div>
-            <div className="text-[#484f58]">映射规则: {DEFAULT_MAPPINGS.length} 条</div>
+            <div className="text-[#94a3b8]">数据源: {sources.filter((s) => s.enabled).length}/{sources.length} 启用</div>
+            <div className="text-[#94a3b8]">映射规则: {DEFAULT_MAPPINGS.length} 条</div>
           </div>
           <div className="flex gap-2">
-            <button className="px-3 py-1 text-[11px] rounded-lg bg-white/[0.04] text-[#8b949e] hover:bg-white/[0.08] transition-all">导出配置</button>
-            <button className="px-3 py-1 text-[11px] rounded-lg bg-[#e5ff00]/10 text-[#e5ff00] border border-[#e5ff00]/20 hover:bg-[#e5ff00]/20 transition-all">保存</button>
+            <button className="px-3 py-1 text-[11px] rounded-lg bg-black/[0.03] text-[#64748b] hover:bg-black/[0.05] transition-all">导出配置</button>
+            <button className="px-3 py-1 text-[11px] rounded-lg bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/20 hover:bg-[#2563eb]/20 transition-all">保存</button>
           </div>
         </div>
 
@@ -427,7 +427,7 @@ export default function SplunkPage() {
           {tabs.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
-                tab === t.key ? "text-white bg-white/[0.08] border border-white/[0.1]" : "text-[#8b949e] hover:text-white hover:bg-white/[0.05]"
+                tab === t.key ? "text-[#1a1a2e] bg-black/[0.05] border border-black/[0.08]" : "text-[#64748b] hover:text-[#1a1a2e] hover:bg-black/[0.04]"
               }`}>
               {t.icon} {t.label}
             </button>
