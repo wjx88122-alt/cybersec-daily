@@ -3,11 +3,14 @@
 import { useState } from "react";
 import {
   DEVICE_TYPE_ICONS, DEVICE_TYPE_LABELS, STATUS_COLORS,
-  type NetworkDevice, type DeviceStatus,
+  type NetworkDevice, type NetworkAlert, type DeviceStatus,
 } from "@/lib/network-mock";
 
 const STATUS_SVG: Record<DeviceStatus, string> = {
   online: "#22c55e", warning: "#eab308", critical: "#ef4444", offline: "#6b7280",
+};
+const SEV_SVG: Record<string, string> = {
+  critical: "#ef4444", high: "#f97316", medium: "#eab308", low: "#3b82f6",
 };
 
 interface TopoNode {
@@ -89,15 +92,22 @@ function buildTopology(devices: NetworkDevice[]): { nodes: TopoNode[]; links: To
   return { nodes, links, zones: Object.values(zoneMap) };
 }
 
-export default function NetworkTopology({ devices }: { devices: NetworkDevice[] }) {
+export default function NetworkTopology({ devices, alerts = [] }: { devices: NetworkDevice[]; alerts?: NetworkAlert[] }) {
   const [hovered, setHovered] = useState<string | null>(null);
   const { nodes, links, zones } = buildTopology(devices);
+
+  // Build alert map: deviceId → alerts
+  const alertMap: Record<string, NetworkAlert[]> = {};
+  alerts.forEach((a) => {
+    if (!alertMap[a.deviceId]) alertMap[a.deviceId] = [];
+    alertMap[a.deviceId].push(a);
+  });
 
   if (devices.length === 0) {
     return <div className="text-xs text-[#94a3b8] text-center py-8">暂无设备数据</div>;
   }
 
-  const svgH = zones.length > 0 ? zones[zones.length - 1].y + zones[zones.length - 1].h + 40 : 300;
+  const svgH = zones.length > 0 ? zones[zones.length - 1].y + zones[zones.length - 1].h + 50 : 300;
   const svgW = 760;
 
   const nodeMap = Object.fromEntries(nodes.map((n) => [n.id, n]));
@@ -142,6 +152,19 @@ export default function NetworkTopology({ devices }: { devices: NetworkDevice[] 
         {nodes.map((n) => {
           const isHov = hovered === n.id;
           const color = STATUS_SVG[n.device.status];
+          const devAlerts = alertMap[n.id] || [];
+          const unacked = devAlerts.filter((a) => !a.acknowledged);
+          const worstSev = unacked.find((a) => a.severity === "critical")?.severity
+            || unacked.find((a) => a.severity === "high")?.severity
+            || unacked.find((a) => a.severity === "medium")?.severity
+            || unacked[0]?.severity;
+          const hasAlerts = unacked.length > 0;
+          // Tooltip height depends on alerts
+          const tipBaseH = 50;
+          const tipAlertH = Math.min(unacked.length, 3) * 14;
+          const tipH = tipBaseH + (hasAlerts ? tipAlertH + 18 : 0);
+          const tipW = hasAlerts ? 220 : 160;
+
           return (
             <g key={n.id}
               onMouseEnter={() => setHovered(n.id)}
@@ -149,6 +172,13 @@ export default function NetworkTopology({ devices }: { devices: NetworkDevice[] 
               className="cursor-pointer">
               {/* Shadow */}
               <ellipse cx={n.x} cy={n.y + 20} rx={22} ry={4} fill="rgba(0,0,0,0.06)" />
+              {/* Alert glow ring */}
+              {hasAlerts && (
+                <rect x={n.x - 27} y={n.y - 21} width={54} height={42} rx={10}
+                  fill="none" stroke={SEV_SVG[worstSev || "medium"]} strokeWidth={2} opacity={0.3}>
+                  <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
+                </rect>
+              )}
               {/* Node body */}
               <rect x={n.x - 24} y={n.y - 18} width={48} height={36} rx={8}
                 fill={isHov ? "#f8fafc" : "#ffffff"} stroke={color} strokeWidth={isHov ? 2.5 : 1.5}
@@ -157,6 +187,13 @@ export default function NetworkTopology({ devices }: { devices: NetworkDevice[] 
               <circle cx={n.x + 18} cy={n.y - 12} r={4} fill={color}>
                 {n.device.status === "critical" && <animate attributeName="opacity" values="1;0.3;1" dur="1.5s" repeatCount="indefinite" />}
               </circle>
+              {/* Alert badge */}
+              {hasAlerts && (
+                <g>
+                  <circle cx={n.x - 18} cy={n.y - 14} r={8} fill={SEV_SVG[worstSev || "medium"]} />
+                  <text x={n.x - 18} y={n.y - 10} textAnchor="middle" fontSize={8} fill="#fff" fontWeight={700}>{unacked.length}</text>
+                </g>
+              )}
               {/* Icon text */}
               <text x={n.x} y={n.y + 5} textAnchor="middle" fontSize={18}>{DEVICE_TYPE_ICONS[n.device.type]}</text>
               {/* Label */}
@@ -166,13 +203,40 @@ export default function NetworkTopology({ devices }: { devices: NetworkDevice[] 
               {/* Tooltip on hover */}
               {isHov && (
                 <g>
-                  <rect x={n.x - 80} y={n.y - 72} width={160} height={48} rx={8} fill="#1e293b" opacity={0.95} />
-                  <text x={n.x} y={n.y - 54} textAnchor="middle" fontSize={10} fill="#f8fafc" fontWeight={600}>
+                  <rect x={n.x - tipW / 2} y={n.y - tipH - 24} width={tipW} height={tipH} rx={8} fill="#1e293b" opacity={0.95} />
+                  {/* Arrow */}
+                  <polygon points={`${n.x - 5},${n.y - 24} ${n.x + 5},${n.y - 24} ${n.x},${n.y - 18}`} fill="#1e293b" opacity={0.95} />
+                  <text x={n.x} y={n.y - tipH - 6} textAnchor="middle" fontSize={10} fill="#f8fafc" fontWeight={600}>
                     {n.device.name} ({DEVICE_TYPE_LABELS[n.device.type]})
                   </text>
-                  <text x={n.x} y={n.y - 40} textAnchor="middle" fontSize={9} fill="#94a3b8">
-                    CPU: {n.device.cpu}% · 内存: {n.device.memory}% · {n.device.firmware}
+                  <text x={n.x} y={n.y - tipH + 8} textAnchor="middle" fontSize={9} fill="#94a3b8">
+                    CPU: {n.device.cpu}% · 内存: {n.device.memory}% · ⏱ {n.device.uptime}
                   </text>
+                  <text x={n.x} y={n.y - tipH + 20} textAnchor="middle" fontSize={8} fill="#78859b">
+                    {n.device.firmware}
+                  </text>
+                  {/* Alert list in tooltip */}
+                  {hasAlerts && (
+                    <g>
+                      <line x1={n.x - tipW / 2 + 10} y1={n.y - tipH + 28} x2={n.x + tipW / 2 - 10} y2={n.y - tipH + 28} stroke="#334155" strokeWidth={0.5} />
+                      <text x={n.x - tipW / 2 + 12} y={n.y - tipH + 40} fontSize={8} fill={SEV_SVG[worstSev || "medium"]} fontWeight={600}>
+                        ⚠ {unacked.length} 条安全事件:
+                      </text>
+                      {unacked.slice(0, 3).map((a, ai) => (
+                        <g key={a.id}>
+                          <circle cx={n.x - tipW / 2 + 16} cy={n.y - tipH + 51 + ai * 14} r={2.5} fill={SEV_SVG[a.severity]} />
+                          <text x={n.x - tipW / 2 + 24} y={n.y - tipH + 54 + ai * 14} fontSize={8} fill="#cbd5e1">
+                            {a.title.length > 28 ? a.title.slice(0, 28) + "…" : a.title}
+                          </text>
+                        </g>
+                      ))}
+                      {unacked.length > 3 && (
+                        <text x={n.x - tipW / 2 + 24} y={n.y - tipH + 54 + 3 * 14} fontSize={8} fill="#64748b">
+                          +{unacked.length - 3} 更多...
+                        </text>
+                      )}
+                    </g>
+                  )}
                 </g>
               )}
             </g>
@@ -189,7 +253,7 @@ export default function NetworkTopology({ devices }: { devices: NetworkDevice[] 
       </svg>
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-[#64748b]">
+      <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-[#64748b] flex-wrap">
         {(["online", "warning", "critical", "offline"] as DeviceStatus[]).map((s) => (
           <div key={s} className="flex items-center gap-1">
             <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[s]}`} />
@@ -199,6 +263,11 @@ export default function NetworkTopology({ devices }: { devices: NetworkDevice[] 
         <span className="text-[#cbd5e1]">|</span>
         <span>━ 跨区连接</span>
         <span>╌ 区内连接</span>
+        <span className="text-[#cbd5e1]">|</span>
+        <div className="flex items-center gap-1">
+          <span className="inline-block w-4 h-4 rounded-full bg-red-500 text-[8px] text-white text-center leading-4 font-bold">3</span>
+          安全事件数
+        </div>
       </div>
     </div>
   );

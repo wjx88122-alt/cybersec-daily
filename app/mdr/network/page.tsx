@@ -248,7 +248,7 @@ export default function NetworkPage() {
                   </div>
                 </div>
                 {/* Network topology */}
-                <NetworkTopology devices={devices} />
+                <NetworkTopology devices={devices} alerts={alerts} />
                 {/* Recent alerts */}
                 {alerts.filter((a) => !a.acknowledged).length > 0 && (
                   <div>
