@@ -3,16 +3,16 @@ import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
 const client = new OpenAI({
-  apiKey: process.env.KIMI_API_KEY,
-  baseURL: "https://api.kimi.com/coding/v1",
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: "https://api.deepseek.com/v1",
 });
 
 async function translateBatch(
   items: { title: string; summary: string }[],
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
   const response = await client.chat.completions.create({
-    model: "kimi-k2",
-    max_tokens: 32000,
+    model: "deepseek-chat",
+    max_tokens: 8192,
     messages: [
       {
         role: "system",

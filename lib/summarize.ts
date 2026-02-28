@@ -3,8 +3,8 @@ import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
 const client = new OpenAI({
-  apiKey: process.env.KIMI_API_KEY,
-  baseURL: "https://api.kimi.com/coding/v1",
+  apiKey: process.env.DEEPSEEK_API_KEY,
+  baseURL: "https://api.deepseek.com/v1",
 });
 
 type SummaryResult = { summaryAi: string };
@@ -21,7 +21,7 @@ export async function summarizeItems(
 
   try {
     const response = await client.chat.completions.create({
-      model: "kimi-k2",
+      model: "deepseek-chat",
       max_tokens: 3000,
       messages: [
         {
