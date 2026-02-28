@@ -46,7 +46,7 @@ export default function DigestCard({
       href={safeHref}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex flex-col rounded-xl overflow-hidden border border-black/[0.06] bg-white transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/8 ${cfg.border} ${cfg.glow}`}
+      className={`group relative flex flex-col rounded-xl overflow-hidden border border-white/[0.06] bg-[#0d1117] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40 ${cfg.border} ${cfg.glow}`}
     >
       {/* Top gradient bar */}
       <div className={`h-[3px] w-full bg-gradient-to-r ${cfg.bar} shrink-0`} />
@@ -59,28 +59,28 @@ export default function DigestCard({
           >
             {cfg.label}
           </span>
-          <span className="text-[10px] text-[#94a3b8] bg-black/[0.03] border border-black/[0.06] px-2 py-0.5 rounded-full truncate max-w-[140px]">
+          <span className="text-[10px] text-[#484f58] bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full truncate max-w-[140px]">
             {item.category}
           </span>
         </div>
 
         {/* Headline */}
         <h3
-          className={`font-semibold leading-snug mb-2.5 text-[#f0f6fc] group-hover:text-[#1a1a2e] transition-colors ${featured ? "text-[15px]" : "text-[13px]"}`}
+          className={`font-semibold leading-snug mb-2.5 text-[#f0f6fc] group-hover:text-white transition-colors ${featured ? "text-[15px]" : "text-[13px]"}`}
         >
           {item.headline}
         </h3>
 
         {/* Summary */}
         <p
-          className={`leading-relaxed text-[#64748b] flex-1 ${featured ? "text-[13px] line-clamp-5" : "text-[12px] line-clamp-3"}`}
+          className={`leading-relaxed text-[#8b949e] flex-1 ${featured ? "text-[13px] line-clamp-5" : "text-[12px] line-clamp-3"}`}
         >
           {item.summary}
         </p>
 
         {/* Footer */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.05]">
-          <span className="text-[11px] text-[#94a3b8] truncate max-w-[80%]">
+          <span className="text-[11px] text-[#484f58] truncate max-w-[80%]">
             {item.sourceTitle}
           </span>
           <svg
