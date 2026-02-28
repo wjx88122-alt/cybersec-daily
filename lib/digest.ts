@@ -1,9 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
-const client = new Anthropic({
-  baseURL: "https://yunyi.rdzhvip.com/claude",
+const client = new OpenAI({
+  apiKey: process.env.KIMI_API_KEY,
+  baseURL: "https://api.kimi.com/coding/v1",
 });
 
 export type DigestItem = {
@@ -64,12 +65,13 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
     day: "numeric",
   });
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 240000);
-  const stream = client.messages.stream({
-    model: "claude-opus-4-6",
+  const response = await client.chat.completions.create({
+    model: "kimi-k2",
     max_tokens: 8000,
-    system: `你是一位顶级网络安全分析师，为企业安全团队撰写每日威胁简报。
+    messages: [
+      {
+        role: "system",
+        content: `你是一位顶级网络安全分析师，为企业安全团队撰写每日威胁简报。
 你的读者是 CISO 和高级安全工程师，他们需要快速掌握：今天各个安全领域发生了什么、整体威胁态势如何、是否需要立即行动。
 
 写作要求：
@@ -77,7 +79,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
 - 每条 summary：2-3句话，包含：技术细节、受影响产品/版本、建议缓解措施
 - 覆盖所有主要类别：综合资讯、威胁情报、漏洞预警、恶意软件、深度分析、政府/监管
 - 严格按照 JSON 格式输出，不要有任何额外文字`,
-    messages: [
+      },
       {
         role: "user",
         content: `今天是 ${today}，以下是近48小时安全资讯，已按类别标注（格式：序号 [类别] 来源: 标题 — 摘要 | 链接），请生成全面的每日威胁简报。
@@ -114,17 +116,7 @@ ${articlesText}
     ],
   });
 
-  const response = await stream.finalMessage();
-  clearTimeout(timeout);
-
-  // Extract text from response (skip thinking blocks)
-  let jsonText = "";
-  for (const block of response.content) {
-    if (block.type === "text") {
-      jsonText = block.text.trim();
-      break;
-    }
-  }
+  let jsonText = response.choices[0]?.message?.content?.trim() ?? "";
 
   // Strip markdown code fences if present
   jsonText = jsonText

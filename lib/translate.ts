@@ -1,26 +1,28 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
-const client = new Anthropic({
-  baseURL: "https://yunyi.rdzhvip.com/claude",
+const client = new OpenAI({
+  apiKey: process.env.KIMI_API_KEY,
+  baseURL: "https://api.kimi.com/coding/v1",
 });
 
 async function translateBatch(
   items: { title: string; summary: string }[],
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 90000);
-  const stream = client.messages.stream({
-    model: "claude-opus-4-6",
+  const response = await client.chat.completions.create({
+    model: "kimi-k2",
     max_tokens: 32000,
-    system: `你是一位顶级网络安全分析师，负责将英文安全资讯本地化为中文，供中国安全从业者阅读。
+    messages: [
+      {
+        role: "system",
+        content: `你是一位顶级网络安全分析师，负责将英文安全资讯本地化为中文，供中国安全从业者阅读。
 你的任务是将给定的标题和摘要翻译成专业的中文。
 要求：
 1. 严格按照 JSON 格式输出，不要有任何额外文字。
 2. 翻译内容中如需使用引号，必须使用中文引号「」或『』，绝对不能使用英文双引号。
 3. 不要在 JSON 字符串值内部使用任何未转义的双引号。`,
-    messages: [
+      },
       {
         role: "user",
         content: `请将以下安全资讯翻译成中文，直接输出 JSON 数组（不要有 markdown 代码块）：
@@ -33,15 +35,7 @@ ${JSON.stringify(items)}
     ],
   });
 
-  const response = await stream.finalMessage();
-  clearTimeout(timeout);
-  let text = "";
-  for (const block of response.content) {
-    if (block.type === "text") {
-      text = block.text.trim();
-      break;
-    }
-  }
+  let text = response.choices[0]?.message?.content?.trim() ?? "";
   const cleaned = text
     .replace(/^```json\s*/i, "")
     .replace(/```\s*$/, "")

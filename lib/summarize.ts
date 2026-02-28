@@ -1,9 +1,10 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { jsonrepair } from "jsonrepair";
 import { FeedItem } from "./feeds";
 
-const client = new Anthropic({
-  baseURL: "https://yunyi.rdzhvip.com/claude",
+const client = new OpenAI({
+  apiKey: process.env.KIMI_API_KEY,
+  baseURL: "https://api.kimi.com/coding/v1",
 });
 
 type SummaryResult = { summaryAi: string };
@@ -18,14 +19,14 @@ export async function summarizeItems(
     })
     .join("\n\n---\n\n");
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 50000);
-
   try {
-    const stream = client.messages.stream({
-      model: "claude-opus-4-6",
+    const response = await client.chat.completions.create({
+      model: "kimi-k2",
       max_tokens: 3000,
-      system: `你是网络安全新闻编辑，为每篇文章生成简洁的中文摘要。
+      messages: [
+        {
+          role: "system",
+          content: `你是网络安全新闻编辑，为每篇文章生成简洁的中文摘要。
 摘要要求：
 - 3-4句话，100-150字
 - 第一句：核心事件或发现
@@ -34,7 +35,7 @@ export async function summarizeItems(
 - 第四句（可选）：建议措施或后续影响
 - 使用专业但易懂的中文
 - 严格按 JSON 数组格式输出，不要有任何额外文字`,
-      messages: [
+        },
         {
           role: "user",
           content: `为以下 ${batch.length} 篇网络安全文章生成中文摘要，直接输出 JSON 数组：
@@ -50,17 +51,7 @@ ${inputText}
       ],
     });
 
-    const response = await stream.finalMessage();
-    clearTimeout(timeout);
-
-    let jsonText = "";
-    for (const block of response.content) {
-      if (block.type === "text") {
-        jsonText = block.text.trim();
-        break;
-      }
-    }
-
+    let jsonText = response.choices[0]?.message?.content?.trim() ?? "";
     jsonText = jsonText
       .replace(/^```json\s*/i, "")
       .replace(/```\s*$/, "")
@@ -72,7 +63,6 @@ ${inputText}
       return JSON.parse(jsonrepair(jsonText)) as SummaryResult[];
     }
   } catch {
-    clearTimeout(timeout);
     return batch.map(() => ({ summaryAi: "" }));
   }
 }
