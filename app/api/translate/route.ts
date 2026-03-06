@@ -11,6 +11,43 @@ const BATCH_SIZE = 10;
 
 /** Helper: detect Chinese content (skip translation for Chinese sources) */
 const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
+const normalize = (text?: string) => (text ?? "").trim();
+
+function isLikelyUntranslated(item: FeedItem) {
+  const title = normalize(item.title);
+  const summary = normalize(item.summary);
+  const titleZh = normalize(item.titleZh);
+  const summaryZh = normalize(item.summaryZh);
+
+  const titleLooksChinese = isChinese(title);
+  const summaryLooksChinese = isChinese(summary);
+
+  // For non-Chinese source text, zh field equal to source text usually means untranslated copy.
+  const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
+  const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
+
+  return (
+    !titleZh ||
+    !summaryZh ||
+    titleCopiedFromSource ||
+    summaryCopiedFromSource
+  );
+}
+
+function autoFillChineseFields(items: FeedItem[]) {
+  items.forEach((item, i) => {
+    const patch: Partial<FeedItem> = {};
+    if (!normalize(item.titleZh) && isChinese(item.title)) {
+      patch.titleZh = item.title;
+    }
+    if (!normalize(item.summaryZh) && isChinese(item.summary)) {
+      patch.summaryZh = item.summary;
+    }
+    if (Object.keys(patch).length > 0) {
+      items[i] = { ...item, ...patch };
+    }
+  });
+}
 
 /** Apply translation map back to item arrays (mutates in place) */
 function applyTranslations(
@@ -19,7 +56,18 @@ function applyTranslations(
 ) {
   items.forEach((item, i) => {
     const t = map.get(item.id);
-    if (t?.titleZh) items[i] = { ...item, titleZh: t.titleZh, summaryZh: t.summaryZh };
+    if (!t) return;
+
+    const nextTitleZh = normalize(t.titleZh) || item.titleZh;
+    const nextSummaryZh = normalize(t.summaryZh) || item.summaryZh;
+
+    if (nextTitleZh || nextSummaryZh) {
+      items[i] = {
+        ...item,
+        titleZh: nextTitleZh,
+        summaryZh: nextSummaryZh,
+      };
+    }
   });
 }
 
@@ -47,19 +95,14 @@ export async function GET(req: NextRequest) {
   const allItems = [...feedA, ...feedB];
   const aiItems = feedAI ?? [];
 
-  // Auto-fill Chinese sources with original text as titleZh/summaryZh
-  aiItems.forEach((item, i) => {
-    if (!item.titleZh && isChinese(item.title)) {
-      aiItems[i] = { ...item, titleZh: item.title, summaryZh: item.summary };
-    }
-  });
+  // Auto-fill Chinese source content into zh fields to avoid unnecessary LLM calls.
+  autoFillChineseFields(allItems);
+  autoFillChineseFields(aiItems);
 
-  // Collect ALL untranslated items — no time filter here
+  // Collect ALL untranslated/incomplete items — no time filter here
   // (time filtering is only for frontend display, not translation eligibility)
-  const toTranslate = allItems.filter((i) => !i.titleZh);
-  const toTranslateAI = aiItems.filter(
-    (i) => !i.titleZh && !isChinese(i.title),
-  );
+  const toTranslate = allItems.filter(isLikelyUntranslated);
+  const toTranslateAI = aiItems.filter(isLikelyUntranslated);
   const allToTranslate = [...toTranslate, ...toTranslateAI];
 
   if (allToTranslate.length === 0) {
@@ -85,7 +128,10 @@ export async function GET(req: NextRequest) {
       const batch = allToTranslate.slice(i, i + BATCH_SIZE);
       const results = await translateItems(batch);
       batch.forEach((item, j) => {
-        if (results[j]?.titleZh) translationMap.set(item.id, results[j]);
+        const result = results[j];
+        if (normalize(result?.titleZh) || normalize(result?.summaryZh)) {
+          translationMap.set(item.id, result);
+        }
       });
       batchesDone++;
     } catch (batchErr) {

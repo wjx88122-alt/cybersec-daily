@@ -1,5 +1,5 @@
 import { jsonrepair } from "jsonrepair";
-import { getDeepSeekClient } from "./deepseek";
+import { getDeepSeekClient, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
 
 export type DigestItem = {
@@ -61,8 +61,9 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   });
 
   const client = getDeepSeekClient();
+  const model = getLLMModel();
   const response = await client.chat.completions.create({
-    model: "deepseek-chat",
+    model,
     max_tokens: 8192,
     messages: [
       {

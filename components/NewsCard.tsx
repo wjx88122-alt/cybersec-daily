@@ -70,7 +70,7 @@ export default function NewsCard({
   }
 
   const title = item.titleZh || item.title;
-  const summary = item.summaryAi || item.summaryZh || item.summary;
+  const summary = item.summaryZh || item.summaryAi || item.summary;
   const imgSrc = !imgError && item.image ? item.image : null;
   const catAccent =
     CATEGORY_ACCENT[item.category] ??

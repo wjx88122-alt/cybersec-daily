@@ -5,30 +5,79 @@ import { jsonrepair } from 'jsonrepair';
 const kvUrl = process.env.KV_REST_API_URL;
 const kvToken = process.env.KV_REST_API_TOKEN;
 const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+const kimiApiKey = process.env.KIMI_API_KEY;
+const openaiApiKey = process.env.OPENAI_API_KEY;
 
 if (!kvUrl || !kvToken) {
   throw new Error('Missing KV_REST_API_URL or KV_REST_API_TOKEN');
 }
-if (!deepseekApiKey) {
-  throw new Error('Missing DEEPSEEK_API_KEY');
+
+function resolveLlmConfig() {
+  if (deepseekApiKey) {
+    return {
+      apiKey: deepseekApiKey,
+      baseURL: 'https://api.deepseek.com/v1',
+      model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+    };
+  }
+  if (kimiApiKey) {
+    return {
+      apiKey: kimiApiKey,
+      baseURL: 'https://api.kimi.com/coding/v1',
+      model: process.env.KIMI_MODEL || 'kimi-k2',
+    };
+  }
+  if (openaiApiKey) {
+    return {
+      apiKey: openaiApiKey,
+      baseURL: '',
+      model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
+    };
+  }
+  throw new Error('Missing LLM key: set DEEPSEEK_API_KEY or KIMI_API_KEY or OPENAI_API_KEY');
 }
+const llm = resolveLlmConfig();
 
 const kv = new Redis({
   url: kvUrl,
   token: kvToken,
 });
 
-const client = new OpenAI({
-  apiKey: deepseekApiKey,
-  baseURL: 'https://api.deepseek.com/v1',
-});
+const client = llm.baseURL
+  ? new OpenAI({ apiKey: llm.apiKey, baseURL: llm.baseURL })
+  : new OpenAI({ apiKey: llm.apiKey });
 
 const BATCH_SIZE = 10;
 const isChinese = (text) => /[\u4e00-\u9fff]/.test(text);
+const normalize = (text) => (text ?? '').trim();
+
+function isLikelyUntranslated(item) {
+  const title = normalize(item.title);
+  const summary = normalize(item.summary);
+  const titleZh = normalize(item.titleZh);
+  const summaryZh = normalize(item.summaryZh);
+
+  const titleLooksChinese = isChinese(title);
+  const summaryLooksChinese = isChinese(summary);
+
+  const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
+  const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
+
+  return !titleZh || !summaryZh || titleCopiedFromSource || summaryCopiedFromSource;
+}
+
+function autoFillChineseFields(items) {
+  items.forEach((item, i) => {
+    const patch = {};
+    if (!normalize(item.titleZh) && isChinese(item.title)) patch.titleZh = item.title;
+    if (!normalize(item.summaryZh) && isChinese(item.summary)) patch.summaryZh = item.summary;
+    if (Object.keys(patch).length > 0) items[i] = { ...item, ...patch };
+  });
+}
 
 async function translateBatch(items) {
   const response = await client.chat.completions.create({
-    model: 'deepseek-chat',
+    model: llm.model,
     max_tokens: 8192,
     messages: [{
       role: 'system',
@@ -64,16 +113,13 @@ async function run() {
   const a = Array.isArray(feedA) ? feedA : [];
   const b = Array.isArray(feedB) ? feedB : [];
   const ai = Array.isArray(feedAI) ? feedAI : [];
-
-  ai.forEach((item, i) => {
-    if (!item.titleZh && isChinese(item.title)) {
-      ai[i] = { ...item, titleZh: item.title, summaryZh: item.summary };
-    }
-  });
-
   const allItems = [...a, ...b];
-  const toTranslate = allItems.filter(i => !i.titleZh);
-  const toTranslateAI = ai.filter(i => !i.titleZh && !isChinese(i.title));
+
+  autoFillChineseFields(allItems);
+  autoFillChineseFields(ai);
+
+  const toTranslate = allItems.filter(isLikelyUntranslated);
+  const toTranslateAI = ai.filter(isLikelyUntranslated);
   const allToTranslate = [...toTranslate, ...toTranslateAI];
 
   console.log(`Total: ${allItems.length + ai.length} | Untranslated: ${allToTranslate.length}`);
@@ -89,7 +135,10 @@ async function run() {
     try {
       const results = await translateBatch(input);
       batch.forEach((item, j) => {
-        if (results[j]?.titleZh) translationMap.set(item.id, results[j]);
+        const result = results[j];
+        if (normalize(result?.titleZh) || normalize(result?.summaryZh)) {
+          translationMap.set(item.id, result);
+        }
       });
       done++;
       console.log(`Batch ${done}: translated ${batch.length} items (${translationMap.size} total)`);
@@ -102,11 +151,15 @@ async function run() {
   // Save
   for (const item of allItems) {
     const t = translationMap.get(item.id);
-    if (t?.titleZh) { item.titleZh = t.titleZh; item.summaryZh = t.summaryZh; }
+    if (!t) continue;
+    item.titleZh = normalize(t.titleZh) || item.titleZh;
+    item.summaryZh = normalize(t.summaryZh) || item.summaryZh;
   }
   for (const item of ai) {
     const t = translationMap.get(item.id);
-    if (t?.titleZh) { item.titleZh = t.titleZh; item.summaryZh = t.summaryZh; }
+    if (!t) continue;
+    item.titleZh = normalize(t.titleZh) || item.titleZh;
+    item.summaryZh = normalize(t.summaryZh) || item.summaryZh;
   }
   await Promise.all([
     kv.set('feed-a', allItems.slice(0, a.length)),

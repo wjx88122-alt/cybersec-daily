@@ -1,5 +1,5 @@
 import { jsonrepair } from "jsonrepair";
-import { getDeepSeekClient } from "./deepseek";
+import { getDeepSeekClient, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
 
 type SummaryResult = { summaryAi: string };
@@ -16,8 +16,9 @@ export async function summarizeItems(
 
   try {
     const client = getDeepSeekClient();
+    const model = getLLMModel();
     const response = await client.chat.completions.create({
-      model: "deepseek-chat",
+      model,
       max_tokens: 3000,
       messages: [
         {
