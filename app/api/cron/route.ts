@@ -54,6 +54,16 @@ export async function GET(req: NextRequest) {
     kv.set("feed-ai", mergedAI),
   ]);
 
+  // Trigger image enrichment right after feed refresh so new items are not left without thumbnails.
+  const selfImagesUrl = `${req.nextUrl.origin}/api/images`;
+  fetch(selfImagesUrl, {
+    headers: {
+      authorization: `Bearer ${process.env.CRON_SECRET}`,
+    },
+  }).catch((e) => {
+    console.error("image enrichment trigger failed:", e);
+  });
+
   // Generate daily snapshot (best-effort, don't block on failure)
   try {
     const [digest, snapshots] = await Promise.all([

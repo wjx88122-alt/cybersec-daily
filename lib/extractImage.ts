@@ -16,46 +16,100 @@ function isAllowedUrl(url: string): boolean {
   }
 }
 
+const MAX_HEAD_BYTES = 160 * 1024;
+const FETCH_TIMEOUT_MS = 6000;
+const BASE_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+} as const;
+
+function decodeHtmlEntities(input: string): string {
+  return input
+    .replace(/&amp;/gi, "&")
+    .replace(/&#38;/gi, "&")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#x27;|&#39;/gi, "'")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function normalizeImageUrl(raw: string, pageUrl: string): string | null {
+  const value = decodeHtmlEntities(raw.trim());
+  if (!value || value.startsWith("data:")) return null;
+
+  const maybeAbsolute = value.startsWith("//") ? `https:${value}` : value;
+
+  try {
+    const resolved = new URL(maybeAbsolute, pageUrl);
+    if (resolved.protocol !== "https:") return null;
+    return resolved.toString();
+  } catch {
+    return null;
+  }
+}
+
+function extractImageFromHtml(html: string, pageUrl: string): string | null {
+  const patterns = [
+    /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
+    /<meta[^>]+property=["']og:image:url["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+name=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']/i,
+    /<meta[^>]+itemprop=["']image["'][^>]+content=["']([^"']+)["']/i,
+    /<link[^>]+rel=["']image_src["'][^>]+href=["']([^"']+)["']/i,
+    /<img[^>]+src=["']([^"']+)["']/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = html.match(pattern);
+    if (!match?.[1]) continue;
+    const normalized = normalizeImageUrl(match[1], pageUrl);
+    if (normalized) return normalized;
+  }
+  return null;
+}
+
+async function readHeadChunk(res: Response): Promise<string> {
+  const reader = res.body?.getReader();
+  if (!reader) return "";
+
+  let html = "";
+  const decoder = new TextDecoder();
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    html += decoder.decode(value, { stream: true });
+    if (html.includes("</head>") || html.length >= MAX_HEAD_BYTES) break;
+  }
+  reader.cancel();
+  return html;
+}
+
 export async function extractOgImage(url: string): Promise<string | null> {
   if (!isAllowedUrl(url)) return null;
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 4000);
-
-  try {
-    const res = await fetch(url, {
-      headers: { Range: "bytes=0-32768" },
-      signal: controller.signal,
-    });
-
-    const reader = res.body?.getReader();
-    if (!reader) return null;
-
-    let html = "";
-    const decoder = new TextDecoder();
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      html += decoder.decode(value, { stream: true });
-      if (html.includes("</head>")) break;
+  for (const useRange of [true, false]) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
+    try {
+      const headers = useRange
+        ? { ...BASE_HEADERS, Range: "bytes=0-163839" }
+        : BASE_HEADERS;
+      const res = await fetch(url, {
+        headers,
+        signal: controller.signal,
+        redirect: "follow",
+      });
+      const html = await readHeadChunk(res);
+      const image = extractImageFromHtml(html, url);
+      if (image) return image;
+    } catch {
+      // Ignore this attempt and retry with the next strategy.
+    } finally {
+      clearTimeout(timeout);
     }
-    reader.cancel();
-
-    const match =
-      html.match(
-        /<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i,
-      ) ||
-      html.match(
-        /<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/i,
-      );
-
-    if (!match) return null;
-    const imageUrl = match[1];
-    return imageUrl.startsWith("https://") ? imageUrl : null;
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timeout);
   }
+  return null;
 }
