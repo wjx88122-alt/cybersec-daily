@@ -78,6 +78,12 @@ export async function GET(req: NextRequest) {
   }
 
   const startTime = Date.now();
+  const triggerDigestRebuild = () => {
+    const digestUrl = `${req.nextUrl.origin}/api/digest`;
+    fetch(digestUrl, {
+      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+    }).catch((e) => console.error("translate: trigger digest failed:", e));
+  };
 
   const [feedA, feedB, feedAI] = await Promise.all([
     kv.get<FeedItem[]>("feed-a"),
@@ -108,6 +114,7 @@ export async function GET(req: NextRequest) {
   if (allToTranslate.length === 0) {
     const totalWithZh = allItems.filter((i) => i.titleZh).length + aiItems.filter((i) => i.titleZh).length;
     if (feedAI) await kv.set("feed-ai", aiItems);
+    triggerDigestRebuild();
     return NextResponse.json({ ok: true, withZh: totalWithZh, skipped: true });
   }
 
@@ -178,6 +185,9 @@ export async function GET(req: NextRequest) {
       headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
     }).catch(() => {});
     console.log(`translate: ${pending} items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`);
+  }
+  if (pending === 0) {
+    triggerDigestRebuild();
   }
 
   return NextResponse.json({

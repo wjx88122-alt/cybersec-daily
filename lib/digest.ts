@@ -62,40 +62,186 @@ function enrichDigestWithFeedItems(
   };
 }
 
+const DIGEST_LOOKBACK_HOURS = 72;
+const AI_CATEGORY_PREFIX = "AI ";
+const SECURITY_KEYWORDS: Array<[RegExp, number]> = [
+  [/\bcve-\d{4}-\d+\b/i, 16],
+  [/(zero[- ]day|0[- ]day|在野利用|已被利用|actively exploited)/i, 14],
+  [/(rce|remote code execution|提权|privilege escalation|沙箱逃逸)/i, 12],
+  [/(勒索软件|ransomware|数据泄露|data breach|供应链|supply chain)/i, 10],
+  [/(apt|后门|backdoor|botnet|僵尸网络|恶意软件)/i, 8],
+  [/(cisa|msrc|advisory|补丁|patch|fortinet|cisco|microsoft)/i, 6],
+];
+const AI_KEYWORDS: Array<[RegExp, number]> = [
+  [/(模型发布|model release|launch|agent|copilot|多模态|multimodal)/i, 8],
+  [/(政策|监管|regulation|compliance|版权|copyright|治理|governance)/i, 10],
+  [/(提示注入|prompt injection|越狱|jailbreak|泄露|data leak|abuse|滥用)/i, 12],
+  [/(企业落地|enterprise|成本|roi|推理|inference|开源|open[- ]source)/i, 6],
+];
+
+type ScoredItem = { item: FeedItem; score: number };
+
+function isAiCategory(category: string): boolean {
+  return category.startsWith(AI_CATEGORY_PREFIX);
+}
+
+function normalizeTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\u4e00-\u9fff]+/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function scoreFeedItem(item: FeedItem, now: number): number {
+  const text = `${item.titleZh || item.title} ${item.summaryZh || item.summaryAi || item.summary}`.toLowerCase();
+  const patterns = isAiCategory(item.category) ? AI_KEYWORDS : SECURITY_KEYWORDS;
+  const pub = new Date(item.pubDate).getTime();
+  const ageHours = Number.isFinite(pub)
+    ? Math.max(0, (now - pub) / 3_600_000)
+    : DIGEST_LOOKBACK_HOURS;
+
+  let score = Math.max(0, DIGEST_LOOKBACK_HOURS - ageHours) * 0.35;
+  for (const [re, weight] of patterns) {
+    if (re.test(text)) score += weight;
+  }
+
+  const source = item.source.toLowerCase();
+  if (
+    /(cisa|msrc|nvd|talos|mandiant|securityweek|the hacker news)/i.test(source)
+  ) {
+    score += 3;
+  }
+  if (
+    /(openai|deepmind|google ai|microsoft ai|nvidia|hugging face|langchain)/i.test(
+      source,
+    )
+  ) {
+    score += 2;
+  }
+  if (item.titleZh && (item.summaryZh || item.summaryAi)) score += 1;
+
+  return score;
+}
+
+function pickWithCoverage(
+  scoredItems: ScoredItem[],
+  total: number,
+  maxPerSource: number,
+  maxPerCategory: number,
+): FeedItem[] {
+  const selected: FeedItem[] = [];
+  const selectedIds = new Set<string>();
+  const sourceCount = new Map<string, number>();
+  const categoryCount = new Map<string, number>();
+  const byCategory = new Map<string, ScoredItem[]>();
+
+  for (const entry of scoredItems) {
+    if (!byCategory.has(entry.item.category)) byCategory.set(entry.item.category, []);
+    byCategory.get(entry.item.category)!.push(entry);
+  }
+
+  const categoryOrder = [...byCategory.entries()]
+    .sort((a, b) => (b[1][0]?.score ?? 0) - (a[1][0]?.score ?? 0))
+    .map(([category]) => category);
+
+  const canTake = (entry: ScoredItem) => {
+    if (selectedIds.has(entry.item.id)) return false;
+    if ((sourceCount.get(entry.item.source) ?? 0) >= maxPerSource) return false;
+    if ((categoryCount.get(entry.item.category) ?? 0) >= maxPerCategory)
+      return false;
+    return true;
+  };
+
+  const take = (entry: ScoredItem) => {
+    selected.push(entry.item);
+    selectedIds.add(entry.item.id);
+    sourceCount.set(entry.item.source, (sourceCount.get(entry.item.source) ?? 0) + 1);
+    categoryCount.set(
+      entry.item.category,
+      (categoryCount.get(entry.item.category) ?? 0) + 1,
+    );
+  };
+
+  // Pass 1: guarantee category coverage
+  for (const category of categoryOrder) {
+    if (selected.length >= total) break;
+    const candidate = byCategory.get(category)?.find(canTake);
+    if (candidate) take(candidate);
+  }
+
+  // Pass 2: fill remaining slots by score
+  for (const entry of scoredItems) {
+    if (selected.length >= total) break;
+    if (canTake(entry)) take(entry);
+  }
+
+  return selected;
+}
+
 function selectRepresentativeItems(
   items: FeedItem[],
   total: number,
 ): FeedItem[] {
-  // Group by category, take top items from each proportionally
-  const byCategory = new Map<string, FeedItem[]>();
-  for (const item of items) {
-    if (!byCategory.has(item.category)) byCategory.set(item.category, []);
-    byCategory.get(item.category)!.push(item);
+  const now = Date.now();
+  const sortedByTime = [...items].sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime(),
+  );
+
+  const seenTitles = new Set<string>();
+  const deduped = sortedByTime.filter((item) => {
+    const key = normalizeTitle(item.titleZh || item.title);
+    if (!key || seenTitles.has(key)) return false;
+    seenTitles.add(key);
+    return true;
+  });
+
+  const scored = deduped
+    .map((item) => ({ item, score: scoreFeedItem(item, now) }))
+    .sort((a, b) => {
+      const scoreDiff = b.score - a.score;
+      if (scoreDiff !== 0) return scoreDiff;
+      return new Date(b.item.pubDate).getTime() - new Date(a.item.pubDate).getTime();
+    });
+
+  const scoredSecurity = scored.filter((s) => !isAiCategory(s.item.category));
+  const scoredAI = scored.filter((s) => isAiCategory(s.item.category));
+
+  // Keep a mixed pool: mostly security events, plus meaningful AI updates.
+  const desiredAi = scoredAI.length > 0 ? Math.max(6, Math.round(total * 0.3)) : 0;
+  const aiTarget = Math.min(desiredAi, scoredAI.length);
+  const securityTarget = Math.min(total - aiTarget, scoredSecurity.length);
+
+  const selectedSecurity = pickWithCoverage(scoredSecurity, securityTarget, 2, 6);
+  const selectedAI = pickWithCoverage(scoredAI, aiTarget, 2, 4);
+
+  const selected = [...selectedSecurity, ...selectedAI];
+  const selectedIds = new Set(selected.map((i) => i.id));
+  for (const entry of scored) {
+    if (selected.length >= total) break;
+    if (selectedIds.has(entry.item.id)) continue;
+    selected.push(entry.item);
+    selectedIds.add(entry.item.id);
   }
 
-  const categories = [...byCategory.keys()];
-  const perCategory = Math.ceil(total / categories.length);
-
-  const selected: FeedItem[] = [];
-  for (const [, catItems] of byCategory) {
-    selected.push(...catItems.slice(0, perCategory));
-  }
-
+  const scoreById = new Map(scored.map((entry) => [entry.item.id, entry.score]));
   return selected
-    .sort(
-      (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime(),
-    )
+    .sort((a, b) => {
+      const scoreDiff = (scoreById.get(b.id) ?? 0) - (scoreById.get(a.id) ?? 0);
+      if (scoreDiff !== 0) return scoreDiff;
+      return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
+    })
     .slice(0, total);
 }
 
 export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
-  // Select up to 40 items with proportional category coverage
-  const recent = selectRepresentativeItems(items, 40);
+  // Select up to 48 high-signal items with security+AI mixed coverage.
+  const recent = selectRepresentativeItems(items, 48);
 
   const articlesText = recent
     .map(
       (item, i) =>
-        `[${i + 1}] [${item.category}] ${item.source}: ${item.titleZh || item.title} — ${(item.summaryZh || item.summaryAi || item.summary).slice(0, 150)} | ${item.link}`,
+        `[${i + 1}] [${isAiCategory(item.category) ? "AI" : "SEC"}][${item.category}] ${item.source}: ${item.titleZh || item.title} — ${(item.summaryZh || item.summaryAi || item.summary).slice(0, 170)} | ${item.link}`,
     )
     .join("\n");
 
@@ -113,47 +259,63 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
     messages: [
       {
         role: "system",
-        content: `你是一位顶级网络安全分析师，为企业安全团队撰写每日威胁简报。
-你的读者是 CISO 和高级安全工程师，他们需要快速掌握：今天各个安全领域发生了什么、整体威胁态势如何、是否需要立即行动。
+        content: `你是一位企业级安全与 AI 治理分析师，为 CISO / SOC 负责人撰写每日关键简报。
+你的任务是从「网络安全事件」和「AI 领域动态」中抽取最重要的可执行信息，帮助管理层快速决策。
 
 写作要求：
-- overview：5-6句话，全面覆盖今日安全态势：①整体威胁趋势 ②漏洞与补丁动态 ③威胁情报与 APT 活动 ④数据泄露与供应链风险 ⑤值得关注的新变化 ⑥整体风险判断与行动建议
-- 每条 summary：2-3句话，包含：技术细节、受影响产品/版本、建议缓解措施
-- 覆盖所有主要类别：综合资讯、威胁情报、漏洞预警、恶意软件、深度分析、政府/监管
+- overview：6-7句话，必须同时覆盖：①安全威胁总体趋势 ②漏洞/补丁动态 ③APT/恶意软件动态 ④AI 关键变化 ⑤AI 与安全联动风险 ⑥未来 24-72 小时行动建议
+- 每条 summary：2-3 句话，结构为：发生了什么 -> 为什么重要 -> 应该做什么
+- 安全类与 AI 类都要覆盖，AI 类事件不能缺失
+- importance 仅能是 critical/high/medium：
+  - critical：已发生在野利用、广泛影响核心业务、或 AI 事件已造成明显安全风险
+  - high：影响面较大、短期需要行动
+  - medium：趋势性信息或中期关注事项
 - 严格按照 JSON 格式输出，不要有任何额外文字`,
       },
       {
         role: "user",
-        content: `今天是 ${today}，以下是近48小时安全资讯，已按类别标注（格式：序号 [类别] 来源: 标题 — 摘要 | 链接），请生成全面的每日威胁简报。
+        content: `今天是 ${today}。以下是近72小时候选资讯，格式为：
+[序号] [SEC|AI][分类] 来源: 标题 — 摘要 | 链接
 
 ${articlesText}
 
 选题标准（按优先级）：
+安全方向：
 - ✅ 有在野利用证据的漏洞（actively exploited）
 - ✅ 影响主流产品的高危漏洞（CVSS ≥ 8.0）
 - ✅ 大规模数据泄露或供应链攻击
 - ✅ 新型 APT 活动或恶意软件家族
 - ✅ 重要安全补丁（微软、思科、Fortinet 等）
 - ✅ 政府监管动态与行业重要公告
-- ❌ 排除：纯观点评论、市场新闻、无技术细节的泛泛报道
+
+AI 方向：
+- ✅ 新模型/能力发布且会影响企业安全治理、开发流程或攻击面
+- ✅ AI 安全事件（提示注入、越狱、数据泄露、模型滥用、恶意插件）
+- ✅ AI 监管/合规/版权政策变动（对企业落地有实质影响）
+- ✅ 影响企业部署决策的关键生态变化（成本、开源、基础设施）
+
+- ❌ 排除：纯营销、无实质信息的产品宣传、重复报道
 
 请输出如下 JSON 格式（不要有 markdown 代码块，直接输出 JSON）：
 {
   "date": "${today}",
-  "overview": "5-6句话的全面威胁态势综述，覆盖今日各安全领域的主要动态、整体风险判断和行动建议",
+  "overview": "6-7句话，兼顾安全威胁与AI变化，并给出可执行建议",
   "items": [
     {
-      "headline": "简短标题（20字以内，突出核心威胁）",
-      "summary": "3-4句话：①技术细节 ②受影响产品和版本 ③攻击方式 ④建议缓解措施",
+      "headline": "中文短标题（20字以内）",
+      "summary": "2-3句话：发生了什么、影响是什么、建议动作",
       "importance": "critical|high|medium",
       "category": "分类名",
-      "sourceTitle": "原文标题",
+      "sourceTitle": "中文来源标题（若原文为英文请翻译）",
       "sourceLink": "原文链接"
     }
   ]
 }
 
-从各类别中选取最重要的事件，共8-10条，按重要性排序，确保覆盖综合资讯、威胁情报、漏洞预警等主要类别。`,
+从各类别中选取最重要事件，共9-12条并按重要性排序，且满足：
+- 至少 6 条安全类（SEC）
+- 至少 2 条 AI 类（AI）
+- 覆盖漏洞预警、威胁情报，以及至少两个 AI 子类别。`,
       },
     ],
   });
@@ -185,8 +347,8 @@ ${articlesText}
   // Last resort fallback
   return {
     date: today,
-    overview: "今日安全资讯摘要生成失败，请直接浏览原始资讯。",
-    items: recent.slice(0, 8).map((item) => ({
+    overview: "今日关键资讯摘要生成失败，请直接浏览原始资讯。",
+    items: recent.slice(0, 9).map((item) => ({
       headline: (item.titleZh || item.title).slice(0, 20),
       summary: item.summaryZh || item.summaryAi || item.summary || item.title,
       importance: "medium" as const,

@@ -10,16 +10,17 @@ export async function GET(req: NextRequest) {
 
   // Cron/manual trigger: regenerate digest
   if (auth === `Bearer ${process.env.CRON_SECRET}`) {
-    const [feedA, feedB] = await Promise.all([
+    const [feedA, feedB, feedAI] = await Promise.all([
       kv.get<FeedItem[]>("feed-a"),
       kv.get<FeedItem[]>("feed-b"),
+      kv.get<FeedItem[]>("feed-ai"),
     ]);
     if (!feedA)
       return NextResponse.json(
         { error: "No feed data, run cron first" },
         { status: 400 },
       );
-    const allItems = [...(feedA ?? []), ...(feedB ?? [])];
+    const allItems = [...(feedA ?? []), ...(feedB ?? []), ...(feedAI ?? [])];
     allItems.sort(
       (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime(),
     );
