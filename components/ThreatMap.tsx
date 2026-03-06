@@ -90,6 +90,8 @@ interface AttackArc {
   speed: number;
 }
 
+const INITIAL_ARC_COUNT = 6;
+
 function randomAttack(id: number): AttackArc {
   const sources = Object.keys(CITIES).filter((c) => !DEFENDED.includes(c));
   const fromKey = sources[Math.floor(Math.random() * sources.length)];
@@ -101,6 +103,16 @@ function randomAttack(id: number): AttackArc {
     type: ATTACK_TYPES[Math.floor(Math.random() * ATTACK_TYPES.length)],
     progress: 0, speed: 0.004 + Math.random() * 0.006,
   };
+}
+
+function createInitialArcs(count: number): AttackArc[] {
+  const initial: AttackArc[] = [];
+  for (let i = 0; i < count; i++) {
+    const arc = randomAttack(i);
+    arc.progress = Math.random() * 0.7;
+    initial.push(arc);
+  }
+  return initial;
 }
 
 // Great circle interpolation
@@ -122,11 +134,16 @@ const GLOBE_CX = 400;
 const GLOBE_CY = 210;
 
 export default function ThreatMap() {
-  const [arcs, setArcs] = useState<AttackArc[]>([]);
-  const [stats, setStats] = useState({ blocked: 47283, active: 0 });
+  const [arcs, setArcs] = useState<AttackArc[]>(() =>
+    createInitialArcs(INITIAL_ARC_COUNT),
+  );
+  const [stats, setStats] = useState({
+    blocked: 47283,
+    active: INITIAL_ARC_COUNT,
+  });
   const [latestAttack, setLatestAttack] = useState<AttackArc | null>(null);
   const [rotation, setRotation] = useState(80); // center longitude
-  const idRef = useRef(0);
+  const idRef = useRef(INITIAL_ARC_COUNT);
   const frameRef = useRef<number>(0);
   const blockedRef = useRef(47283);
 
@@ -135,14 +152,6 @@ export default function ThreatMap() {
   }, [rotation]);
 
   useEffect(() => {
-    const initial: AttackArc[] = [];
-    for (let i = 0; i < 6; i++) {
-      const a = randomAttack(idRef.current++);
-      a.progress = Math.random() * 0.7;
-      initial.push(a);
-    }
-    setArcs(initial);
-
     const animate = () => {
       setArcs((prev) => {
         let newArcs = prev.map((a) => ({ ...a, progress: a.progress + a.speed }));
@@ -189,7 +198,6 @@ export default function ThreatMap() {
     }
     const visiblePts = pts.filter((p) => p.visible);
     const headGeo = geoInterp(from, to, arc.progress);
-    const headLift = Math.sin(Math.PI) * 0.15;
     const head = orthoProject(headGeo.lat, headGeo.lon, 20, rotation, GLOBE_R * (1 + Math.sin(arc.progress * Math.PI) * 0.15), GLOBE_CX, GLOBE_CY);
     const pathD = visiblePts.length > 1 ? visiblePts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ") : null;
     // Impact point (on surface)

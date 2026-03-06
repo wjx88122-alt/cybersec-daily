@@ -3,12 +3,9 @@
 import { useState, useEffect, useMemo } from "react";
 import {
   MOCK_ALERTS, MOCK_TICKETS, MOCK_ANALYSTS,
-  SEVERITY_LABELS, STATUS_LABELS,
-  type Severity, type TicketStatus, type AlertSource,
 } from "@/lib/mdr-mock";
 import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
-  type DeviceStatus,
 } from "@/lib/network-mock";
 import ThreatMap from "@/components/ThreatMap";
 
@@ -36,12 +33,17 @@ function AnimatedNumber({ value, duration = 1500 }: { value: number; duration?: 
 /* ── Ring Chart (CSS) ── */
 function RingChart({ data, size = 120 }: { data: { label: string; value: number; color: string }[]; size?: number }) {
   const total = data.reduce((s, d) => s + d.value, 0);
-  let cumulative = 0;
-  const segments = data.map((d) => {
-    const start = (cumulative / total) * 360;
-    cumulative += d.value;
-    const end = (cumulative / total) * 360;
-    return { ...d, start, end };
+  const safeTotal = total || 1;
+  const segments = data.map((d, i) => {
+    const startValue = data
+      .slice(0, i)
+      .reduce((sum, item) => sum + item.value, 0);
+    const endValue = startValue + d.value;
+    return {
+      ...d,
+      start: (startValue / safeTotal) * 360,
+      end: (endValue / safeTotal) * 360,
+    };
   });
   const r = size / 2 - 8;
   const cx = size / 2;

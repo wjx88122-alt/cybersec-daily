@@ -1,3 +1,4 @@
+import https from "node:https";
 import { NextRequest, NextResponse } from "next/server";
 
 /**
@@ -21,6 +22,13 @@ interface HuaweiRequest {
   verifySsl?: boolean;
 }
 
+type ProxyRequestOptions = {
+  method: HuaweiRequest["method"];
+  headers: Record<string, string>;
+  body?: string;
+  signal: AbortSignal;
+};
+
 // Validate required fields
 function validate(req: HuaweiRequest): string | null {
   if (!req.host) return "缺少防火墙地址 (host)";
@@ -35,6 +43,77 @@ function validate(req: HuaweiRequest): string | null {
   // Prevent path traversal
   if (!req.path.startsWith("/restconf/")) return "API 路径必须以 /restconf/ 开头";
   return null;
+}
+
+function fetchWithInsecureTls(
+  url: string,
+  options: ProxyRequestOptions,
+): Promise<Response> {
+  return new Promise((resolve, reject) => {
+    const req = https.request(
+      url,
+      {
+        method: options.method,
+        headers: options.headers,
+        rejectUnauthorized: false,
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on("data", (chunk) => {
+          chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+        });
+        res.on("end", () => {
+          cleanup();
+          const responseHeaders = new Headers();
+          for (const [key, value] of Object.entries(res.headers)) {
+            if (Array.isArray(value)) responseHeaders.set(key, value.join(", "));
+            else if (typeof value === "string") responseHeaders.set(key, value);
+          }
+          resolve(
+            new Response(Buffer.concat(chunks).toString("utf8"), {
+              status: res.statusCode ?? 502,
+              statusText: res.statusMessage ?? "Bad Gateway",
+              headers: responseHeaders,
+            }),
+          );
+        });
+      },
+    );
+
+    const onAbort = () => req.destroy(new Error("AbortError"));
+    const cleanup = () => options.signal.removeEventListener("abort", onAbort);
+
+    req.on("error", (err) => {
+      cleanup();
+      reject(err);
+    });
+
+    if (options.signal.aborted) {
+      onAbort();
+      return;
+    }
+
+    options.signal.addEventListener("abort", onAbort, { once: true });
+
+    if (options.body) req.write(options.body);
+    req.end();
+  });
+}
+
+async function proxyFetch(
+  url: string,
+  options: ProxyRequestOptions,
+  verifySsl: boolean,
+): Promise<Response> {
+  if (verifySsl) {
+    return fetch(url, {
+      method: options.method,
+      headers: options.headers,
+      body: options.body,
+      signal: options.signal,
+    });
+  }
+  return fetchWithInsecureTls(url, options);
 }
 
 export async function POST(request: NextRequest) {
@@ -57,49 +136,38 @@ export async function POST(request: NextRequest) {
       "Content-Type": "application/yang-data+json",
     };
 
-    const fetchOptions: RequestInit = {
-      method,
-      headers,
-    };
-
-    if (reqBody && method !== "GET") {
-      fetchOptions.body = JSON.stringify(reqBody);
-    }
-
-    // For self-signed certs, we need to disable TLS verification
-    // In Node.js 18+ (Vercel runtime), we use the undici dispatcher or env var
-    // NODE_TLS_REJECT_UNAUTHORIZED is set per-request via custom agent
+    const requestBody =
+      reqBody && method !== "GET" ? JSON.stringify(reqBody) : undefined;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000); // 15s timeout
 
     let response: Response;
     try {
-      // Use dynamic import for https agent to handle self-signed certs
-      if (typeof process !== "undefined" && body.verifySsl === false) {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-      }
-      
-      response = await fetch(url, {
-        ...fetchOptions,
-        signal: controller.signal,
-      });
+      response = await proxyFetch(
+        url,
+        {
+          method,
+          headers,
+          body: requestBody,
+          signal: controller.signal,
+        },
+        body.verifySsl !== false,
+      );
     } catch (fetchErr: unknown) {
       const msg = fetchErr instanceof Error ? fetchErr.message : String(fetchErr);
-      if (msg.includes("abort")) {
+      const lowerMsg = msg.toLowerCase();
+      if (lowerMsg.includes("abort")) {
         return NextResponse.json({ success: false, error: "连接超时 (15s)，请检查防火墙地址和端口" }, { status: 504 });
       }
       if (msg.includes("ECONNREFUSED")) {
         return NextResponse.json({ success: false, error: `连接被拒绝: ${host}:${port}，请确认防火墙 RESTCONF 服务已启用` }, { status: 502 });
       }
-      if (msg.includes("CERT") || msg.includes("certificate") || msg.includes("SSL")) {
+      if (lowerMsg.includes("cert") || lowerMsg.includes("certificate") || lowerMsg.includes("ssl")) {
         return NextResponse.json({ success: false, error: "SSL 证书验证失败，请关闭「验证 SSL 证书」选项（华为设备默认使用自签名证书）" }, { status: 502 });
       }
       return NextResponse.json({ success: false, error: `网络错误: ${msg}` }, { status: 502 });
     } finally {
       clearTimeout(timeout);
-      if (typeof process !== "undefined") {
-        process.env.NODE_TLS_REJECT_UNAUTHORIZED = "1";
-      }
     }
 
     // Parse response

@@ -90,6 +90,7 @@ export default function NewsCard({
         className={`relative overflow-hidden ${hero ? "aspect-[16/7]" : "aspect-[16/9]"}`}
       >
         {imgSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={imgSrc}
             alt={title}

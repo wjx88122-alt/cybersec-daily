@@ -2,13 +2,24 @@ import { Redis } from '@upstash/redis';
 import OpenAI from 'openai';
 import { jsonrepair } from 'jsonrepair';
 
+const kvUrl = process.env.KV_REST_API_URL;
+const kvToken = process.env.KV_REST_API_TOKEN;
+const deepseekApiKey = process.env.DEEPSEEK_API_KEY;
+
+if (!kvUrl || !kvToken) {
+  throw new Error('Missing KV_REST_API_URL or KV_REST_API_TOKEN');
+}
+if (!deepseekApiKey) {
+  throw new Error('Missing DEEPSEEK_API_KEY');
+}
+
 const kv = new Redis({
-  url: 'https://normal-shark-41284.upstash.io',
-  token: 'AaFEAAIncDFlN2EyMWYxNmE1YTI0NTI1OGVlNDBlYmNlZDFlNTg3OXAxNDEyODQ',
+  url: kvUrl,
+  token: kvToken,
 });
 
 const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
+  apiKey: deepseekApiKey,
   baseURL: 'https://api.deepseek.com/v1',
 });
 

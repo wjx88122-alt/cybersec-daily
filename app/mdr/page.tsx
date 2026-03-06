@@ -57,12 +57,12 @@ function slaRemaining(deadline: string) {
 type Tab = "dashboard" | "alerts" | "tickets" | "analysts";
 
 /* ── Dashboard Stats ── */
-function StatsBar({ tickets, alerts }: { tickets: Ticket[]; alerts: Alert[] }) {
+function StatsBar({ tickets, alerts, nowTs }: { tickets: Ticket[]; alerts: Alert[]; nowTs: number }) {
   const open = tickets.filter((t) => t.status !== "closed" && t.status !== "resolved").length;
   const critical = tickets.filter((t) => t.severity === "critical" && t.status !== "closed" && t.status !== "resolved").length;
   const breached = tickets.filter((t) => {
     if (t.status === "closed" || t.status === "resolved") return false;
-    return new Date(t.slaDeadline).getTime() < Date.now();
+    return new Date(t.slaDeadline).getTime() < nowTs;
   }).length;
   const unassigned = tickets.filter((t) => !t.assignee && t.status === "pending").length;
   const stats = [
@@ -278,11 +278,11 @@ export default function MDRPage() {
     MOCK_ALERTS.filter((a) => !MOCK_TICKETS.some((t) => t.alertId === a.id))
   );
   const [toast, setToast] = useState<{ alert: Alert; analyst: Analyst | null } | null>(null);
-  const [, setTick] = useState(0);
+  const [nowTs, setNowTs] = useState(() => Date.now());
 
   // SLA countdown refresh
   useEffect(() => {
-    const iv = setInterval(() => setTick((t) => t + 1), 30000);
+    const iv = setInterval(() => setNowTs(Date.now()), 30000);
     return () => clearInterval(iv);
   }, []);
 
@@ -395,7 +395,7 @@ export default function MDRPage() {
         {/* Dashboard */}
         {tab === "dashboard" && (
           <>
-            <StatsBar tickets={tickets} alerts={alerts} />
+            <StatsBar tickets={tickets} alerts={alerts} nowTs={nowTs} />
             {/* Workflow diagram */}
             <div className="glass rounded-xl p-4 mb-6">
               <div className="text-xs text-[#64748b] font-medium mb-3">🔄 MDR 工单生命周期</div>

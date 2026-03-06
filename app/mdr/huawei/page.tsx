@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback } from "react";
 import NavBar from "@/components/NavBar";
 
 /* ── Types ── */
@@ -463,13 +463,11 @@ export default function HuaweiPage() {
   const [config, setConfig] = useState<HuaweiConfig>(loadConfig);
   const [test, setTest] = useState<TestResult>({ status: "idle", message: "" });
   const [history, setHistory] = useState<DisposalAction[]>(loadHistory);
-  const configRef = useRef(config);
-  configRef.current = config;
 
-  const handleSave = useCallback(() => { saveConfig(configRef.current); alert("配置已保存到浏览器"); }, []);
+  const handleSave = useCallback(() => { saveConfig(config); alert("配置已保存到浏览器"); }, [config]);
 
   const handleTest = useCallback(async () => {
-    const c = configRef.current;
+    const c = config;
     if (!c.host) { setTest({ status: "error", message: "请填写防火墙地址" }); return; }
     if (!c.username || !c.password) { setTest({ status: "error", message: "请填写用户名和密码" }); return; }
     setTest({ status: "testing", message: "" });
@@ -490,7 +488,7 @@ export default function HuaweiPage() {
     } catch (e: unknown) {
       setTest({ status: "error", message: e instanceof Error ? e.message : String(e) });
     }
-  }, []);
+  }, [config]);
 
   const handleExecute = useCallback((action: DisposalAction) => {
     setHistory((prev) => { const h = [action, ...prev]; saveHistory(h); return h; });

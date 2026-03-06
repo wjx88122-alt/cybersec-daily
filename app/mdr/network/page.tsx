@@ -7,7 +7,7 @@ import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
   DEVICE_TYPE_LABELS, DEVICE_TYPE_ICONS, TIER_LABELS, TIER_COLORS,
   STATUS_COLORS,
-  type Client, type NetworkDevice, type NetworkAlert, type OpsTicket,
+  type Client, type NetworkDevice,
   type DeviceStatus,
 } from "@/lib/network-mock";
 
@@ -148,11 +148,12 @@ export default function NetworkPage() {
     { key: "ops", label: "运维工单", icon: "🔧" },
   ];
 
-  const statusCounts = useMemo(() => {
-    const c: Record<string, number> = { online: 0, warning: 0, critical: 0, offline: 0 };
-    devices.forEach((d) => c[d.status]++);
-    return c;
-  }, [devices]);
+  const statusCounts: Record<DeviceStatus, number> = {
+    online: devices.filter((d) => d.status === "online").length,
+    warning: devices.filter((d) => d.status === "warning").length,
+    critical: devices.filter((d) => d.status === "critical").length,
+    offline: devices.filter((d) => d.status === "offline").length,
+  };
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>

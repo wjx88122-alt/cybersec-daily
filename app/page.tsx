@@ -12,6 +12,7 @@ export default function Home() {
   const [error, setError] = useState("");
   const [category, setCategory] = useState("全部");
   const [search, setSearch] = useState("");
+  const [cutoff] = useState(() => Date.now() - CUTOFF_MS);
 
   useEffect(() => {
     Promise.all([
@@ -31,7 +32,6 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, []);
 
-  const cutoff = Date.now() - CUTOFF_MS;
   const filtered = items.filter((item) => {
     const t = new Date(item.pubDate).getTime();
     const matchTime = !isNaN(t) && t >= cutoff;

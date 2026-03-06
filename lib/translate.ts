@@ -1,15 +1,11 @@
-import OpenAI from "openai";
 import { jsonrepair } from "jsonrepair";
+import { getDeepSeekClient } from "./deepseek";
 import { FeedItem } from "./feeds";
-
-const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: "https://api.deepseek.com/v1",
-});
 
 async function translateBatch(
   items: { title: string; summary: string }[],
 ): Promise<{ titleZh: string; summaryZh: string }[]> {
+  const client = getDeepSeekClient();
   const response = await client.chat.completions.create({
     model: "deepseek-chat",
     max_tokens: 8192,
@@ -35,7 +31,7 @@ ${JSON.stringify(items)}
     ],
   });
 
-  let text = response.choices[0]?.message?.content?.trim() ?? "";
+  const text = response.choices[0]?.message?.content?.trim() ?? "";
   const cleaned = text
     .replace(/^```json\s*/i, "")
     .replace(/```\s*$/, "")

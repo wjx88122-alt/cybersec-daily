@@ -1,11 +1,6 @@
-import OpenAI from "openai";
 import { jsonrepair } from "jsonrepair";
+import { getDeepSeekClient } from "./deepseek";
 import { FeedItem } from "./feeds";
-
-const client = new OpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY,
-  baseURL: "https://api.deepseek.com/v1",
-});
 
 type SummaryResult = { summaryAi: string };
 
@@ -20,6 +15,7 @@ export async function summarizeItems(
     .join("\n\n---\n\n");
 
   try {
+    const client = getDeepSeekClient();
     const response = await client.chat.completions.create({
       model: "deepseek-chat",
       max_tokens: 3000,
