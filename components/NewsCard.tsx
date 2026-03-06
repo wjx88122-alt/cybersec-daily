@@ -5,6 +5,21 @@ import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useState } from "react";
 
+type CategoryIconKind =
+  | "globe"
+  | "search"
+  | "alert"
+  | "target"
+  | "shield"
+  | "building"
+  | "cpu"
+  | "flask"
+  | "briefcase"
+  | "code"
+  | "scroll"
+  | "bulb"
+  | "news";
+
 const CATEGORY_GRADIENT: Record<string, string> = {
   综合资讯: "from-blue-950 to-blue-900",
   深度分析: "from-purple-950 to-purple-900",
@@ -35,20 +50,131 @@ const CATEGORY_ACCENT: Record<string, string> = {
   "AI 洞察": "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
 };
 
-const CATEGORY_ICON: Record<string, string> = {
-  综合资讯: "🌐",
-  深度分析: "🔍",
-  漏洞预警: "⚠️",
-  威胁情报: "🎯",
-  恶意软件: "🦠",
-  "政府/监管": "🏛️",
-  "AI 产品": "🤖",
-  "AI 研究": "🧪",
-  "AI 商业": "💼",
-  "AI 开发": "🛠️",
-  "AI 政策": "📜",
-  "AI 洞察": "💡",
+const CATEGORY_ICON: Record<string, CategoryIconKind> = {
+  综合资讯: "globe",
+  深度分析: "search",
+  漏洞预警: "alert",
+  威胁情报: "target",
+  恶意软件: "shield",
+  "政府/监管": "building",
+  "AI 产品": "cpu",
+  "AI 研究": "flask",
+  "AI 商业": "briefcase",
+  "AI 开发": "code",
+  "AI 政策": "scroll",
+  "AI 洞察": "bulb",
 };
+
+function CategoryIcon({
+  kind,
+  className = "w-10 h-10",
+}: {
+  kind: CategoryIconKind;
+  className?: string;
+}) {
+  const common = {
+    className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+
+  switch (kind) {
+    case "globe":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg {...common}>
+          <circle cx="11" cy="11" r="6" />
+          <path d="m20 20-4.2-4.2" />
+        </svg>
+      );
+    case "alert":
+      return (
+        <svg {...common}>
+          <path d="M12 4 3.5 19h17L12 4Z" />
+          <path d="M12 9.5v4M12 16.5h.01" />
+        </svg>
+      );
+    case "target":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="12" r="8" />
+          <circle cx="12" cy="12" r="4" />
+          <circle cx="12" cy="12" r="1" />
+        </svg>
+      );
+    case "shield":
+      return (
+        <svg {...common}>
+          <path d="m12 3 7 3v6c0 4.5-2.8 7.6-7 9-4.2-1.4-7-4.5-7-9V6l7-3Z" />
+          <path d="m8.5 15.5 7-7" />
+        </svg>
+      );
+    case "building":
+      return (
+        <svg {...common}>
+          <path d="M3 10h18M5 10V7l7-3 7 3v3M6 10v8M10 10v8M14 10v8M18 10v8M4 18h16" />
+        </svg>
+      );
+    case "cpu":
+      return (
+        <svg {...common}>
+          <rect x="7" y="7" width="10" height="10" rx="2" />
+          <path d="M9 1v4M15 1v4M9 19v4M15 19v4M1 9h4M1 15h4M19 9h4M19 15h4" />
+        </svg>
+      );
+    case "flask":
+      return (
+        <svg {...common}>
+          <path d="M10 3h4M11 3v4l-5.5 9a2 2 0 0 0 1.7 3h9.6a2 2 0 0 0 1.7-3L13 7V3" />
+          <path d="M8.2 14h7.6" />
+        </svg>
+      );
+    case "briefcase":
+      return (
+        <svg {...common}>
+          <rect x="3" y="7" width="18" height="12" rx="2" />
+          <path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7M3 12h18" />
+        </svg>
+      );
+    case "code":
+      return (
+        <svg {...common}>
+          <path d="m9 8-4 4 4 4M15 8l4 4-4 4M13 6l-2 12" />
+        </svg>
+      );
+    case "scroll":
+      return (
+        <svg {...common}>
+          <rect x="5" y="3.5" width="14" height="17" rx="2" />
+          <path d="M9 8h6M9 12h6M9 16h4" />
+        </svg>
+      );
+    case "bulb":
+      return (
+        <svg {...common}>
+          <path d="M12 3a6 6 0 0 0-3.5 10.9c.9.7 1.5 1.8 1.5 3.1h4c0-1.3.6-2.4 1.5-3.1A6 6 0 0 0 12 3Z" />
+          <path d="M10 20h4M10.5 17.5h3" />
+        </svg>
+      );
+    default:
+      return (
+        <svg {...common}>
+          <rect x="4" y="5" width="16" height="14" rx="2" />
+          <path d="M8 9h8M8 13h8M8 17h5" />
+        </svg>
+      );
+  }
+}
 
 export default function NewsCard({
   item,
@@ -101,8 +227,8 @@ export default function NewsCard({
           <div
             className={`w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br ${catGradient}`}
           >
-            <span className="text-4xl opacity-60">
-              {CATEGORY_ICON[item.category] ?? "📰"}
+            <span className="opacity-70 text-[#f0f6fc]">
+              <CategoryIcon kind={CATEGORY_ICON[item.category] ?? "news"} />
             </span>
             <span className="text-xs text-white/30 font-medium tracking-wide">
               {item.source}
