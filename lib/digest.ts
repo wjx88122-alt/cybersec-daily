@@ -17,6 +17,40 @@ export type DailyDigest = {
   items: DigestItem[];
 };
 
+function normalizeLink(link: string): string {
+  try {
+    const u = new URL(link);
+    u.hash = "";
+    // Normalize trailing slash but keep root path intact.
+    if (u.pathname.length > 1 && u.pathname.endsWith("/")) {
+      u.pathname = u.pathname.slice(0, -1);
+    }
+    return u.toString();
+  } catch {
+    return link.trim();
+  }
+}
+
+function enrichDigestWithFeedItems(
+  digest: DailyDigest,
+  feedItems: FeedItem[],
+): DailyDigest {
+  const byLink = new Map(feedItems.map((item) => [normalizeLink(item.link), item]));
+
+  return {
+    ...digest,
+    items: digest.items.map((entry) => {
+      const matched = byLink.get(normalizeLink(entry.sourceLink));
+      if (!matched) return entry;
+      return {
+        ...entry,
+        sourceTitle: matched.titleZh || matched.title || entry.sourceTitle,
+        category: matched.category || entry.category,
+      };
+    }),
+  };
+}
+
 function selectRepresentativeItems(
   items: FeedItem[],
   total: number,
@@ -50,7 +84,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   const articlesText = recent
     .map(
       (item, i) =>
-        `[${i + 1}] [${item.category}] ${item.source}: ${item.title} — ${(item.summaryAi || item.summary).slice(0, 150)} | ${item.link}`,
+        `[${i + 1}] [${item.category}] ${item.source}: ${item.titleZh || item.title} — ${(item.summaryZh || item.summaryAi || item.summary).slice(0, 150)} | ${item.link}`,
     )
     .join("\n");
 
@@ -123,13 +157,15 @@ ${articlesText}
 
   // Try standard parse, then jsonrepair
   try {
-    return JSON.parse(jsonText) as DailyDigest;
+    const digest = JSON.parse(jsonText) as DailyDigest;
+    return enrichDigestWithFeedItems(digest, recent);
   } catch {
     /* fall through to repair */
   }
 
   try {
-    return JSON.parse(jsonrepair(jsonText)) as DailyDigest;
+    const digest = JSON.parse(jsonrepair(jsonText)) as DailyDigest;
+    return enrichDigestWithFeedItems(digest, recent);
   } catch {
     console.error("DIGEST JSON PARSE FAILED, raw:", jsonText.slice(0, 500));
     /* fall through to fallback */
@@ -140,11 +176,11 @@ ${articlesText}
     date: today,
     overview: "今日安全资讯摘要生成失败，请直接浏览原始资讯。",
     items: recent.slice(0, 8).map((item) => ({
-      headline: item.title.slice(0, 20),
-      summary: item.summary || item.title,
+      headline: (item.titleZh || item.title).slice(0, 20),
+      summary: item.summaryZh || item.summaryAi || item.summary || item.title,
       importance: "medium" as const,
       category: item.category,
-      sourceTitle: item.title,
+      sourceTitle: item.titleZh || item.title,
       sourceLink: item.link,
     })),
   };
