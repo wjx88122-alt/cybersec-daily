@@ -64,6 +64,16 @@ export async function GET(req: NextRequest) {
     console.error("image enrichment trigger failed:", e);
   });
 
+  // Trigger translation right after feed refresh to keep zh fields up-to-date for new entries.
+  const selfTranslateUrl = `${req.nextUrl.origin}/api/translate`;
+  fetch(selfTranslateUrl, {
+    headers: {
+      authorization: `Bearer ${process.env.CRON_SECRET}`,
+    },
+  }).catch((e) => {
+    console.error("translation trigger failed:", e);
+  });
+
   // Generate daily snapshot (best-effort, don't block on failure)
   try {
     const [digest, snapshots] = await Promise.all([

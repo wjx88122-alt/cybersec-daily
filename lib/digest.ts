@@ -36,15 +36,26 @@ function enrichDigestWithFeedItems(
   feedItems: FeedItem[],
 ): DailyDigest {
   const byLink = new Map(feedItems.map((item) => [normalizeLink(item.link), item]));
+  const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
 
   return {
     ...digest,
     items: digest.items.map((entry) => {
       const matched = byLink.get(normalizeLink(entry.sourceLink));
-      if (!matched) return entry;
+      if (!matched) {
+        if (isChinese(entry.sourceTitle)) return entry;
+        return { ...entry, sourceTitle: entry.headline };
+      }
+
+      const resolvedSourceTitle =
+        matched.titleZh || matched.title || entry.sourceTitle;
+      const sourceTitle = isChinese(resolvedSourceTitle)
+        ? resolvedSourceTitle
+        : entry.headline;
+
       return {
         ...entry,
-        sourceTitle: matched.titleZh || matched.title || entry.sourceTitle,
+        sourceTitle,
         category: matched.category || entry.category,
       };
     }),
