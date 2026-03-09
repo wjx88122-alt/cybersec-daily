@@ -20,6 +20,21 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Cloud-first triggering
+
+Server-to-server follow-up calls now prefer a cloud base URL instead of the incoming local origin. Set `APP_BASE_URL` to your deployed domain (recommended), or rely on `VERCEL_URL` as a fallback.
+
+The scheduled refresh pipeline stays in the cloud through a single `vercel.json` cron:
+
+- `/api/cron`
+
+That cron refreshes feeds first, then the downstream cloud routes chain automatically:
+
+- `/api/images`
+- `/api/translate`
+- `/api/summarize`
+- `/api/digest`
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

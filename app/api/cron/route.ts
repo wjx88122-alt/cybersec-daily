@@ -3,6 +3,7 @@ import { fetchFeedsA, fetchFeedsB, fetchFeedsAI } from "@/lib/fetchFeeds";
 import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
+import { resolveAppBaseUrl } from "@/lib/app-url";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
@@ -54,8 +55,10 @@ export async function GET(req: NextRequest) {
     kv.set("feed-ai", mergedAI),
   ]);
 
+  const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+
   // Trigger image enrichment right after feed refresh so new items are not left without thumbnails.
-  const selfImagesUrl = `${req.nextUrl.origin}/api/images`;
+  const selfImagesUrl = `${appBaseUrl}/api/images`;
   fetch(selfImagesUrl, {
     headers: {
       authorization: `Bearer ${process.env.CRON_SECRET}`,
@@ -65,7 +68,7 @@ export async function GET(req: NextRequest) {
   });
 
   // Trigger translation right after feed refresh to keep zh fields up-to-date for new entries.
-  const selfTranslateUrl = `${req.nextUrl.origin}/api/translate`;
+  const selfTranslateUrl = `${appBaseUrl}/api/translate`;
   fetch(selfTranslateUrl, {
     headers: {
       authorization: `Bearer ${process.env.CRON_SECRET}`,

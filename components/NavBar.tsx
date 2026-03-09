@@ -4,9 +4,8 @@ import Link from "next/link";
 import Image from "next/image";
 
 const NAV_ITEMS = [
-  { label: "资讯", href: "/" },
+  { label: "安全", href: "/" },
   { label: "AI", href: "/ai" },
-  { label: "简报", href: "/digest" },
   { label: "MDR", href: "/mdr" },
 ];
 

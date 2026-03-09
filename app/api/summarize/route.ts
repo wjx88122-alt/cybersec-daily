@@ -1,6 +1,7 @@
 import { kv } from "@/lib/kv";
 import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
 import { extractArticleText } from "@/lib/extractArticle";
+import { resolveAppBaseUrl } from "@/lib/app-url";
 import { summarizeItems } from "@/lib/summarize";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -11,6 +12,14 @@ export async function GET(req: NextRequest) {
   if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
+  const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const triggerDigestRebuild = () => {
+    const digestUrl = `${appBaseUrl}/api/digest`;
+    fetch(digestUrl, {
+      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+    }).catch((e) => console.error("summarize: trigger digest failed:", e));
+  };
 
   const [feedA, feedB, feedAI] = await Promise.all([
     kv.get<FeedItem[]>("feed-a"),
@@ -47,6 +56,7 @@ export async function GET(req: NextRequest) {
     .slice(0, 50);
 
   if (toProcess.length === 0 && toProcessAI.length === 0) {
+    triggerDigestRebuild();
     return NextResponse.json({
       ok: true,
       summarized: 0,
@@ -95,6 +105,8 @@ export async function GET(req: NextRequest) {
     kv.set("feed-b", finalB),
     kv.set("feed-ai", finalAI),
   ]);
+
+  triggerDigestRebuild();
 
   return NextResponse.json({ ok: true, summarized, total: allToProcess.length });
 }

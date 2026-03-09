@@ -249,6 +249,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
     year: "numeric",
     month: "long",
     day: "numeric",
+    timeZone: "Asia/Shanghai",
   });
 
   const client = getDeepSeekClient();

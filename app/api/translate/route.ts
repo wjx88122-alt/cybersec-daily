@@ -1,6 +1,7 @@
 import { kv } from "@/lib/kv";
 import { translateItems } from "@/lib/translate";
 import { FeedItem } from "@/lib/feeds";
+import { resolveAppBaseUrl } from "@/lib/app-url";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
@@ -78,11 +79,12 @@ export async function GET(req: NextRequest) {
   }
 
   const startTime = Date.now();
-  const triggerDigestRebuild = () => {
-    const digestUrl = `${req.nextUrl.origin}/api/digest`;
-    fetch(digestUrl, {
+  const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const triggerSummarize = () => {
+    const summarizeUrl = `${appBaseUrl}/api/summarize`;
+    fetch(summarizeUrl, {
       headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-    }).catch((e) => console.error("translate: trigger digest failed:", e));
+    }).catch((e) => console.error("translate: trigger summarize failed:", e));
   };
 
   const [feedA, feedB, feedAI] = await Promise.all([
@@ -114,7 +116,7 @@ export async function GET(req: NextRequest) {
   if (allToTranslate.length === 0) {
     const totalWithZh = allItems.filter((i) => i.titleZh).length + aiItems.filter((i) => i.titleZh).length;
     if (feedAI) await kv.set("feed-ai", aiItems);
-    triggerDigestRebuild();
+    triggerSummarize();
     return NextResponse.json({ ok: true, withZh: totalWithZh, skipped: true });
   }
 
@@ -180,14 +182,14 @@ export async function GET(req: NextRequest) {
   const chainCount = parseInt(req.nextUrl.searchParams.get("chain") ?? "0");
   const MAX_CHAINS = 3;
   if (pending > 0 && chainCount < MAX_CHAINS) {
-    const selfUrl = `${req.nextUrl.origin}/api/translate?chain=${chainCount + 1}`;
+    const selfUrl = `${appBaseUrl}/api/translate?chain=${chainCount + 1}`;
     fetch(selfUrl, {
       headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
     }).catch(() => {});
     console.log(`translate: ${pending} items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`);
   }
   if (pending === 0) {
-    triggerDigestRebuild();
+    triggerSummarize();
   }
 
   return NextResponse.json({

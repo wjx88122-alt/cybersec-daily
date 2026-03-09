@@ -49,7 +49,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen" style={{ background: "var(--bg)" }}>
-      <NavBar active="资讯" />
+      <NavBar active="安全" />
 
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Search */}
