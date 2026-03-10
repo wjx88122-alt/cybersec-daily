@@ -6,6 +6,7 @@ import Image from "next/image";
 const NAV_ITEMS = [
   { label: "安全", href: "/" },
   { label: "AI", href: "/ai" },
+  { label: "团队", href: "/team" },
   { label: "MDR", href: "/mdr" },
 ];
 
