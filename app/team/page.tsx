@@ -39,17 +39,39 @@ type PromptGroup = {
 type PhasePlan = {
   phase: string;
   title: string;
-  roles: string[];
+  roles: RoleId[];
   goal: string;
   outcome: string;
 };
 
 type HistoryStep = {
-  role: string;
+  role: RoleId;
   title: string;
   detail: string;
   result: string;
   accentClass: string;
+};
+
+type CaseSummaryItem = {
+  label: string;
+  value: string;
+};
+
+type DiscussionCase = {
+  id: string;
+  status: string;
+  category: string;
+  title: string;
+  question: string;
+  description: string;
+  indexSummary: string;
+  involvedRoles: RoleId[];
+  involvedNote: string;
+  standbyRoles: RoleId[];
+  standbyNote: string;
+  summaryItems: CaseSummaryItem[];
+  decision: string;
+  steps: HistoryStep[];
 };
 
 const ROLES: Role[] = [
@@ -368,44 +390,89 @@ const PHASES: PhasePlan[] = [
   },
 ];
 
-const FIREWALL_HISTORY_STEPS: HistoryStep[] = [
+const CASE_LIBRARY_SUMMARY: CaseSummaryItem[] = [
   {
-    role: "chief",
-    title: "总参谋先重写问题",
-    detail:
-      "先把“下一代 AI 防火墙怎么做”改写成真正需要拍板的问题：第一阶段到底卖什么、客户先为什么买单、首发能力必须压缩到什么程度。",
-    result: "把任务从“大而全平台构想”收敛为“首发产品定义与优先级排序”。",
-    accentClass:
-      "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+    label: "归档原则",
+    value: "重要判断、关键定义与最终拍板都在这里留下可见历史。",
   },
   {
-    role: "intel",
-    title: "情报研判市场买单逻辑",
-    detail:
-      "从企业级 / 运营商级安全场景看，客户当前最在意的不是 AI 多炫，而是是否可控、可审、可合规、能不能进 PoC 与生产。",
-    result: "给出外部判断：入口治理和证据链，比炫技型语义安全更容易成交。",
-    accentClass: "border-cyan-500/20 bg-cyan-500/10 text-cyan-300",
+    label: "呈现格式",
+    value: "每条案例统一保留原问题、参会席位、关键节点与收口结论。",
   },
   {
-    role: "product",
-    title: "产品定义官压缩首发范围",
-    detail:
-      "围绕首发可卖、可交付、可复制三个标准，把第一阶段能力排成 P0 / P1 / P2，并明确哪些能力不能首发就做。",
-    result:
-      "形成清晰优先级：统一模型网关、访问控制、数据防泄漏、审计取证、私有化集成进入 P0。",
-    accentClass: "border-blue-500/20 bg-blue-500/10 text-blue-300",
-  },
-  {
-    role: "chief",
-    title: "chief 最终收口拍板",
-    detail:
-      "把情报判断与产品取舍压成一句产品定义，再输出结论、优先级、风险和动作，形成可直接给总裁拍板的一页版。",
-    result:
-      "最终收口为：第一阶段不要做大而全 AI 安全平台，而要做 AI 统一出口与合规审计网关。",
-    accentClass:
-      "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+    label: "更新方式",
+    value: "未来凡是值得团队回看的重要讨论，都会按同样格式持续追加。",
   },
 ];
+
+const DISCUSSION_CASES: DiscussionCase[] = [
+  {
+    id: "ai-firewall-priority",
+    status: "已归档",
+    category: "战略判断 + 产品定义",
+    title: "下一代 AI 防火墙优先级讨论",
+    question: "如果我要定义下一代 AI 防火墙，第一阶段能力该怎么排优先级？",
+    description:
+      "这次不是所有角色一起开会，而是由 chief 判断后，优先拉起最关键的两位专家：intel 负责外部买单逻辑与行业判断，product 负责首发定义与优先级压缩；最后再由 chief 收口成一页可拍板结论。",
+    indexSummary:
+      "围绕 AI 防火墙首发能力排序，团队把战略判断与产品定义压成了一页可拍板结论。",
+    involvedRoles: ["chief", "intel", "product"],
+    involvedNote: "这是最适合“战略判断 + 产品定义”类问题的最小作战编组。",
+    standbyRoles: ["pmo", "studio", "field"],
+    standbyNote:
+      "如果下一步进入项目落地、董事会表达或客户验证，再由它们接力上桌。",
+    summaryItems: [
+      { label: "议题类型", value: "战略判断 + 产品定义" },
+      { label: "出场席位", value: "3 位核心席位上桌" },
+      { label: "收口方式", value: "chief 一页式拍板" },
+      { label: "归档定位", value: "Visible Team History" },
+    ],
+    decision:
+      "第一阶段不要做“大而全 AI 安全平台”，而应收敛为 AI 统一出口与合规审计网关，优先做统一入口、策略管控、数据防泄漏、审计取证与私有化集成。",
+    steps: [
+      {
+        role: "chief",
+        title: "总参谋先重写问题",
+        detail:
+          "先把“下一代 AI 防火墙怎么做”改写成真正需要拍板的问题：第一阶段到底卖什么、客户先为什么买单、首发能力必须压缩到什么程度。",
+        result: "把任务从“大而全平台构想”收敛为“首发产品定义与优先级排序”。",
+        accentClass:
+          "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+      },
+      {
+        role: "intel",
+        title: "情报研判市场买单逻辑",
+        detail:
+          "从企业级 / 运营商级安全场景看，客户当前最在意的不是 AI 多炫，而是是否可控、可审、可合规、能不能进 PoC 与生产。",
+        result: "给出外部判断：入口治理和证据链，比炫技型语义安全更容易成交。",
+        accentClass: "border-cyan-500/20 bg-cyan-500/10 text-cyan-300",
+      },
+      {
+        role: "product",
+        title: "产品定义官压缩首发范围",
+        detail:
+          "围绕首发可卖、可交付、可复制三个标准，把第一阶段能力排成 P0 / P1 / P2，并明确哪些能力不能首发就做。",
+        result:
+          "形成清晰优先级：统一模型网关、访问控制、数据防泄漏、审计取证、私有化集成进入 P0。",
+        accentClass: "border-blue-500/20 bg-blue-500/10 text-blue-300",
+      },
+      {
+        role: "chief",
+        title: "chief 最终收口拍板",
+        detail:
+          "把情报判断与产品取舍压成一句产品定义，再输出结论、优先级、风险和动作，形成可直接给总裁拍板的一页版。",
+        result:
+          "最终收口为：第一阶段不要做大而全 AI 安全平台，而要做 AI 统一出口与合规审计网关。",
+        accentClass:
+          "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+      },
+    ],
+  },
+];
+
+function getRoleById(roleId: RoleId) {
+  return ROLES.find((role) => role.id === roleId);
+}
 
 function SectionTitle({
   eyebrow,
@@ -577,17 +644,77 @@ function PromptCard({ group }: { group: PromptGroup }) {
   );
 }
 
+function RoleBadge({
+  roleId,
+  muted = false,
+}: {
+  roleId: RoleId;
+  muted?: boolean;
+}) {
+  const role = getRoleById(roleId);
+
+  if (!role) {
+    return null;
+  }
+
+  return (
+    <span
+      className={`rounded-full border px-3 py-1.5 text-sm ${
+        muted
+          ? "border-white/10 bg-black/[0.18] text-[#94a3b8]"
+          : role.accentClass
+      }`}
+    >
+      {role.chineseName} / {role.code}
+    </span>
+  );
+}
+
+function CaseIndexCard({
+  item,
+  index,
+}: {
+  item: DiscussionCase;
+  index: number;
+}) {
+  return (
+    <a
+      href={`#case-${item.id}`}
+      className="block rounded-2xl border border-white/8 bg-black/[0.16] p-4 transition-all hover:border-black/[0.12]"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+          Case {String(index + 1).padStart(2, "0")}
+        </span>
+        <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-2.5 py-1 text-[11px] font-semibold text-[#e5ff00]">
+          {item.status}
+        </span>
+      </div>
+      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        {item.category}
+      </p>
+      <h3 className="mt-2 text-lg font-semibold text-[#f0f6fc]">{item.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{item.indexSummary}</p>
+      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#64748b]">
+        查看议题卡
+      </p>
+    </a>
+  );
+}
+
 function HistoryStepCard({ step }: { step: HistoryStep }) {
+  const role = getRoleById(step.role);
+
   return (
     <article className="glass rounded-2xl p-5 transition-all hover:border-black/[0.12]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span
           className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${step.accentClass}`}
         >
-          {step.role}
+          {role ? `${role.chineseName} / ${role.code}` : step.role}
         </span>
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
-          讨论节点
+          关键节点
         </span>
       </div>
       <h3 className="mt-4 text-lg font-semibold text-[#f0f6fc]">{step.title}</h3>
@@ -817,89 +944,155 @@ export default function TeamPage() {
 
           <section className="mt-10">
             <SectionTitle
-              eyebrow="History"
-              title="实战历史记录：下一代 AI 防火墙优先级讨论"
-              description="这不是抽象方法论，而是团队刚刚真实跑过的一次协同案例。你能直接看到：问题如何进入 chief，谁参与了判断，谁负责收敛定义，最后如何形成可拍板结论。"
+              eyebrow="Case Library"
+              title="历史案例墙：未来重要讨论持续追加在这里"
+              description="这里不是临时备注区，而是总裁辅助团队的 visible team history。每次值得回看的重要判断、定义与拍板，都会按同一格式追加归档，方便团队回溯，也方便总裁快速看到这支班底是如何形成结论的。"
             />
-            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-              <div className="glass rounded-3xl p-6">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
-                    历史案例 / Case Log
-                  </span>
-                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                    已发生的团队协同
-                  </span>
-                </div>
-                <h3 className="mt-5 text-2xl font-semibold text-[#f0f6fc]">
-                  原问题：如果我要定义下一代 AI 防火墙，第一阶段能力该怎么排优先级？
-                </h3>
-                <p className="mt-4 text-sm leading-7 text-[#94a3b8]">
-                  这次不是所有角色一起开会，而是由 chief 判断后，优先拉起最关键的两位专家：
-                  <span className="text-[#f0f6fc]"> intel </span>
-                  负责外部买单逻辑与行业判断，
-                  <span className="text-[#f0f6fc]"> product </span>
-                  负责首发定义与优先级压缩；最后再由
-                  <span className="text-[#f0f6fc]"> chief </span>
-                  收口成一页可拍板结论。
-                </p>
+            <div className="glass rounded-3xl p-6">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
+                  Visible Team History
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                  未来重要讨论持续追加
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                  当前归档 {DISCUSSION_CASES.length} 条
+                </span>
+              </div>
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                      本次出场角色
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {['chief', 'intel', 'product'].map((role) => (
-                        <span
-                          key={role}
-                          className="rounded-full border border-white/10 bg-black/[0.18] px-3 py-1.5 text-sm text-[#dbe4ee]"
-                        >
-                          {role}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                      这是最适合“战略判断 + 产品定义”类问题的最小作战编组。
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                      待命但未出场角色
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {['pmo', 'studio', 'field'].map((role) => (
-                        <span
-                          key={role}
-                          className="rounded-full border border-white/10 bg-black/[0.18] px-3 py-1.5 text-sm text-[#94a3b8]"
-                        >
-                          {role}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                      如果下一步进入项目落地、董事会表达或客户验证，再由它们接力上桌。
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6 rounded-2xl border border-[#e5ff00]/20 bg-[#e5ff00]/8 p-4">
+              <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
+                <div className="rounded-2xl border border-white/8 bg-black/[0.16] p-5">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                    本次收口结论
+                    案例墙说明
                   </p>
                   <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
-                    第一阶段不要做“大而全 AI 安全平台”，而应收敛为
-                    <span className="font-semibold text-[#e5ff00]"> AI 统一出口与合规审计网关 </span>
-                    ，优先做统一入口、策略管控、数据防泄漏、审计取证与私有化集成。
+                    这里保留已经发生的重要讨论，作为这支总裁辅助团队的可见历史档案。
                   </p>
+                  <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
+                    后续凡是影响产品方向、客户判断、资源取舍或对外口径的重要议题，都会继续追加到这面案例墙，保留原问题、出场席位、关键节点与最终收口，方便随时回看和复盘。
+                  </p>
+                </div>
+
+                <div className="grid gap-3 md:grid-cols-3">
+                  {CASE_LIBRARY_SUMMARY.map((item) => (
+                    <div
+                      key={item.label}
+                      className="rounded-2xl border border-white/8 bg-white/[0.02] p-4"
+                    >
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                        {item.label}
+                      </p>
+                      <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{item.value}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              <div className="grid gap-4">
-                {FIREWALL_HISTORY_STEPS.map((step) => (
-                  <HistoryStepCard key={step.title} step={step} />
+              <div className="mt-5 grid gap-3 xl:grid-cols-3">
+                {DISCUSSION_CASES.map((item, index) => (
+                  <CaseIndexCard key={item.id} item={item} index={index} />
                 ))}
               </div>
+            </div>
+
+            <div className="mt-4 space-y-4">
+              {DISCUSSION_CASES.map((item) => (
+                <div
+                  key={item.id}
+                  id={`case-${item.id}`}
+                  className="scroll-mt-24 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]"
+                >
+                  <div className="glass rounded-3xl p-6">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
+                        历史案例墙 / Case File
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                        {item.status}
+                      </span>
+                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                        {item.category}
+                      </span>
+                    </div>
+                    <h3 className="mt-5 text-2xl font-semibold text-[#f0f6fc]">
+                      {item.title}
+                    </h3>
+
+                    <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      {item.summaryItems.map((summaryItem) => (
+                        <div
+                          key={summaryItem.label}
+                          className="rounded-2xl border border-white/8 bg-white/[0.02] p-4"
+                        >
+                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                            {summaryItem.label}
+                          </p>
+                          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">
+                            {summaryItem.value}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                        原问题
+                      </p>
+                      <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
+                        {item.question}
+                      </p>
+                      <p className="mt-3 text-sm leading-7 text-[#94a3b8]">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-6 grid gap-4 md:grid-cols-2">
+                      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                          本次出场席位
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {item.involvedRoles.map((roleId) => (
+                            <RoleBadge key={roleId} roleId={roleId} />
+                          ))}
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
+                          {item.involvedNote}
+                        </p>
+                      </div>
+                      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                          待命但未出场席位
+                        </p>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {item.standbyRoles.map((roleId) => (
+                            <RoleBadge key={roleId} roleId={roleId} muted />
+                          ))}
+                        </div>
+                        <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
+                          {item.standbyNote}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 rounded-2xl border border-[#e5ff00]/20 bg-[#e5ff00]/8 p-4">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                        本次收口结论
+                      </p>
+                      <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
+                        {item.decision}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-4">
+                    {item.steps.map((step) => (
+                      <HistoryStepCard key={`${item.id}-${step.title}`} step={step} />
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </section>
 
