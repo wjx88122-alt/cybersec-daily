@@ -5,10 +5,17 @@ import NavBar from "@/components/NavBar";
 export const metadata: Metadata = {
   title: "总裁辅助团队 | 家兴的网络安全日报",
   description:
-    "以执行班底编制表方式展示 AI 总裁辅助团队的人设、边界、上线顺序与日常调用模板。",
+    "展示家兴最新的 7 角色总裁辅助团队、v2.1 调度规则，以及 AI 安全周报生成机制。",
 };
 
-type RoleId = "chief" | "intel" | "product" | "pmo" | "field" | "studio";
+type RoleId =
+  | "chief"
+  | "market"
+  | "intel"
+  | "product"
+  | "pmo"
+  | "field"
+  | "studio";
 
 type Role = {
   id: RoleId;
@@ -19,60 +26,32 @@ type Role = {
   identity: string;
   portrait: string;
   personalityTags: string[];
-  workTraits: string[];
   strengths: string[];
-  notFitFor: string[];
-  motto: string;
-  positioning: string;
-  responsibilities: string[];
+  boundaries: string[];
   usage: string;
   phase: string;
   accentClass: string;
 };
 
-type PromptGroup = {
-  key: string;
-  label: string;
+type DispatchCard = {
+  title: string;
   summary: string;
-  prompts: string[];
+  combos: string[];
+};
+
+type WeeklyNode = {
+  title: string;
+  label: string;
+  detail: string;
+  accentClass: string;
 };
 
 type PhasePlan = {
   phase: string;
   title: string;
-  roles: RoleId[];
   goal: string;
   outcome: string;
-};
-
-type HistoryStep = {
-  role: RoleId;
-  title: string;
-  detail: string;
-  result: string;
-  accentClass: string;
-};
-
-type CaseSummaryItem = {
-  label: string;
-  value: string;
-};
-
-type DiscussionCase = {
-  id: string;
-  status: string;
-  category: string;
-  title: string;
-  question: string;
-  description: string;
-  indexSummary: string;
-  involvedRoles: RoleId[];
-  involvedNote: string;
-  standbyRoles: RoleId[];
-  standbyNote: string;
-  summaryItems: CaseSummaryItem[];
-  decision: string;
-  steps: HistoryStep[];
+  roles: string[];
 };
 
 const ROLES: Role[] = [
@@ -80,400 +59,297 @@ const ROLES: Role[] = [
     id: "chief",
     order: 1,
     code: "chief",
-    chineseName: "总裁参谋长",
-    shortLabel: "默认司令席 / Command Seat",
-    identity: "CEO 办公室里的 AI 参谋长，负责接住原始问题、校准目标、排兵布阵。",
+    chineseName: "总参谋",
+    shortLabel: "默认入口 / Final Synthesis",
+    identity: "总裁桌边的统一入口，负责接住问题、判断问题类型、决定谁上场、最后统一收口。",
     portrait:
-      "像一个站在老板桌边的二号位，不急着先给答案，而是先问清为什么要做、谁该上场、最后怎么拍板。",
-    personalityTags: ["先问目标", "重判断", "会取舍", "擅收口"],
-    workTraits: [
-      "先把一句话需求翻译成真正的决策问题",
-      "在信息不完整时先补关键边界，而不是仓促下结论",
-      "把多角色输出压成一页判断、风险、动作和统一口径",
-    ],
+      "像一个真正的参谋长：先把问题问对，再决定是否需要市场、竞争、产品、推进或表达支持。",
+    personalityTags: ["默认入口", "先判断后调度", "结论先行", "最终收口"],
     strengths: [
-      "跨部门分歧、资源取舍、优先级冲突",
-      "信息不足但老板必须先给方向的管理问题",
-      "需要最终拍板口径的一页式结论",
+      "跨部门问题和模糊问题的重写与收口",
+      "需要老板拍板的一页式判断",
+      "把多角色意见压成结论 / 风险 / 动作",
     ],
-    notFitFor: [
-      "替代专家做长篇细分研究或大量细节执行",
-      "在没有目标约束时做无限发散的创意脑暴",
-      "绕过专家直接处理高度专业的深度分析",
-    ],
-    motto: "先把问题问对，再决定谁上场。",
-    positioning:
-      "日常默认入口。先理解老板真实目标，再决定是否分派给其他角色，最后统一收口。",
-    responsibilities: [
-      "把原始问题翻译成真正的决策问题",
-      "判断需要调哪些专家以及先后顺序",
-      "输出结论、风险、下一步动作和统一口径",
+    boundaries: [
+      "不包办所有细分分析",
+      "不替代 specialist 做深度研究",
+      "不在信息明显不足时强行给满结论",
     ],
     usage:
-      "每天默认先找 chief。跨部门、信息不完整、需要最终判断时，也必须由 chief 收口。",
+      "任何问题优先先找 chief。chief 判断是否需要 market / intel / product / pmo / field / studio 参与。",
     phase: "Phase 1",
     accentClass:
       "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_30px_rgba(229,255,0,0.08)]",
   },
   {
-    id: "intel",
+    id: "market",
     order: 2,
-    code: "intel",
-    chineseName: "情报研判官",
-    shortLabel: "风险雷达 / Intelligence Desk",
-    identity: "外部信号与风险判断席，负责看清发生了什么、是真是假、值不值得重视。",
+    code: "market",
+    chineseName: "市场洞察官",
+    shortLabel: "机会判断 / Opportunity Lens",
+    identity: "负责行业趋势、区域机会、需求迁移和增长信号，把外部机会压缩成对我方有价值的判断。",
     portrait:
-      "像一个永远盯着外部风向、信源质量和影响范围的情报台，先拆事实，再做判断，不被热闹带节奏。",
-    personalityTags: ["冷静", "证据优先", "风险敏感", "不轻信"],
-    workTraits: [
-      "先判断信源质量，再判断风险等级和时效性",
-      "把模糊消息拆成事实、推测和待确认项",
-      "输出 chief 可以直接引用的依据和研判底稿",
-    ],
+      "像一个盯着市场结构变化的人，不做资讯搬运，而是回答哪里值得进、哪里只是热闹。",
+    personalityTags: ["看机会", "看趋势", "看区域", "看需求迁移"],
     strengths: [
-      "政策、竞争、客户、舆情的真假与轻重判断",
-      "突发行业信息是否需要老板亲自介入",
-      "给管理层提供带证据链的风险判断",
+      "新市场进入判断",
+      "区域优先级与增长窗口识别",
+      "需求迁移和伪机会识别",
     ],
-    notFitFor: [
-      "替代 product 定义路线和功能边界",
-      "直接排项目节奏、责任人和例会机制",
-      "在缺乏证据时给情绪化结论背书",
-    ],
-    motto: "没有证据的热闹，不算情报。",
-    positioning:
-      "负责外部信号和风险判断，先回答发生了什么、值不值得重视、影响有多大。",
-    responsibilities: [
-      "研判行业、竞争、客户、政策与舆情信号",
-      "判断风险等级、时效性与可信度",
-      "给 chief 提供可直接引用的情报底稿",
+    boundaries: [
+      "不替代 intel 做竞品威胁判断",
+      "不直接定义路线图",
+      "不把个别客户声音直接当市场结论",
     ],
     usage:
-      "当你需要判断真假、轻重缓急，或者需要外部证据支撑时，chief 会优先调 intel。",
+      "当问题是‘机会在哪里、值不值得进、需求往哪变’时，chief 优先拉 market。",
+    phase: "Phase 1",
+    accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+  },
+  {
+    id: "intel",
+    order: 3,
+    code: "intel",
+    chineseName: "竞争与战略情报官",
+    shortLabel: "威胁判断 / Threat & Intel",
+    identity: "负责竞品、定价、渠道、政策与外部威胁变化，回答‘发生了什么、为什么重要、对我方意味着什么’。",
+    portrait:
+      "像一个外部威胁雷达，先拆事实再做判断，不被热点带着跑。",
+    personalityTags: ["看威胁", "证据优先", "竞争敏感", "不轻信"],
+    strengths: [
+      "竞品动作和定价变化判断",
+      "政策 / 监管 / 外部威胁研判",
+      "给 chief 提供可直接引用的情报底稿",
+    ],
+    boundaries: [
+      "不把市场机会判断包进自己职责",
+      "不替代 product 做产品取舍",
+      "不输出无证据的情绪化判断",
+    ],
+    usage:
+      "当问题是‘竞品动了没有、影响多大、要不要跟’时，chief 优先拉 intel。",
     phase: "Phase 1",
     accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
   },
   {
     id: "product",
-    order: 3,
+    order: 4,
     code: "product",
-    chineseName: "产品定义官",
-    shortLabel: "方案收敛者 / Product Framer",
-    identity: "把模糊想法压成清晰方案的定义席，负责回答做什么、不做什么、先做什么。",
+    chineseName: "产品办公室",
+    shortLabel: "先做 / 后做 / 不做",
+    identity: "把战略意图压成产品定义、优先级和路线图动作，负责明确做什么、不做什么、先做什么。",
     portrait:
-      "像一个擅长把战略意图收敛成用户、场景、价值和边界的产品负责人，不迷恋大而全，只关心定义是否清楚。",
-    personalityTags: ["结构化", "边界清晰", "用户导向", "能做取舍"],
-    workTraits: [
-      "先明确用户、场景、价值，再讨论功能和资源",
-      "习惯先列不做什么，避免方向失控",
-      "把目标压缩成 MVP、优先级和成功标准",
-    ],
+      "像一个会收边界的产品办公室，不追求大而全，重视最小可售能力包和明确取舍。",
+    personalityTags: ["边界清晰", "能取舍", "定义导向", "MVP 思维"],
     strengths: [
-      "新方向、新服务、新能力的一页式定义",
-      "需求过多时的边界梳理与优先级收敛",
-      "把战略意图翻译成路线图和里程碑假设",
+      "新方向的一页式定义",
+      "功能优先级压缩与先后顺序",
+      "把模糊战略翻译成产品动作",
     ],
-    notFitFor: [
-      "在目标尚未确认时替老板做最终取舍",
-      "持续追项目偏差和跨团队催办",
-      "处理需要强临场感的客户推进与谈判",
-    ],
-    motto: "定义不清，执行一定变形。",
-    positioning:
-      "把模糊想法变成清晰定义，明确做什么、不做什么、先做什么。",
-    responsibilities: [
-      "定义目标用户、场景、价值和边界",
-      "拆出 MVP、优先级与成功标准",
-      "协助 chief 形成一页式方案或路线图",
+    boundaries: [
+      "不替老板拍最终战略板",
+      "不替 pmo 追项目节奏",
+      "不把‘都重要’当答案",
     ],
     usage:
-      "当问题从想法进入方案设计，或者需要统一边界和优先级时接 product。",
+      "只要问题进入‘先做 / 后做 / 不做 / 场景切入 / 路线图动作’，chief 自动补 product。",
     phase: "Phase 1",
     accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
   },
   {
     id: "pmo",
-    order: 4,
+    order: 5,
     code: "pmo",
-    chineseName: "PMO推进官",
-    shortLabel: "执行节奏官 / Delivery Control",
-    identity: "把结论拆成节奏、责任人和关键节点的推进中枢，专盯执行而不是空谈方向。",
+    chineseName: "总裁 PMO",
+    shortLabel: "推进节奏 / Delivery Control",
+    identity: "把结论拆成责任、节奏、依赖和里程碑，负责推进而不是空谈。",
     portrait:
-      "像一个盯住时间表、里程碑、依赖关系和偏差预警的执行总控位，天然对失焦、拖延和承诺漂移敏感。",
-    personalityTags: ["强节奏", "结果导向", "追偏差", "敢催办"],
-    workTraits: [
-      "先锁负责人和依赖，再谈时间和资源",
-      "习惯把目标拆成 30/60/90 天推进盘",
-      "持续识别阻塞点，并把偏差回推给 chief 决策",
-    ],
+      "像一个盯节奏和偏差的推进官，对负责人、时间点和阻塞点天然敏感。",
+    personalityTags: ["强节奏", "结果导向", "追偏差", "控依赖"],
     strengths: [
-      "跨团队项目推进、周节奏管理、里程碑设计",
-      "责任矩阵、风险清单、复盘机制和例会动作",
-      "把方案变成可跟踪的执行看板",
+      "30/60/90 天推进盘",
+      "里程碑与依赖设计",
+      "需要老板拍板的阻塞点识别",
     ],
-    notFitFor: [
-      "定义产品边界或判断外部信息真假",
-      "替代现场角色处理客户关系与临场反馈",
-      "在结论未定前用流程掩盖决策空白",
-    ],
-    motto: "没有责任人和时间点，就不叫计划。",
-    positioning:
-      "把已经明确的方案拆成推进路径，保证责任、节奏、依赖和风险可管理。",
-    responsibilities: [
-      "拆里程碑、负责人、依赖与关键检查点",
-      "生成周节奏、会议动作与复盘机制",
-      "持续追踪偏差并把阻塞回推给 chief",
+    boundaries: [
+      "不替代 product 定义产品边界",
+      "不替代 intel 判断外部真假",
+      "不在结论未定时用流程掩盖问题",
     ],
     usage:
-      "当方向清楚但推进发散、协同困难、需要明确节奏时接 pmo。",
+      "当问题进入试点计划、资源配置、阶段推进或组织协同时，chief 补 pmo。",
     phase: "Phase 2",
     accentClass: "border-orange-500/30 bg-orange-500/10 text-orange-300",
-  },
-  {
-    id: "studio",
-    order: 5,
-    code: "studio",
-    chineseName: "表达工作室",
-    shortLabel: "口径总编 / Executive Studio",
-    identity: "把结论打磨成老板可直接发出的表达资产，负责语气、结构、对象和场合适配。",
-    portrait:
-      "像一个懂老板语气、懂对象心理、也懂正式场合节奏的总编室，擅长把复杂结论压成一句判断和一版成稿。",
-    personalityTags: ["会表达", "懂对象", "控语气", "会压缩"],
-    workTraits: [
-      "把复杂材料压成一句判断、三点重点和一版可发送文本",
-      "能按董事会、客户、员工、合作伙伴切换口径",
-      "特别在意开头怎么起、最后一句怎么落",
-    ],
-    strengths: [
-      "汇报稿、邮件、讲话稿、微信、口播提纲",
-      "对内版、对外版、客户版的多版本表达",
-      "把 chief 的判断改成可直接发出的内容",
-    ],
-    notFitFor: [
-      "替代 intel 做事实研判和证据判断",
-      "独立决定战略取舍和项目优先级",
-      "在结论未定前先堆砌漂亮措辞",
-    ],
-    motto: "同一句话，换个对象就该换个说法。",
-    positioning:
-      "负责把结论变成老板能直接发出的表达资产，适配不同对象与语境。",
-    responsibilities: [
-      "把复杂材料压缩成汇报、邮件、讲话稿或微信",
-      "统一语气、结构、重点和对外口径",
-      "根据对象改写为对内、对外、客户版表达",
-    ],
-    usage:
-      "当 chief 已经形成结论，需要对外发声、内部同步或正式成文时接 studio。",
-    phase: "Phase 2",
-    accentClass: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300",
   },
   {
     id: "field",
     order: 6,
     code: "field",
     chineseName: "一线作战官",
-    shortLabel: "现场翻译器 / Frontline Operator",
-    identity: "客户、销售与交付现场的翻译席，负责把策略改写成一线真能用的话术和动作。",
+    shortLabel: "前线验证 / Frontline Validation",
+    identity: "负责客户、销售与交付现场的真实反馈，判断到底是真需求还是局部噪音。",
     portrait:
-      "像一个长期待在客户现场的老兵，听得出异议背后的真实顾虑，也知道哪些承诺在前线最容易失控。",
-    personalityTags: ["临场感", "懂客户", "反馈直接", "实战优先"],
-    workTraits: [
-      "先看现场氛围、真实阻力和推进窗口，再给建议",
-      "擅长把策略翻译成拜访提纲、异议应对和下一步动作",
-      "会把前线反馈带回 chief，而不是只报喜不报忧",
-    ],
+      "像一个长期在客户现场的人，知道前线真正卡在哪里，也知道哪些承诺最容易失控。",
+    personalityTags: ["懂客户", "临场感", "反馈直接", "验证需求"],
     strengths: [
-      "客户拜访提纲、异议处理和推进下一步",
-      "销售或交付现场的真实问题诊断",
-      "验证方案在一线是否真的能打",
+      "客户/销售反馈聚类",
+      "需求真假与问题归因",
+      "现场话术与推进动作建议",
     ],
-    notFitFor: [
-      "替代 chief 做最终资源取舍和对外拍板",
-      "做纯内部流程推进或例会机制设计",
-      "在缺少现场语境时空谈宏大战略",
-    ],
-    motto: "现场不买单，再漂亮的策略也只是纸面。",
-    positioning:
-      "面向客户、销售和交付现场，把策略翻译成打法，也把真实反馈带回团队。",
-    responsibilities: [
-      "生成客户拜访提纲、异议处理和推进动作",
-      "识别现场真实阻力、窗口与承诺风险",
-      "把一线反馈带回 chief 形成策略闭环",
+    boundaries: [
+      "不把个别客户反馈直接上升为市场趋势",
+      "不替代 chief 做最终取舍",
+      "不替代 product 做路线图定义",
     ],
     usage:
-      "遇到客户现场问题或需要验证真实反馈时插入 field，但最后仍由 chief 收口。",
+      "当‘竞品跟不跟’进入投资决策，或需要验证客户是否真在买时，chief 补 field。",
     phase: "Phase 3",
     accentClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
   },
+  {
+    id: "studio",
+    order: 7,
+    code: "studio",
+    chineseName: "表达与材料官",
+    shortLabel: "高层表达 / Executive Studio",
+    identity: "把结论压成高层可直接使用的一页纸、汇报、讲话稿或 WhatsApp 版本。",
+    portrait:
+      "像一个总编室，懂老板语气、懂对象差异，也懂复杂材料怎么压成一句话和三条重点。",
+    personalityTags: ["会表达", "会压缩", "懂对象", "统一口径"],
+    strengths: [
+      "一页纸、邮件、讲话稿、消息版转写",
+      "管理层 / 客户 / 内部多版本表达",
+      "把 chief 的判断改成可直接发出的内容",
+    ],
+    boundaries: [
+      "不创造不存在的证据",
+      "不在结论未定时先堆漂亮措辞",
+      "不替代 chief 做拍板",
+    ],
+    usage:
+      "当结论需要进入汇报、周报、对外口径或高层表达时，最后再由 studio 接力。",
+    phase: "Phase 2",
+    accentClass: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300",
+  },
 ];
 
-const USAGE_ORDER = [
-  "chief 接住老板原始问题",
-  "intel 判断外部信号是否值得重视",
-  "product 收敛定义、边界与优先级",
-  "pmo 拆节奏、责任人与里程碑",
-  "studio 产出可直接发出的表达",
-  "field 把真实现场反馈带回 chief",
+const DISPATCH_CARDS: DispatchCard[] = [
+  {
+    title: "四维判断框架",
+    summary:
+      "所有‘要不要做 / 要不要投 / 要不要跟’的问题，chief 默认先压成四个维度。",
+    combos: [
+      "吸引力：这个方向值不值得看",
+      "可赢性：我们是否进得去、打得赢、能复制",
+      "战略匹配度：是否符合主航道与当前能力基础",
+      "执行负担：销售、交付、合规、组织成本是否过重",
+    ],
+  },
+  {
+    title: "最少必要角色原则",
+    summary:
+      "不是所有问题都拉满全队。chief 先判断问题类型，再只拉最少必要角色上桌。",
+    combos: [
+      "市场是否值得进入 → market + intel",
+      "竞品发新东西，我们要不要跟 → intel + product",
+      "重大客户需求是否进路线图 → field + market + product",
+      "重点项目卡住且需要老板拍板 → pmo + product + field",
+    ],
+  },
+  {
+    title: "v2.1 触发补角规则",
+    summary:
+      "一旦问题进入某个判断层，相关角色自动补入，而不是靠感觉临时决定。",
+    combos: [
+      "进入先做 / 后做 / 不做 / 场景切入 → 自动补 product",
+      "竞品跟不跟进入立项 / 投资判断 → 自动补 field 或 market 做需求验证",
+      "进入试点推进 / 资源配置 / 节奏管理 → 自动补 pmo",
+      "要变成汇报 / 周报 / 对外口径 → 最后补 studio",
+    ],
+  },
 ];
 
-const PROMPT_GROUPS: PromptGroup[] = [
+const WEEKLY_FLOW: WeeklyNode[] = [
   {
-    key: "judge",
-    label: "判断",
-    summary: "先判轻重缓急、真假和是否值得老板亲自跟进。",
-    prompts: [
-      "请以 chief 视角先判断这件事值不值得我亲自跟进，再决定是否需要拉 intel。背景：……",
-      "请让 intel 研判这条信息对公司、客户和竞争格局的真实影响，给出风险等级、依据和建议。输入：……",
-    ],
+    title: "market 周报",
+    label: "机会输入",
+    detail:
+      "每周输出：市场机会、需求迁移、区域变化、增长信号与先做 / 后做 / 不做建议。",
+    accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
   },
   {
-    key: "define",
-    label: "定义",
-    summary: "把模糊想法收敛成可执行的一页式定义。",
-    prompts: [
-      "chief 先理解我的目标，再请 product 形成一页式方案，写清用户、场景、价值、边界和优先级。背景：……",
-      "请让 product 把这个新方向定义成最小可行版本，列出必须做、不做、可延后项和成功标准。输入：……",
-    ],
+    title: "intel 周报",
+    label: "威胁输入",
+    detail:
+      "每周输出：竞品动作、定价变化、渠道/生态变化、政策监管信号与我方应对判断。",
+    accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
   },
   {
-    key: "push",
-    label: "推进",
-    summary: "把方向拆成节奏、责任和下周动作。",
-    prompts: [
-      "请让 pmo 把这个目标拆成 30/60/90 天推进计划，列出负责人、依赖、风险和例会节奏。目标：……",
-      "chief 收到下面目标后，调用 pmo 生成下周可执行清单，并标出需要我亲自拍板的节点。输入：……",
-    ],
+    title: "chief 周报",
+    label: "总收口",
+    detail:
+      "把 market / intel 等输入压成管理层一页纸：结论、风险、本周动作、待拍板事项。",
+    accentClass:
+      "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_24px_rgba(229,255,0,0.06)]",
   },
   {
-    key: "field",
-    label: "一线",
-    summary: "把策略翻译成客户现场能用的话术和动作。",
-    prompts: [
-      "请让 field 站在客户一线视角，给我一套拜访提纲、常见异议和下一步推进建议。背景：……",
-      "把这次销售或交付现场情况交给 field，提炼真实阻力、关键信号和复盘动作。输入：……",
-    ],
-  },
-  {
-    key: "studio",
-    label: "表达",
-    summary: "把结论改成老板可直接发出的表达版本。",
-    prompts: [
-      "请让 studio 把下面材料改成老板可直接发出的微信、邮件或讲话稿，保持坚定、简洁、有判断。原文：……",
-      "chief 收口后，请 studio 生成 1 分钟口播版和书面摘要版，适合对内同步。内容：……",
-    ],
+    title: "合并 PDF",
+    label: "分发输出",
+    detail:
+      "系统会生成 AI 安全周报汇总版，自动转成 PDF，并通过 WhatsApp 推送给家兴。",
+    accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
   },
 ];
 
 const PHASES: PhasePlan[] = [
   {
     phase: "Phase 1",
-    title: "chief + intel + product",
-    roles: ["chief", "intel", "product"],
-    goal: "先把判断和定义跑顺，建立每天都能使用的默认入口。",
+    title: "chief + market + intel + product",
+    goal: "先把判断、机会、威胁和产品定义跑顺，形成每天都能使用的默认作战编组。",
     outcome:
-      "老板先问 chief，chief 视情况拉 intel 和 product，形成稳定的日常工作流。",
+      "老板先找 chief，chief 按问题类型拉 market / intel / product，完成最核心的判断闭环。",
+    roles: ["chief", "market", "intel", "product"],
   },
   {
     phase: "Phase 2",
     title: "增加 pmo + studio",
-    roles: ["pmo", "studio"],
-    goal: "补齐推进和表达，让决策既能落地，也能被高质量传达。",
+    goal: "让结论不仅能判断，也能推进、能表达，形成执行与汇报闭环。",
     outcome:
-      "从结论延伸到计划、节奏、汇报、邮件和对外口径，开始形成执行闭环。",
+      "从一页式判断延伸到推进节奏、汇报材料、对外口径和周报机制。",
+    roles: ["pmo", "studio"],
   },
   {
     phase: "Phase 3",
     title: "增加 field",
-    roles: ["field"],
-    goal: "接入客户与现场反馈，把一线信息真正带回 chief。",
+    goal: "把客户与销售现场反馈真正接回系统，完成前线验证闭环。",
     outcome:
-      "从纸面策略升级为前线闭环，及时修正判断、定义和推进路径。",
+      "竞品判断、需求判断和资源投入不再只靠内部推演，而有一线验证支撑。",
+    roles: ["field"],
   },
 ];
 
-const CASE_LIBRARY_SUMMARY: CaseSummaryItem[] = [
+const PROMPTS = [
   {
-    label: "归档原则",
-    value: "重要判断、关键定义与最终拍板都在这里留下可见历史。",
+    title: "市场进入判断",
+    prompt:
+      "请以 chief 视角判断这个市场值不值得进入；若需要，调用 market + intel，最后输出结论 / 依据 / 风险 / 动作。",
   },
   {
-    label: "呈现格式",
-    value: "每条案例统一保留原问题、参会席位、关键节点与收口结论。",
+    title: "竞品跟进判断",
+    prompt:
+      "请由 chief 处理：核心竞品刚发布新产品，我们要不要跟？若进入产品动作，自动补 product；若进入投资决策，补 field 或 market 做需求验证。",
   },
   {
-    label: "更新方式",
-    value: "未来凡是值得团队回看的重要讨论，都会按同样格式持续追加。",
+    title: "路线图取舍",
+    prompt:
+      "请 chief 先理解目标，再请 product 给出先做 / 后做 / 不做和最小可售能力包；必要时再由 pmo 拆 30/60/90 天推进。",
   },
-];
-
-const DISCUSSION_CASES: DiscussionCase[] = [
   {
-    id: "ai-firewall-priority",
-    status: "已归档",
-    category: "战略判断 + 产品定义",
-    title: "下一代 AI 防火墙优先级讨论",
-    question: "如果我要定义下一代 AI 防火墙，第一阶段能力该怎么排优先级？",
-    description:
-      "这次不是所有角色一起开会，而是由 chief 判断后，优先拉起最关键的两位专家：intel 负责外部买单逻辑与行业判断，product 负责首发定义与优先级压缩；最后再由 chief 收口成一页可拍板结论。",
-    indexSummary:
-      "围绕 AI 防火墙首发能力排序，团队把战略判断与产品定义压成了一页可拍板结论。",
-    involvedRoles: ["chief", "intel", "product"],
-    involvedNote: "这是最适合“战略判断 + 产品定义”类问题的最小作战编组。",
-    standbyRoles: ["pmo", "studio", "field"],
-    standbyNote:
-      "如果下一步进入项目落地、董事会表达或客户验证，再由它们接力上桌。",
-    summaryItems: [
-      { label: "议题类型", value: "战略判断 + 产品定义" },
-      { label: "出场席位", value: "3 位核心席位上桌" },
-      { label: "收口方式", value: "chief 一页式拍板" },
-      { label: "归档定位", value: "Visible Team History" },
-    ],
-    decision:
-      "第一阶段不要做“大而全 AI 安全平台”，而应收敛为 AI 统一出口与合规审计网关，优先做统一入口、策略管控、数据防泄漏、审计取证与私有化集成。",
-    steps: [
-      {
-        role: "chief",
-        title: "总参谋先重写问题",
-        detail:
-          "先把“下一代 AI 防火墙怎么做”改写成真正需要拍板的问题：第一阶段到底卖什么、客户先为什么买单、首发能力必须压缩到什么程度。",
-        result: "把任务从“大而全平台构想”收敛为“首发产品定义与优先级排序”。",
-        accentClass:
-          "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
-      },
-      {
-        role: "intel",
-        title: "情报研判市场买单逻辑",
-        detail:
-          "从企业级 / 运营商级安全场景看，客户当前最在意的不是 AI 多炫，而是是否可控、可审、可合规、能不能进 PoC 与生产。",
-        result: "给出外部判断：入口治理和证据链，比炫技型语义安全更容易成交。",
-        accentClass: "border-cyan-500/20 bg-cyan-500/10 text-cyan-300",
-      },
-      {
-        role: "product",
-        title: "产品定义官压缩首发范围",
-        detail:
-          "围绕首发可卖、可交付、可复制三个标准，把第一阶段能力排成 P0 / P1 / P2，并明确哪些能力不能首发就做。",
-        result:
-          "形成清晰优先级：统一模型网关、访问控制、数据防泄漏、审计取证、私有化集成进入 P0。",
-        accentClass: "border-blue-500/20 bg-blue-500/10 text-blue-300",
-      },
-      {
-        role: "chief",
-        title: "chief 最终收口拍板",
-        detail:
-          "把情报判断与产品取舍压成一句产品定义，再输出结论、优先级、风险和动作，形成可直接给总裁拍板的一页版。",
-        result:
-          "最终收口为：第一阶段不要做大而全 AI 安全平台，而要做 AI 统一出口与合规审计网关。",
-        accentClass:
-          "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
-      },
-    ],
+    title: "高层表达",
+    prompt:
+      "chief 收口后，请 studio 把结果改成一页纸或老板可直接发出的消息版，保留结论、风险与动作。",
   },
 ];
-
-function getRoleById(roleId: RoleId) {
-  return ROLES.find((role) => role.id === roleId);
-}
 
 function SectionTitle({
   eyebrow,
@@ -499,13 +375,7 @@ function SectionTitle({
   );
 }
 
-function RoleListBlock({
-  title,
-  items,
-}: {
-  title: string;
-  items: string[];
-}) {
+function RoleListBlock({ title, items }: { title: string; items: string[] }) {
   return (
     <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
@@ -562,7 +432,7 @@ function RoleCard({ role }: { role: Role }) {
       <div className="mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
         <div className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-            职业身份 / 职业画像
+            职业身份 / 角色画像
           </p>
           <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">
             {role.identity}
@@ -571,344 +441,63 @@ function RoleCard({ role }: { role: Role }) {
         </div>
 
         <div className="rounded-2xl border border-white/8 bg-black/[0.16] p-4">
-          <span
-            className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}
-          >
-            代表台词 / 风格线
-          </span>
-          <p className="mt-3 text-lg leading-7 text-[#f0f6fc]">“{role.motto}”</p>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            老板怎么叫他出场
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.usage}</p>
           <div className="mt-4 border-t border-white/8 pt-4">
             <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-              老板怎么叫他出场
+              角色标签
             </p>
-            <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{role.usage}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {role.personalityTags.map((tag) => (
+                <span
+                  key={tag}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${role.accentClass}`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-          性格标签
-        </p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {role.personalityTags.map((tag) => (
-            <span
-              key={tag}
-              className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${role.accentClass}`}
-            >
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
-        <RoleListBlock title="工作特点" items={role.workTraits} />
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <RoleListBlock title="擅长处理的问题" items={role.strengths} />
-        <RoleListBlock title="不适合处理的问题" items={role.notFitFor} />
-      </div>
-
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-        <RoleListBlock title="职责边界" items={role.responsibilities} />
-        <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-            角色定位
-          </p>
-          <p className="mt-3 text-sm leading-6 text-[#c9d1d9]">{role.positioning}</p>
-        </div>
+        <RoleListBlock title="边界 / 不适合处理的问题" items={role.boundaries} />
       </div>
     </article>
   );
 }
 
-function PromptCard({ group }: { group: PromptGroup }) {
+function DispatchCardView({ card }: { card: DispatchCard }) {
   return (
     <article className="glass rounded-2xl p-5 transition-all hover:border-black/[0.12]">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold text-[#f0f6fc]">{group.label}</h3>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
-          日常模板
-        </span>
-      </div>
-      <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{group.summary}</p>
-      <div className="mt-4 space-y-3">
-        {group.prompts.map((prompt) => (
-          <div
-            key={prompt}
-            className="rounded-xl border border-white/8 bg-black/[0.16] p-3 text-sm leading-6 text-[#dbe4ee]"
-          >
-            {prompt}
-          </div>
+      <h3 className="text-lg font-semibold text-[#f0f6fc]">{card.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{card.summary}</p>
+      <ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#dbe4ee]">
+        {card.combos.map((item) => (
+          <li key={item} className="flex gap-2.5 rounded-xl border border-white/8 bg-black/[0.16] p-3">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
+            <span>{item}</span>
+          </li>
         ))}
-      </div>
+      </ul>
     </article>
   );
 }
 
-function RoleBadge({
-  roleId,
-  muted = false,
-}: {
-  roleId: RoleId;
-  muted?: boolean;
-}) {
-  const role = getRoleById(roleId);
-
-  if (!role) {
-    return null;
-  }
-
+function WeeklyNodeCard({ node }: { node: WeeklyNode }) {
   return (
-    <span
-      className={`rounded-full border px-3 py-1.5 text-sm ${
-        muted
-          ? "border-white/10 bg-black/[0.18] text-[#94a3b8]"
-          : role.accentClass
-      }`}
-    >
-      {role.chineseName} / {role.code}
-    </span>
-  );
-}
-
-function CaseIndexCard({
-  item,
-  index,
-}: {
-  item: DiscussionCase;
-  index: number;
-}) {
-  return (
-    <a
-      href={`#case-${item.id}`}
-      className="block rounded-2xl border border-white/8 bg-black/[0.16] p-4 transition-all hover:border-black/[0.12]"
-    >
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
-          Case {String(index + 1).padStart(2, "0")}
-        </span>
-        <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-2.5 py-1 text-[11px] font-semibold text-[#e5ff00]">
-          {item.status}
-        </span>
-      </div>
-      <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-        {item.category}
-      </p>
-      <h3 className="mt-2 text-lg font-semibold text-[#f0f6fc]">{item.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{item.indexSummary}</p>
-      <p className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-[#64748b]">
-        查看议题卡
-      </p>
-    </a>
-  );
-}
-
-type FlowOverviewNode = {
-  key: string;
-  eyebrow: string;
-  title: string;
-  caption: string;
-  accentClass: string;
-};
-
-type FlowStage = {
-  key: string;
-  stageLabel: string;
-  title: string;
-  detail: string;
-  result?: string;
-  roleId?: RoleId;
-  marker: string;
-  accentClass: string;
-};
-
-function getExecutiveStepLabel(step: HistoryStep, index: number, total: number) {
-  if (step.role === "chief" && index === 0) {
-    return "chief 重写问题";
-  }
-
-  if (step.role === "chief" && index === total - 1) {
-    return "chief 收口拍板";
-  }
-
-  switch (step.role) {
-    case "intel":
-      return "intel 情报判断";
-    case "product":
-      return "product 定义收敛";
-    case "pmo":
-      return "pmo 推进拆解";
-    case "studio":
-      return "studio 统一口径";
-    case "field":
-      return "field 一线验证";
-    default: {
-      const role = getRoleById(step.role);
-
-      return role ? `${role.code} 关键判断` : step.title;
-    }
-  }
-}
-
-function getFlowOverviewNodes(item: DiscussionCase): FlowOverviewNode[] {
-  return [
-    {
-      key: `${item.id}-origin`,
-      eyebrow: "起点",
-      title: "原问题",
-      caption: "原始需求先进入 chief",
-      accentClass: "border-white/10 bg-white/[0.03] text-[#f0f6fc]",
-    },
-    ...item.steps.map((step, index) => ({
-      key: `${item.id}-overview-${index}`,
-      eyebrow: `节点 ${index + 1}`,
-      title: getExecutiveStepLabel(step, index, item.steps.length),
-      caption: step.title,
-      accentClass: step.accentClass,
-    })),
-    {
-      key: `${item.id}-close`,
-      eyebrow: "收口",
-      title: "一页式拍板结论",
-      caption: "形成可直接拍板口径",
-      accentClass: "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
-    },
-  ];
-}
-
-function getFlowStages(item: DiscussionCase): FlowStage[] {
-  return [
-    {
-      key: `${item.id}-stage-origin`,
-      stageLabel: "起点 / 原问题",
-      title: "原问题进入 chief",
-      detail: item.question,
-      result: item.description,
-      marker: "问",
-      accentClass: "border-white/10 bg-white/[0.03] text-[#f0f6fc]",
-    },
-    ...item.steps.map((step, index) => ({
-      key: `${item.id}-stage-${index}`,
-      stageLabel: `节点 ${index + 1} / ${getExecutiveStepLabel(
-        step,
-        index,
-        item.steps.length,
-      )}`,
-      title: step.title,
-      detail: step.detail,
-      result: step.result,
-      roleId: step.role,
-      marker: String(index + 1).padStart(2, "0"),
-      accentClass: step.accentClass,
-    })),
-    {
-      key: `${item.id}-stage-close`,
-      stageLabel: "收口 / chief 最终拍板",
-      title: "形成最终拍板结论",
-      detail: item.decision,
-      marker: "定",
-      accentClass: "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
-    },
-  ];
-}
-
-function ExecutiveFlowBoard({ item }: { item: DiscussionCase }) {
-  const overviewNodes = getFlowOverviewNodes(item);
-  const stages = getFlowStages(item);
-
-  return (
-    <div className="glass rounded-3xl p-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-            Executive Flow
-          </p>
-          <h3 className="mt-2 text-2xl font-semibold text-[#f0f6fc]">
-            这次讨论如何一路走到拍板
-          </h3>
-        </div>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#94a3b8]">
-          共 {stages.length} 段决策路径
-        </span>
-      </div>
-      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-        先把原问题送进 chief，再按判断与定义的顺序逐段推进，最后统一收口成一页式结论。
-      </p>
-
-      <div className="mt-5 rounded-[28px] border border-white/8 bg-black/[0.16] p-4 sm:p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-          决策路径总览
-        </p>
-        <div className="mt-4 flex flex-col gap-3 xl:flex-row xl:items-stretch">
-          {overviewNodes.map((node, index) => (
-            <Fragment key={node.key}>
-              <div className="min-w-0 flex-1 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                <span
-                  className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${node.accentClass}`}
-                >
-                  {node.eyebrow}
-                </span>
-                <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">
-                  {node.title}
-                </p>
-                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{node.caption}</p>
-              </div>
-              {index < overviewNodes.length - 1 && (
-                <>
-                  <div className="flex justify-center text-xl text-[#64748b] xl:hidden">
-                    ↓
-                  </div>
-                  <div className="hidden items-center justify-center text-2xl text-[#64748b] xl:flex">
-                    →
-                  </div>
-                </>
-              )}
-            </Fragment>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-          关键判断节点
-        </p>
-        <div className="mt-4 space-y-4">
-          {stages.map((stage, index) => (
-            <div key={stage.key} className="relative pl-16 sm:pl-20">
-              <div
-                className={`absolute left-0 top-1 flex h-11 w-11 items-center justify-center rounded-2xl border text-sm font-semibold sm:h-12 sm:w-12 ${stage.accentClass}`}
-              >
-                {stage.marker}
-              </div>
-              {index < stages.length - 1 && (
-                <div className="absolute left-[21px] top-14 h-[calc(100%+0.75rem)] w-px bg-gradient-to-b from-white/35 via-white/12 to-white/0 sm:left-[23px]" />
-              )}
-              <div className="rounded-[28px] border border-white/8 bg-white/[0.02] p-5">
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                    {stage.stageLabel}
-                  </p>
-                  {stage.roleId && <RoleBadge roleId={stage.roleId} />}
-                </div>
-                <h4 className="mt-3 text-xl font-semibold text-[#f0f6fc]">
-                  {stage.title}
-                </h4>
-                <p className="mt-3 text-sm leading-7 text-[#94a3b8]">{stage.detail}</p>
-                {stage.result && (
-                  <div className="mt-4 rounded-2xl border border-white/8 bg-black/[0.18] p-4">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                      本轮产出
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
-                      {stage.result}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-5">
+      <span
+        className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${node.accentClass}`}
+      >
+        {node.label}
+      </span>
+      <h3 className="mt-3 text-xl font-semibold text-[#f0f6fc]">{node.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{node.detail}</p>
     </div>
   );
 }
@@ -939,20 +528,22 @@ export default function TeamPage() {
             <div className="glass rounded-3xl p-6 sm:p-8">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
-                  Executive AI Roster
+                  Executive AI Roster v2.1
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
                   总裁辅助团队
                 </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                  7 角色模型
+                </span>
               </div>
               <h1 className="mt-5 text-3xl font-semibold leading-tight text-[#f0f6fc] sm:text-5xl">
-                让老板每天先找 <span className="gradient-text">chief</span>
-                ，由 chief 编排整支 AI 幕僚班底。
+                先找 <span className="gradient-text">chief</span>
+                ，再由 chief 调最少必要角色上桌。
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[#94a3b8] sm:text-base">
-                这不是一页普通说明文档，而是一张老板桌边可直接调用的 AI 班底编制表。
-                chief 坐默认司令席，负责接住问题、判断局势、安排 specialist agents
-                上桌，再把所有意见压成你能直接拍板的一页结论。
+                这不是一页普通说明文档，而是一张真正可用的 AI 总裁辅助团队编制表。
+                现在的团队已经从 6 角色升级到 7 角色：chief 负责入口与收口，market 看机会，intel 看威胁，product 做取舍，pmo 管推进，field 验证一线，studio 负责高层表达。
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2">
@@ -960,63 +551,40 @@ export default function TeamPage() {
                   默认入口: chief
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
-                  6 位幕僚角色
+                  7 位幕僚角色
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
-                  3 个上线阶段
+                  v2.1 调度规则
+                </span>
+                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
+                  周报自动生成机制
                 </span>
               </div>
 
               <div className="mt-8 rounded-2xl border border-white/8 bg-black/[0.16] p-4">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                  建议调用顺序
+                  推荐调用顺序
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-[#dbe4ee]">
-                  {USAGE_ORDER.map((step, index) => (
+                  {[
+                    "1. chief 先重写问题",
+                    "2. market 看机会 / intel 看威胁",
+                    "3. product 定先做 / 后做 / 不做",
+                    "4. pmo 拆节奏，field 做验证，studio 统一表达",
+                    "5. 最后仍由 chief 收口",
+                  ].map((step, index, arr) => (
                     <div key={step} className="flex items-center gap-2">
                       <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">
-                        {index + 1}. {step}
+                        {step}
                       </span>
-                      {index < USAGE_ORDER.length - 1 && (
-                        <span className="text-[#64748b]">→</span>
-                      )}
+                      {index < arr.length - 1 && <span className="text-[#64748b]">→</span>}
                     </div>
                   ))}
                 </div>
-                <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                  规则保持不变: 客户现场问题可以中途插入 field，但最终仍然回到 chief
-                  做判断、取舍和收口。
-                </p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="glass rounded-3xl p-6">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                  CEO Office Rules
-                </p>
-                <div className="mt-4 space-y-4">
-                  <div className="rounded-2xl border border-[#e5ff00]/20 bg-[#e5ff00]/8 p-4">
-                    <p className="text-sm font-semibold text-[#f0f6fc]">
-                      这是 AI roster，不是功能菜单
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
-                      不需要先决定该叫谁。先把问题扔给 chief，chief 会判断要不要拉 intel、
-                      product、pmo、studio、field 参与。
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                    <p className="text-sm font-semibold text-[#f0f6fc]">
-                      chief 的价值是编排，不是包办
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
-                      其他角色都各守一摊，不争入口。chief 负责统一问题定义、决定调用顺序，
-                      最后把多角色内容压成你能直接拿去拍板的判断书。
-                    </p>
-                  </div>
-                </div>
-              </div>
-
               <div className="glass rounded-3xl p-6">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
                   Roster Snapshot
@@ -1049,14 +617,38 @@ export default function TeamPage() {
                   ))}
                 </div>
               </div>
+
+              <div className="glass rounded-3xl p-6">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
+                  核心规则
+                </p>
+                <div className="mt-4 space-y-4">
+                  <div className="rounded-2xl border border-[#e5ff00]/20 bg-[#e5ff00]/8 p-4">
+                    <p className="text-sm font-semibold text-[#f0f6fc]">
+                      先 chief，后专家，最后还是 chief
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
+                      你不需要先判断应该叫谁。chief 负责判断问题类型、决定谁上场、按什么顺序上场，以及最后怎么收口。
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                    <p className="text-sm font-semibold text-[#f0f6fc]">
+                      不是所有问题都要全队出动
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
+                      这套 v2.1 的升级重点不是加更多角色，而是让 chief 只调用最少必要角色，并按四维判断框架稳定收口。
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
           <section className="mt-10">
             <SectionTitle
               eyebrow="Roster"
-              title="6 位角色，一眼看懂人设与边界"
-              description="每个角色都像一个真实的高管幕僚位，个性、擅长场景和边界都明确。老板只要记住一个原则：先 chief，后专家，最后还是 chief。"
+              title="7 位角色，一眼看懂人设、边界与上场方式"
+              description="团队从旧的 6 角色升级为 7 角色。最大的变化是新增 market，并把 intel 收窄为竞争与战略情报官，让‘机会’和‘威胁’彻底分开。"
             />
             <div className="grid gap-4 xl:grid-cols-2">
               {ROLES.map((role) => (
@@ -1069,231 +661,68 @@ export default function TeamPage() {
 
           <section className="mt-10">
             <SectionTitle
-              eyebrow="Flow"
-              title="这支 AI 团队怎么协同"
-              description="问题先进入 chief，由 chief 分配给最合适的专家角色，最后再由 chief 汇总结论、风险和下一步。"
+              eyebrow="Dispatch v2.1"
+              title="这支团队现在怎么调度"
+              description="重点不再是‘把所有人都拉上来’，而是 chief 用最少必要角色解决问题，并且在进入某个判断层时自动补角。"
             />
-            <div className="grid gap-4 lg:grid-cols-[1fr_auto_1.15fr_auto_1fr] lg:items-center">
-              <div className="glass rounded-2xl p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                  Step 1
-                </p>
-                <h3 className="mt-2 text-xl font-semibold text-[#f0f6fc]">
-                  问题先进入 chief
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                  chief 先识别你真正要解决的是什么，再决定是先判断、先定义，还是直接进入推进和表达。
-                </p>
-              </div>
-
-              <div className="hidden text-center text-3xl text-[#64748b] lg:block">→</div>
-
-              <div className="glass rounded-2xl p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                  Step 2
-                </p>
-                <h3 className="mt-2 text-xl font-semibold text-[#f0f6fc]">
-                  specialist agents 分工上桌
-                </h3>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {ROLES.filter((role) => role.id !== "chief").map((role) => (
-                    <span
-                      key={role.id}
-                      className={`rounded-full border px-3 py-1.5 text-sm ${role.accentClass}`}
-                    >
-                      {role.code} / {role.chineseName}
-                    </span>
-                  ))}
-                </div>
-                <p className="mt-4 text-sm leading-6 text-[#94a3b8]">
-                  专家角色只处理自己负责的那一摊，不争夺入口。chief 负责判断拉谁、按什么顺序拉、要什么产出。
-                </p>
-              </div>
-
-              <div className="hidden text-center text-3xl text-[#64748b] lg:block">→</div>
-
-              <div className="glass rounded-2xl p-5">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                  Step 3
-                </p>
-                <h3 className="mt-2 text-xl font-semibold text-[#f0f6fc]">
-                  chief 最终收口
-                </h3>
-                <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                  chief 把专家输出压成一页判断，包括结论、取舍、风险、动作、对外口径和下一步。
-                </p>
-              </div>
+            <div className="grid gap-4 xl:grid-cols-3">
+              {DISPATCH_CARDS.map((card) => (
+                <DispatchCardView key={card.title} card={card} />
+              ))}
             </div>
           </section>
 
           <section className="mt-10">
             <SectionTitle
-              eyebrow="Case Library"
-              title="历史案例墙：未来重要讨论持续追加在这里"
-              description="这里不是临时备注区，而是总裁辅助团队的 visible team history。每次值得回看的重要判断、定义与拍板，都会按同一格式追加归档，方便团队回溯，也方便总裁快速看到这支班底是如何形成结论的。"
+              eyebrow="Weekly Intelligence Loop"
+              title="AI 安全周报机制已经进入团队系统"
+              description="现在这套总裁辅助团队不只是回答单次问题，还会把市场、竞争和管理层收口固化成每周周报，并能自动生成 PDF 输出。"
             />
             <div className="glass rounded-3xl p-6">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
-                  Visible Team History
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                  未来重要讨论持续追加
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                  当前归档 {DISCUSSION_CASES.length} 条
-                </span>
-              </div>
-
-              <div className="mt-5 grid gap-4 lg:grid-cols-[1.05fr_0.95fr]">
-                <div className="rounded-2xl border border-white/8 bg-black/[0.16] p-5">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                    案例墙说明
-                  </p>
-                  <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
-                    这里保留已经发生的重要讨论，作为这支总裁辅助团队的可见历史档案。
-                  </p>
-                  <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                    后续凡是影响产品方向、客户判断、资源取舍或对外口径的重要议题，都会继续追加到这面案例墙，保留原问题、出场席位、关键节点与最终收口，方便随时回看和复盘。
-                  </p>
-                </div>
-
-                <div className="grid gap-3 md:grid-cols-3">
-                  {CASE_LIBRARY_SUMMARY.map((item) => (
-                    <div
-                      key={item.label}
-                      className="rounded-2xl border border-white/8 bg-white/[0.02] p-4"
-                    >
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                        {item.label}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{item.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-5 grid gap-3 xl:grid-cols-3">
-                {DISCUSSION_CASES.map((item, index) => (
-                  <CaseIndexCard key={item.id} item={item} index={index} />
+              <div className="grid gap-4 xl:grid-cols-[1fr_auto_1fr_auto_1fr_auto_1fr] xl:items-stretch">
+                {WEEKLY_FLOW.map((node, index) => (
+                  <Fragment key={node.title}>
+                    <WeeklyNodeCard node={node} />
+                    {index < WEEKLY_FLOW.length - 1 && (
+                      <div className="hidden items-center justify-center text-3xl text-[#64748b] xl:flex">
+                        →
+                      </div>
+                    )}
+                  </Fragment>
                 ))}
               </div>
-            </div>
 
-            <div className="mt-4 space-y-4">
-              {DISCUSSION_CASES.map((item) => (
-                <div
-                  key={item.id}
-                  id={`case-${item.id}`}
-                  className="scroll-mt-24 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]"
-                >
-                  <div className="glass rounded-3xl p-6">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
-                        历史案例墙 / Case File
-                      </span>
-                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                        {item.status}
-                      </span>
-                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                        {item.category}
-                      </span>
-                    </div>
-                    <h3 className="mt-5 text-2xl font-semibold text-[#f0f6fc]">
-                      {item.title}
-                    </h3>
-
-                    <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                      {item.summaryItems.map((summaryItem) => (
-                        <div
-                          key={summaryItem.label}
-                          className="rounded-2xl border border-white/8 bg-white/[0.02] p-4"
-                        >
-                          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                            {summaryItem.label}
-                          </p>
-                          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">
-                            {summaryItem.value}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-
-                    <div className="mt-6 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                        原问题
-                      </p>
-                      <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
-                        {item.question}
-                      </p>
-                      <p className="mt-3 text-sm leading-7 text-[#94a3b8]">
-                        {item.description}
-                      </p>
-                    </div>
-
-                    <div className="mt-6 grid gap-4 md:grid-cols-2">
-                      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                          本次出场席位
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {item.involvedRoles.map((roleId) => (
-                            <RoleBadge key={roleId} roleId={roleId} />
-                          ))}
-                        </div>
-                        <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                          {item.involvedNote}
-                        </p>
-                      </div>
-                      <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
-                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                          待命但未出场席位
-                        </p>
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {item.standbyRoles.map((roleId) => (
-                            <RoleBadge key={roleId} roleId={roleId} muted />
-                          ))}
-                        </div>
-                        <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
-                          {item.standbyNote}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="mt-6 rounded-2xl border border-[#e5ff00]/20 bg-[#e5ff00]/8 p-4">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                        本次收口结论
-                      </p>
-                      <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
-                        {item.decision}
-                      </p>
-                    </div>
-                  </div>
-
-                  <ExecutiveFlowBoard item={item} />
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                <div className="rounded-2xl border border-white/8 bg-black/[0.16] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                    周报输入怎么分工
+                  </p>
+                  <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
+                    <li>• market：机会、需求迁移、区域变化、增长信号</li>
+                    <li>• intel：竞品、定价、渠道、政策、外部威胁</li>
+                    <li>• chief：一页纸结论、风险、本周动作、待拍板事项</li>
+                  </ul>
                 </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="mt-10">
-            <SectionTitle
-              eyebrow="Prompts"
-              title="老板日常可直接调用的模板"
-              description="下面这些模板可以直接拿来用。最佳实践仍然是先把问题交给 chief，再指定 chief 是否需要调某个角色。"
-            />
-            <div className="grid gap-4 xl:grid-cols-2">
-              {PROMPT_GROUPS.map((group) => (
-                <PromptCard key={group.key} group={group} />
-              ))}
+                <div className="rounded-2xl border border-white/8 bg-black/[0.16] p-5">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                    周报输出怎么落地
+                  </p>
+                  <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
+                    <li>• 汇总为 AI 安全周报合并版</li>
+                    <li>• 自动转成 PDF</li>
+                    <li>• 自动推送到 WhatsApp</li>
+                    <li>• 适合先看 chief，再按需下钻 market / intel</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </section>
 
           <section className="mt-10">
             <SectionTitle
               eyebrow="Rollout"
-              title="按班底成熟度分阶段上线"
-              description="团队不需要一次性全部铺开。建议按照判断、定义、推进、表达、一线反馈的顺序逐步上线。"
+              title="按成熟度分阶段上线，而不是一次铺满"
+              description="新的团队设计保持渐进式：先跑顺判断与定义，再补推进与表达，最后把一线验证接回来。"
             />
             <div className="grid gap-4 lg:grid-cols-3">
               {PHASES.map((phase) => (
@@ -1302,9 +731,7 @@ export default function TeamPage() {
                     <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
                       {phase.phase}
                     </span>
-                    <span className="text-xs text-[#64748b]">
-                      {phase.roles.join(" + ")}
-                    </span>
+                    <span className="text-xs text-[#64748b]">{phase.roles.join(" + ")}</span>
                   </div>
                   <h3 className="mt-4 text-xl font-semibold text-[#f0f6fc]">
                     {phase.title}
@@ -1314,18 +741,37 @@ export default function TeamPage() {
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
                         目标
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-[#dbe4ee]">
-                        {phase.goal}
-                      </p>
+                      <p className="mt-1 text-sm leading-6 text-[#dbe4ee]">{phase.goal}</p>
                     </div>
                     <div>
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
                         结果
                       </p>
-                      <p className="mt-1 text-sm leading-6 text-[#94a3b8]">
-                        {phase.outcome}
-                      </p>
+                      <p className="mt-1 text-sm leading-6 text-[#94a3b8]">{phase.outcome}</p>
                     </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="mt-10">
+            <SectionTitle
+              eyebrow="Prompt Templates"
+              title="老板日常可以直接调用的模板"
+              description="模板也跟着 v2.1 更新：先 chief，后最少必要角色，最后统一收口。"
+            />
+            <div className="grid gap-4 xl:grid-cols-2">
+              {PROMPTS.map((item) => (
+                <article key={item.title} className="glass rounded-2xl p-5 transition-all hover:border-black/[0.12]">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-[#f0f6fc]">{item.title}</h3>
+                    <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+                      直接可用
+                    </span>
+                  </div>
+                  <div className="mt-4 rounded-xl border border-white/8 bg-black/[0.16] p-4 text-sm leading-6 text-[#dbe4ee]">
+                    {item.prompt}
                   </div>
                 </article>
               ))}
