@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import type { Metadata } from "next";
 import NavBar from "@/components/NavBar";
 
@@ -702,30 +703,213 @@ function CaseIndexCard({
   );
 }
 
-function HistoryStepCard({ step }: { step: HistoryStep }) {
-  const role = getRoleById(step.role);
+type FlowOverviewNode = {
+  key: string;
+  eyebrow: string;
+  title: string;
+  caption: string;
+  accentClass: string;
+};
+
+type FlowStage = {
+  key: string;
+  stageLabel: string;
+  title: string;
+  detail: string;
+  result?: string;
+  roleId?: RoleId;
+  marker: string;
+  accentClass: string;
+};
+
+function getExecutiveStepLabel(step: HistoryStep, index: number, total: number) {
+  if (step.role === "chief" && index === 0) {
+    return "chief 重写问题";
+  }
+
+  if (step.role === "chief" && index === total - 1) {
+    return "chief 收口拍板";
+  }
+
+  switch (step.role) {
+    case "intel":
+      return "intel 情报判断";
+    case "product":
+      return "product 定义收敛";
+    case "pmo":
+      return "pmo 推进拆解";
+    case "studio":
+      return "studio 统一口径";
+    case "field":
+      return "field 一线验证";
+    default: {
+      const role = getRoleById(step.role);
+
+      return role ? `${role.code} 关键判断` : step.title;
+    }
+  }
+}
+
+function getFlowOverviewNodes(item: DiscussionCase): FlowOverviewNode[] {
+  return [
+    {
+      key: `${item.id}-origin`,
+      eyebrow: "起点",
+      title: "原问题",
+      caption: "原始需求先进入 chief",
+      accentClass: "border-white/10 bg-white/[0.03] text-[#f0f6fc]",
+    },
+    ...item.steps.map((step, index) => ({
+      key: `${item.id}-overview-${index}`,
+      eyebrow: `节点 ${index + 1}`,
+      title: getExecutiveStepLabel(step, index, item.steps.length),
+      caption: step.title,
+      accentClass: step.accentClass,
+    })),
+    {
+      key: `${item.id}-close`,
+      eyebrow: "收口",
+      title: "一页式拍板结论",
+      caption: "形成可直接拍板口径",
+      accentClass: "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+    },
+  ];
+}
+
+function getFlowStages(item: DiscussionCase): FlowStage[] {
+  return [
+    {
+      key: `${item.id}-stage-origin`,
+      stageLabel: "起点 / 原问题",
+      title: "原问题进入 chief",
+      detail: item.question,
+      result: item.description,
+      marker: "问",
+      accentClass: "border-white/10 bg-white/[0.03] text-[#f0f6fc]",
+    },
+    ...item.steps.map((step, index) => ({
+      key: `${item.id}-stage-${index}`,
+      stageLabel: `节点 ${index + 1} / ${getExecutiveStepLabel(
+        step,
+        index,
+        item.steps.length,
+      )}`,
+      title: step.title,
+      detail: step.detail,
+      result: step.result,
+      roleId: step.role,
+      marker: String(index + 1).padStart(2, "0"),
+      accentClass: step.accentClass,
+    })),
+    {
+      key: `${item.id}-stage-close`,
+      stageLabel: "收口 / chief 最终拍板",
+      title: "形成最终拍板结论",
+      detail: item.decision,
+      marker: "定",
+      accentClass: "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+    },
+  ];
+}
+
+function ExecutiveFlowBoard({ item }: { item: DiscussionCase }) {
+  const overviewNodes = getFlowOverviewNodes(item);
+  const stages = getFlowStages(item);
 
   return (
-    <article className="glass rounded-2xl p-5 transition-all hover:border-black/[0.12]">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <span
-          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${step.accentClass}`}
-        >
-          {role ? `${role.chineseName} / ${role.code}` : step.role}
-        </span>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
-          关键节点
+    <div className="glass rounded-3xl p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
+            Executive Flow
+          </p>
+          <h3 className="mt-2 text-2xl font-semibold text-[#f0f6fc]">
+            这次讨论如何一路走到拍板
+          </h3>
+        </div>
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#94a3b8]">
+          共 {stages.length} 段决策路径
         </span>
       </div>
-      <h3 className="mt-4 text-lg font-semibold text-[#f0f6fc]">{step.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{step.detail}</p>
-      <div className="mt-4 rounded-2xl border border-white/8 bg-black/[0.16] p-4">
+      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
+        先把原问题送进 chief，再按判断与定义的顺序逐段推进，最后统一收口成一页式结论。
+      </p>
+
+      <div className="mt-5 rounded-[28px] border border-white/8 bg-black/[0.16] p-4 sm:p-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-          本轮产出
+          决策路径总览
         </p>
-        <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">{step.result}</p>
+        <div className="mt-4 flex flex-col gap-3 xl:flex-row xl:items-stretch">
+          {overviewNodes.map((node, index) => (
+            <Fragment key={node.key}>
+              <div className="min-w-0 flex-1 rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                <span
+                  className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${node.accentClass}`}
+                >
+                  {node.eyebrow}
+                </span>
+                <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">
+                  {node.title}
+                </p>
+                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{node.caption}</p>
+              </div>
+              {index < overviewNodes.length - 1 && (
+                <>
+                  <div className="flex justify-center text-xl text-[#64748b] xl:hidden">
+                    ↓
+                  </div>
+                  <div className="hidden items-center justify-center text-2xl text-[#64748b] xl:flex">
+                    →
+                  </div>
+                </>
+              )}
+            </Fragment>
+          ))}
+        </div>
       </div>
-    </article>
+
+      <div className="mt-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+          关键判断节点
+        </p>
+        <div className="mt-4 space-y-4">
+          {stages.map((stage, index) => (
+            <div key={stage.key} className="relative pl-16 sm:pl-20">
+              <div
+                className={`absolute left-0 top-1 flex h-11 w-11 items-center justify-center rounded-2xl border text-sm font-semibold sm:h-12 sm:w-12 ${stage.accentClass}`}
+              >
+                {stage.marker}
+              </div>
+              {index < stages.length - 1 && (
+                <div className="absolute left-[21px] top-14 h-[calc(100%+0.75rem)] w-px bg-gradient-to-b from-white/35 via-white/12 to-white/0 sm:left-[23px]" />
+              )}
+              <div className="rounded-[28px] border border-white/8 bg-white/[0.02] p-5">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                    {stage.stageLabel}
+                  </p>
+                  {stage.roleId && <RoleBadge roleId={stage.roleId} />}
+                </div>
+                <h4 className="mt-3 text-xl font-semibold text-[#f0f6fc]">
+                  {stage.title}
+                </h4>
+                <p className="mt-3 text-sm leading-7 text-[#94a3b8]">{stage.detail}</p>
+                {stage.result && (
+                  <div className="mt-4 rounded-2xl border border-white/8 bg-black/[0.18] p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                      本轮产出
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
+                      {stage.result}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -1086,11 +1270,7 @@ export default function TeamPage() {
                     </div>
                   </div>
 
-                  <div className="grid gap-4">
-                    {item.steps.map((step) => (
-                      <HistoryStepCard key={`${item.id}-${step.title}`} step={step} />
-                    ))}
-                  </div>
+                  <ExecutiveFlowBoard item={item} />
                 </div>
               ))}
             </div>
