@@ -44,6 +44,14 @@ type PhasePlan = {
   outcome: string;
 };
 
+type HistoryStep = {
+  role: string;
+  title: string;
+  detail: string;
+  result: string;
+  accentClass: string;
+};
+
 const ROLES: Role[] = [
   {
     id: "chief",
@@ -360,6 +368,45 @@ const PHASES: PhasePlan[] = [
   },
 ];
 
+const FIREWALL_HISTORY_STEPS: HistoryStep[] = [
+  {
+    role: "chief",
+    title: "总参谋先重写问题",
+    detail:
+      "先把“下一代 AI 防火墙怎么做”改写成真正需要拍板的问题：第一阶段到底卖什么、客户先为什么买单、首发能力必须压缩到什么程度。",
+    result: "把任务从“大而全平台构想”收敛为“首发产品定义与优先级排序”。",
+    accentClass:
+      "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+  },
+  {
+    role: "intel",
+    title: "情报研判市场买单逻辑",
+    detail:
+      "从企业级 / 运营商级安全场景看，客户当前最在意的不是 AI 多炫，而是是否可控、可审、可合规、能不能进 PoC 与生产。",
+    result: "给出外部判断：入口治理和证据链，比炫技型语义安全更容易成交。",
+    accentClass: "border-cyan-500/20 bg-cyan-500/10 text-cyan-300",
+  },
+  {
+    role: "product",
+    title: "产品定义官压缩首发范围",
+    detail:
+      "围绕首发可卖、可交付、可复制三个标准，把第一阶段能力排成 P0 / P1 / P2，并明确哪些能力不能首发就做。",
+    result:
+      "形成清晰优先级：统一模型网关、访问控制、数据防泄漏、审计取证、私有化集成进入 P0。",
+    accentClass: "border-blue-500/20 bg-blue-500/10 text-blue-300",
+  },
+  {
+    role: "chief",
+    title: "chief 最终收口拍板",
+    detail:
+      "把情报判断与产品取舍压成一句产品定义，再输出结论、优先级、风险和动作，形成可直接给总裁拍板的一页版。",
+    result:
+      "最终收口为：第一阶段不要做大而全 AI 安全平台，而要做 AI 统一出口与合规审计网关。",
+    accentClass:
+      "border-[#e5ff00]/20 bg-[#e5ff00]/10 text-[#e5ff00]",
+  },
+];
+
 function SectionTitle({
   eyebrow,
   title,
@@ -525,6 +572,31 @@ function PromptCard({ group }: { group: PromptGroup }) {
             {prompt}
           </div>
         ))}
+      </div>
+    </article>
+  );
+}
+
+function HistoryStepCard({ step }: { step: HistoryStep }) {
+  return (
+    <article className="glass rounded-2xl p-5 transition-all hover:border-black/[0.12]">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span
+          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${step.accentClass}`}
+        >
+          {step.role}
+        </span>
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+          讨论节点
+        </span>
+      </div>
+      <h3 className="mt-4 text-lg font-semibold text-[#f0f6fc]">{step.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{step.detail}</p>
+      <div className="mt-4 rounded-2xl border border-white/8 bg-black/[0.16] p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+          本轮产出
+        </p>
+        <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">{step.result}</p>
       </div>
     </article>
   );
@@ -739,6 +811,94 @@ export default function TeamPage() {
                 <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
                   chief 把专家输出压成一页判断，包括结论、取舍、风险、动作、对外口径和下一步。
                 </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-10">
+            <SectionTitle
+              eyebrow="History"
+              title="实战历史记录：下一代 AI 防火墙优先级讨论"
+              description="这不是抽象方法论，而是团队刚刚真实跑过的一次协同案例。你能直接看到：问题如何进入 chief，谁参与了判断，谁负责收敛定义，最后如何形成可拍板结论。"
+            />
+            <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="glass rounded-3xl p-6">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
+                    历史案例 / Case Log
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                    已发生的团队协同
+                  </span>
+                </div>
+                <h3 className="mt-5 text-2xl font-semibold text-[#f0f6fc]">
+                  原问题：如果我要定义下一代 AI 防火墙，第一阶段能力该怎么排优先级？
+                </h3>
+                <p className="mt-4 text-sm leading-7 text-[#94a3b8]">
+                  这次不是所有角色一起开会，而是由 chief 判断后，优先拉起最关键的两位专家：
+                  <span className="text-[#f0f6fc]"> intel </span>
+                  负责外部买单逻辑与行业判断，
+                  <span className="text-[#f0f6fc]"> product </span>
+                  负责首发定义与优先级压缩；最后再由
+                  <span className="text-[#f0f6fc]"> chief </span>
+                  收口成一页可拍板结论。
+                </p>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-2">
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                      本次出场角色
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {['chief', 'intel', 'product'].map((role) => (
+                        <span
+                          key={role}
+                          className="rounded-full border border-white/10 bg-black/[0.18] px-3 py-1.5 text-sm text-[#dbe4ee]"
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
+                      这是最适合“战略判断 + 产品定义”类问题的最小作战编组。
+                    </p>
+                  </div>
+                  <div className="rounded-2xl border border-white/8 bg-white/[0.02] p-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                      待命但未出场角色
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {['pmo', 'studio', 'field'].map((role) => (
+                        <span
+                          key={role}
+                          className="rounded-full border border-white/10 bg-black/[0.18] px-3 py-1.5 text-sm text-[#94a3b8]"
+                        >
+                          {role}
+                        </span>
+                      ))}
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-[#94a3b8]">
+                      如果下一步进入项目落地、董事会表达或客户验证，再由它们接力上桌。
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6 rounded-2xl border border-[#e5ff00]/20 bg-[#e5ff00]/8 p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+                    本次收口结论
+                  </p>
+                  <p className="mt-3 text-base leading-7 text-[#f0f6fc]">
+                    第一阶段不要做“大而全 AI 安全平台”，而应收敛为
+                    <span className="font-semibold text-[#e5ff00]"> AI 统一出口与合规审计网关 </span>
+                    ，优先做统一入口、策略管控、数据防泄漏、审计取证与私有化集成。
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                {FIREWALL_HISTORY_STEPS.map((step) => (
+                  <HistoryStepCard key={step.title} step={step} />
+                ))}
               </div>
             </div>
           </section>
