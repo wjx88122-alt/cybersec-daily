@@ -1,6 +1,10 @@
 {
   "crons": [
-    { "path": "/api/cron", "schedule": "0 17 * * *" }
+    { "path": "/api/cron", "schedule": "0 17 * * *" },
+    { "path": "/api/images", "schedule": "0 18 * * *" },
+    { "path": "/api/translate", "schedule": "0 19 * * *" },
+    { "path": "/api/summarize", "schedule": "0 20 * * *" },
+    { "path": "/api/digest", "schedule": "0 21 * * *" }
   ],
   "functions": {
     "app/api/feed-a/route.ts": { "maxDuration": 10 },
