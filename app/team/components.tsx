@@ -1,0 +1,315 @@
+import Link from "next/link";
+import type {
+  Role,
+  DispatchCard,
+  WeeklyNode,
+  HistoryMilestone,
+  DecisionCase,
+} from "./data";
+
+export function SectionTitle({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string;
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="mb-6">
+      <div className="flex items-center gap-3">
+        <span className="h-px w-10 bg-gradient-to-r from-[#e5ff00] to-transparent" />
+        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94a3b8]">
+          {eyebrow}
+        </p>
+      </div>
+      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-[#f0f6fc] sm:text-3xl">
+        {title}
+      </h2>
+      <p className="mt-2 max-w-3xl text-sm leading-6 text-[#94a3b8]">{description}</p>
+    </div>
+  );
+}
+
+export function TeamTabs({ active }: { active: "overview" | "history" }) {
+  const items = [
+    { id: "overview", href: "/team", label: "团队总览", note: "Roster / Dispatch" },
+    { id: "history", href: "/team/history", label: "决策档案", note: "Timeline / Cases" },
+  ] as const;
+
+  return (
+    <nav
+      aria-label="Team sections"
+      className="glass glass-premium mb-8 flex flex-wrap gap-2 rounded-2xl p-2"
+    >
+      {items.map((item) => {
+        const isActive = active === item.id;
+
+        return (
+          <Link
+            key={item.id}
+            href={item.href}
+            aria-current={isActive ? "page" : undefined}
+            className={`min-w-[168px] rounded-xl border px-4 py-3 transition-all ${
+              isActive
+                ? "border-[#e5ff00]/25 bg-[#e5ff00]/10 text-[#f0f6fc] shadow-[0_0_24px_rgba(229,255,0,0.08)]"
+                : "border-transparent bg-transparent text-[#94a3b8] hover:border-white/10 hover:bg-white/[0.03] hover:text-[#f0f6fc]"
+            }`}
+          >
+            <div className="text-sm font-semibold">{item.label}</div>
+            <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#64748b]">
+              {item.note}
+            </div>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function StatCard({
+  value,
+  label,
+  accentClass,
+}: {
+  value: string;
+  label: string;
+  accentClass: string;
+}) {
+  return (
+    <div className="panel-deep rounded-2xl p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        {label}
+      </p>
+      <p className={`mt-3 text-3xl font-semibold tracking-tight ${accentClass}`}>{value}</p>
+    </div>
+  );
+}
+
+function RoleListBlock({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="panel-soft rounded-2xl p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        {title}
+      </p>
+      <ul className="mt-3 space-y-2.5 text-sm leading-6 text-[#c9d1d9]">
+        {items.map((item) => (
+          <li key={item} className="flex gap-2.5">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563eb]" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export function RoleCard({ role }: { role: Role }) {
+  const isChief = role.id === "chief";
+
+  return (
+    <article
+      className={`glass glass-premium h-full rounded-[28px] p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12] sm:p-6 ${
+        isChief ? "border-[#e5ff00]/20 shadow-[0_0_40px_rgba(229,255,0,0.08)]" : ""
+      }`}
+    >
+      <div
+        className={`pointer-events-none absolute inset-x-0 top-0 h-24 opacity-80 ${
+          isChief ? "bg-[radial-gradient(circle_at_top,rgba(229,255,0,0.14),transparent_68%)]" : "bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.12),transparent_68%)]"
+        }`}
+      />
+
+      <div className="relative flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+              {role.emoji}
+            </span>
+            <span
+              className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}
+            >
+              {role.code}
+            </span>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+              推荐顺序 {role.order}
+            </span>
+            {isChief && (
+              <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-2.5 py-1 text-[11px] font-semibold text-[#e5ff00]">
+                默认入口
+              </span>
+            )}
+          </div>
+          <h3 className="mt-3 text-2xl font-semibold text-[#f0f6fc]">{role.chineseName}</h3>
+          <p className="mt-1 text-sm text-[#94a3b8]">{role.shortLabel}</p>
+        </div>
+        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+          {role.phase}
+        </span>
+      </div>
+
+      <div className="relative mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            职业身份 / 角色画像
+          </p>
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">{role.identity}</p>
+          <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{role.portrait}</p>
+        </div>
+
+        <div className="panel-deep rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            老板怎么叫他出场
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.usage}</p>
+          <div className="mt-4 border-t border-white/8 pt-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+              角色标签
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {role.personalityTags.map((tag) => (
+                <span
+                  key={tag}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${role.accentClass}`}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            思考框架
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.thinkingFramework}</p>
+        </div>
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            工作脑回路
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.workingPattern}</p>
+        </div>
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            常用提问
+          </p>
+          <ul className="mt-3 space-y-2 text-sm leading-6 text-[#dbe4ee]">
+            {role.commonQuestions.map((q) => (
+              <li key={q} className="flex gap-2">
+                <span className="text-[#64748b]">•</span>
+                <span>{q}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 lg:grid-cols-2">
+        <RoleListBlock title="擅长处理的问题" items={role.strengths} />
+        <RoleListBlock title="边界 / 不适合处理的问题" items={role.boundaries} />
+      </div>
+    </article>
+  );
+}
+
+export function DispatchCardView({ card }: { card: DispatchCard }) {
+  return (
+    <article className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+      <h3 className="text-lg font-semibold text-[#f0f6fc]">{card.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{card.summary}</p>
+      <ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#dbe4ee]">
+        {card.combos.map((item) => (
+          <li key={item} className="panel-deep flex gap-2.5 rounded-xl p-3">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+export function WeeklyNodeCard({ node }: { node: WeeklyNode }) {
+  return (
+    <div className="panel-soft rounded-2xl p-5">
+      <span
+        className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${node.accentClass}`}
+      >
+        {node.label}
+      </span>
+      <h3 className="mt-3 text-xl font-semibold text-[#f0f6fc]">{node.title}</h3>
+      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{node.detail}</p>
+    </div>
+  );
+}
+
+export function TimelineCard({ milestone }: { milestone: HistoryMilestone }) {
+  const categoryColors = {
+    evolution: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+    decision: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    integration: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+  };
+
+  const categoryLabels = {
+    evolution: "架构演进",
+    decision: "关键决策",
+    integration: "系统集成",
+  };
+
+  return (
+    <article className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+      <div className="flex items-start justify-between gap-3">
+        <span
+          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${categoryColors[milestone.category]}`}
+        >
+          {categoryLabels[milestone.category]}
+        </span>
+        <span className="text-xs text-[#64748b]">{milestone.date}</span>
+      </div>
+      <h3 className="mt-3 text-lg font-semibold text-[#f0f6fc]">{milestone.title}</h3>
+      <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{milestone.description}</p>
+    </article>
+  );
+}
+
+export function DecisionCaseCard({ decisionCase }: { decisionCase: DecisionCase }) {
+  return (
+    <article className="glass glass-premium rounded-2xl p-6 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+      <h3 className="text-xl font-semibold text-[#f0f6fc]">{decisionCase.title}</h3>
+
+      <div className="mt-5 space-y-4">
+        <div className="panel-soft rounded-xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            背景
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">{decisionCase.context}</p>
+        </div>
+
+        <div className="panel-accent rounded-xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            决策
+          </p>
+          <p className="mt-2 text-sm font-semibold leading-6 text-[#f0f6fc]">{decisionCase.decision}</p>
+        </div>
+
+        <div className="panel-deep rounded-xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            理由
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">{decisionCase.rationale}</p>
+        </div>
+
+        <div className="panel-soft rounded-xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            结果
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{decisionCase.outcome}</p>
+        </div>
+      </div>
+    </article>
+  );
+}

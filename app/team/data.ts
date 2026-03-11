@@ -1,0 +1,510 @@
+export type RoleId =
+  | "chief"
+  | "market"
+  | "intel"
+  | "product"
+  | "pmo"
+  | "field"
+  | "studio";
+
+export type Role = {
+  id: RoleId;
+  order: number;
+  code: string;
+  chineseName: string;
+  shortLabel: string;
+  identity: string;
+  portrait: string;
+  personalityTags: string[];
+  strengths: string[];
+  boundaries: string[];
+  usage: string;
+  phase: string;
+  accentClass: string;
+  emoji: string;
+  thinkingFramework: string;
+  workingPattern: string;
+  commonQuestions: string[];
+};
+
+export type DispatchCard = {
+  title: string;
+  summary: string;
+  combos: string[];
+};
+
+export type WeeklyNode = {
+  title: string;
+  label: string;
+  detail: string;
+  accentClass: string;
+};
+
+export type PhasePlan = {
+  phase: string;
+  title: string;
+  goal: string;
+  outcome: string;
+  roles: string[];
+};
+
+export type PromptTemplate = {
+  title: string;
+  prompt: string;
+};
+
+export type HistoryMilestone = {
+  date: string;
+  title: string;
+  description: string;
+  category: "evolution" | "decision" | "integration";
+};
+
+export type DecisionCase = {
+  title: string;
+  context: string;
+  decision: string;
+  rationale: string;
+  outcome: string;
+};
+
+export const ROLES: Role[] = [
+  {
+    id: "chief",
+    order: 1,
+    code: "chief",
+    chineseName: "总参谋",
+    shortLabel: "默认入口 / Final Synthesis",
+    identity: "总裁桌边的统一入口，负责接住问题、判断问题类型、决定谁上场、最后统一收口。",
+    portrait:
+      "像一个真正的参谋长：先把问题问对，再决定是否需要市场、竞争、产品、推进或表达支持。",
+    personalityTags: ["默认入口", "先判断后调度", "结论先行", "最终收口"],
+    strengths: [
+      "跨部门问题和模糊问题的重写与收口",
+      "需要老板拍板的一页式判断",
+      "把多角色意见压成结论 / 风险 / 动作",
+    ],
+    boundaries: [
+      "不包办所有细分分析",
+      "不替代 specialist 做深度研究",
+      "不在信息明显不足时强行给满结论",
+    ],
+    usage:
+      "任何问题优先先找 chief。chief 判断是否需要 market / intel / product / pmo / field / studio 参与。",
+    phase: "Phase 1",
+    accentClass:
+      "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_30px_rgba(229,255,0,0.08)]",
+    emoji: "🎯",
+    thinkingFramework: "四维判断框架：吸引力、可赢性、战略匹配度、执行负担",
+    workingPattern: "接住问题 → 重写问题 → 判断类型 → 调度角色 → 统一收口",
+    commonQuestions: [
+      "这个问题的本质是什么？",
+      "需要哪些角色参与？",
+      "结论、风险、动作分别是什么？",
+    ],
+  },
+  {
+    id: "market",
+    order: 2,
+    code: "market",
+    chineseName: "市场洞察官",
+    shortLabel: "机会判断 / Opportunity Lens",
+    identity: "负责行业趋势、区域机会、需求迁移和增长信号，把外部机会压缩成对我方有价值的判断。",
+    portrait:
+      "像一个盯着市场结构变化的人，不做资讯搬运，而是回答哪里值得进、哪里只是热闹。",
+    personalityTags: ["看机会", "看趋势", "看区域", "看需求迁移"],
+    strengths: [
+      "新市场进入判断",
+      "区域优先级与增长窗口识别",
+      "需求迁移和伪机会识别",
+    ],
+    boundaries: [
+      "不替代 intel 做竞品威胁判断",
+      "不直接定义路线图",
+      "不把个别客户声音直接当市场结论",
+    ],
+    usage:
+      "当问题是'机会在哪里、值不值得进、需求往哪变'时，chief 优先拉 market。",
+    phase: "Phase 1",
+    accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    emoji: "📊",
+    thinkingFramework: "机会三问：值不值得看、进得去吗、能复制吗",
+    workingPattern: "识别信号 → 判断真伪 → 评估窗口 → 给出优先级",
+    commonQuestions: [
+      "这个市场的增长驱动力是什么？",
+      "需求迁移的方向在哪里？",
+      "哪些是伪机会？",
+    ],
+  },
+  {
+    id: "intel",
+    order: 3,
+    code: "intel",
+    chineseName: "竞争与战略情报官",
+    shortLabel: "威胁判断 / Threat & Intel",
+    identity: "负责竞品、定价、渠道、政策与外部威胁变化，回答'发生了什么、为什么重要、对我方意味着什么'。",
+    portrait:
+      "像一个外部威胁雷达，先拆事实再做判断，不被热点带着跑。",
+    personalityTags: ["看威胁", "证据优先", "竞争敏感", "不轻信"],
+    strengths: [
+      "竞品动作和定价变化判断",
+      "政策 / 监管 / 外部威胁研判",
+      "给 chief 提供可直接引用的情报底稿",
+    ],
+    boundaries: [
+      "不把市场机会判断包进自己职责",
+      "不替代 product 做产品取舍",
+      "不输出无证据的情绪化判断",
+    ],
+    usage:
+      "当问题是'竞品动了没有、影响多大、要不要跟'时，chief 优先拉 intel。",
+    phase: "Phase 1",
+    accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    emoji: "🔍",
+    thinkingFramework: "情报三层：发生了什么、为什么重要、对我方意味着什么",
+    workingPattern: "收集证据 → 拆解动作 → 判断意图 → 评估影响",
+    commonQuestions: [
+      "竞品的真实意图是什么？",
+      "这个变化的影响范围有多大？",
+      "我们需要跟进吗？",
+    ],
+  },
+  {
+    id: "product",
+    order: 4,
+    code: "product",
+    chineseName: "产品办公室",
+    shortLabel: "先做 / 后做 / 不做",
+    identity: "把战略意图压成产品定义、优先级和路线图动作，负责明确做什么、不做什么、先做什么。",
+    portrait:
+      "像一个会收边界的产品办公室，不追求大而全，重视最小可售能力包和明确取舍。",
+    personalityTags: ["边界清晰", "能取舍", "定义导向", "MVP 思维"],
+    strengths: [
+      "新方向的一页式定义",
+      "功能优先级压缩与先后顺序",
+      "把模糊战略翻译成产品动作",
+    ],
+    boundaries: [
+      "不替老板拍最终战略板",
+      "不替 pmo 追项目节奏",
+      "不把'都重要'当答案",
+    ],
+    usage:
+      "只要问题进入'先做 / 后做 / 不做 / 场景切入 / 路线图动作'，chief 自动补 product。",
+    phase: "Phase 1",
+    accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+    emoji: "🎨",
+    thinkingFramework: "产品三问：做什么、不做什么、先做什么",
+    workingPattern: "理解意图 → 定义边界 → 排优先级 → 输出路线图",
+    commonQuestions: [
+      "最小可售能力包是什么？",
+      "哪些功能可以不做？",
+      "先后顺序怎么排？",
+    ],
+  },
+  {
+    id: "pmo",
+    order: 5,
+    code: "pmo",
+    chineseName: "总裁 PMO",
+    shortLabel: "推进节奏 / Delivery Control",
+    identity: "把结论拆成责任、节奏、依赖和里程碑，负责推进而不是空谈。",
+    portrait:
+      "像一个盯节奏和偏差的推进官，对负责人、时间点和阻塞点天然敏感。",
+    personalityTags: ["强节奏", "结果导向", "追偏差", "控依赖"],
+    strengths: [
+      "30/60/90 天推进盘",
+      "里程碑与依赖设计",
+      "需要老板拍板的阻塞点识别",
+    ],
+    boundaries: [
+      "不替代 product 定义产品边界",
+      "不替代 intel 判断外部真假",
+      "不在结论未定时用流程掩盖问题",
+    ],
+    usage:
+      "当问题进入试点计划、资源配置、阶段推进或组织协同时，chief 补 pmo。",
+    phase: "Phase 2",
+    accentClass: "border-orange-500/30 bg-orange-500/10 text-orange-300",
+    emoji: "⚡",
+    thinkingFramework: "推进四要素：责任人、时间点、依赖项、阻塞点",
+    workingPattern: "拆解动作 → 设计里程碑 → 识别依赖 → 追踪偏差",
+    commonQuestions: [
+      "谁负责？什么时候完成？",
+      "依赖项是什么？",
+      "阻塞点在哪里？",
+    ],
+  },
+  {
+    id: "field",
+    order: 6,
+    code: "field",
+    chineseName: "一线作战官",
+    shortLabel: "前线验证 / Frontline Validation",
+    identity: "负责客户、销售与交付现场的真实反馈，判断到底是真需求还是局部噪音。",
+    portrait:
+      "像一个长期在客户现场的人，知道前线真正卡在哪里，也知道哪些承诺最容易失控。",
+    personalityTags: ["懂客户", "临场感", "反馈直接", "验证需求"],
+    strengths: [
+      "客户/销售反馈聚类",
+      "需求真假与问题归因",
+      "现场话术与推进动作建议",
+    ],
+    boundaries: [
+      "不把个别客户反馈直接上升为市场趋势",
+      "不替代 chief 做最终取舍",
+      "不替代 product 做路线图定义",
+    ],
+    usage:
+      "当'竞品跟不跟'进入投资决策，或需要验证客户是否真在买时，chief 补 field。",
+    phase: "Phase 3",
+    accentClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    emoji: "🎯",
+    thinkingFramework: "验证三步：聚类反馈、判断真假、归因问题",
+    workingPattern: "收集反馈 → 聚类分析 → 验证需求 → 给出建议",
+    commonQuestions: [
+      "客户真的在买吗？",
+      "这是真需求还是噪音？",
+      "前线卡在哪里？",
+    ],
+  },
+  {
+    id: "studio",
+    order: 7,
+    code: "studio",
+    chineseName: "表达与材料官",
+    shortLabel: "高层表达 / Executive Studio",
+    identity: "把结论压成高层可直接使用的一页纸、汇报、讲话稿或 WhatsApp 版本。",
+    portrait:
+      "像一个总编室，懂老板语气、懂对象差异，也懂复杂材料怎么压成一句话和三条重点。",
+    personalityTags: ["会表达", "会压缩", "懂对象", "统一口径"],
+    strengths: [
+      "一页纸、邮件、讲话稿、消息版转写",
+      "管理层 / 客户 / 内部多版本表达",
+      "把 chief 的判断改成可直接发出的内容",
+    ],
+    boundaries: [
+      "不创造不存在的证据",
+      "不在结论未定时先堆漂亮措辞",
+      "不替代 chief 做拍板",
+    ],
+    usage:
+      "当结论需要进入汇报、周报、对外口径或高层表达时，最后再由 studio 接力。",
+    phase: "Phase 2",
+    accentClass: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300",
+    emoji: "✍️",
+    thinkingFramework: "表达三层：对象是谁、核心信息、表达方式",
+    workingPattern: "理解对象 → 提取核心 → 选择形式 → 打磨表达",
+    commonQuestions: [
+      "对象是谁？他们关心什么？",
+      "核心信息是什么？",
+      "用什么形式表达？",
+    ],
+  },
+];
+
+export const DISPATCH_CARDS: DispatchCard[] = [
+  {
+    title: "四维判断框架",
+    summary:
+      "所有'要不要做 / 要不要投 / 要不要跟'的问题，chief 默认先压成四个维度。",
+    combos: [
+      "吸引力：这个方向值不值得看",
+      "可赢性：我们是否进得去、打得赢、能复制",
+      "战略匹配度：是否符合主航道与当前能力基础",
+      "执行负担：销售、交付、合规、组织成本是否过重",
+    ],
+  },
+  {
+    title: "最少必要角色原则",
+    summary:
+      "不是所有问题都拉满全队。chief 先判断问题类型，再只拉最少必要角色上桌。",
+    combos: [
+      "市场是否值得进入 → market + intel",
+      "竞品发新东西，我们要不要跟 → intel + product",
+      "重大客户需求是否进路线图 → field + market + product",
+      "重点项目卡住且需要老板拍板 → pmo + product + field",
+    ],
+  },
+  {
+    title: "v2.1 触发补角规则",
+    summary:
+      "一旦问题进入某个判断层，相关角色自动补入，而不是靠感觉临时决定。",
+    combos: [
+      "进入先做 / 后做 / 不做 / 场景切入 → 自动补 product",
+      "竞品跟不跟进入立项 / 投资判断 → 自动补 field 或 market 做需求验证",
+      "进入试点推进 / 资源配置 / 节奏管理 → 自动补 pmo",
+      "要变成汇报 / 周报 / 对外口径 → 最后补 studio",
+    ],
+  },
+];
+
+export const WEEKLY_FLOW: WeeklyNode[] = [
+  {
+    title: "market 周报",
+    label: "机会输入",
+    detail:
+      "每周输出：市场机会、需求迁移、区域变化、增长信号与先做 / 后做 / 不做建议。",
+    accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+  },
+  {
+    title: "intel 周报",
+    label: "威胁输入",
+    detail:
+      "每周输出：竞品动作、定价变化、渠道/生态变化、政策监管信号与我方应对判断。",
+    accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+  },
+  {
+    title: "chief 周报",
+    label: "总收口",
+    detail:
+      "把 market / intel 等输入压成管理层一页纸：结论、风险、本周动作、待拍板事项。",
+    accentClass:
+      "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_24px_rgba(229,255,0,0.06)]",
+  },
+  {
+    title: "合并 PDF",
+    label: "分发输出",
+    detail:
+      "系统会生成 AI 安全周报汇总版，自动转成 PDF，并通过 WhatsApp 推送给家兴。",
+    accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+  },
+];
+
+export const PHASES: PhasePlan[] = [
+  {
+    phase: "Phase 1",
+    title: "chief + market + intel + product",
+    goal: "先把判断、机会、威胁和产品定义跑顺，形成每天都能使用的默认作战编组。",
+    outcome:
+      "老板先找 chief，chief 按问题类型拉 market / intel / product，完成最核心的判断闭环。",
+    roles: ["chief", "market", "intel", "product"],
+  },
+  {
+    phase: "Phase 2",
+    title: "增加 pmo + studio",
+    goal: "让结论不仅能判断，也能推进、能表达，形成执行与汇报闭环。",
+    outcome:
+      "从一页式判断延伸到推进节奏、汇报材料、对外口径和周报机制。",
+    roles: ["pmo", "studio"],
+  },
+  {
+    phase: "Phase 3",
+    title: "增加 field",
+    goal: "把客户与销售现场反馈真正接回系统，完成前线验证闭环。",
+    outcome:
+      "竞品判断、需求判断和资源投入不再只靠内部推演，而有一线验证支撑。",
+    roles: ["field"],
+  },
+];
+
+export const PROMPTS: PromptTemplate[] = [
+  {
+    title: "市场进入判断",
+    prompt:
+      "请以 chief 视角判断这个市场值不值得进入；若需要，调用 market + intel，最后输出结论 / 依据 / 风险 / 动作。",
+  },
+  {
+    title: "竞品跟进判断",
+    prompt:
+      "请由 chief 处理：核心竞品刚发布新产品，我们要不要跟？若进入产品动作，自动补 product；若进入投资决策，补 field 或 market 做需求验证。",
+  },
+  {
+    title: "路线图取舍",
+    prompt:
+      "请 chief 先理解目标，再请 product 给出先做 / 后做 / 不做和最小可售能力包；必要时再由 pmo 拆 30/60/90 天推进。",
+  },
+  {
+    title: "高层表达",
+    prompt:
+      "chief 收口后，请 studio 把结果改成一页纸或老板可直接发出的消息版，保留结论、风险与动作。",
+  },
+];
+
+export const HISTORY_TIMELINE: HistoryMilestone[] = [
+  {
+    date: "2024-12",
+    title: "6 角色模型上线",
+    description:
+      "初始团队包含 chief、intel、product、pmo、field、studio 六个角色，建立基础调度机制。",
+    category: "evolution",
+  },
+  {
+    date: "2025-01",
+    title: "新增 market 角色",
+    description:
+      "识别到机会判断与威胁判断需要分离，新增 market 作为独立的市场洞察官，专注行业趋势、区域机会和需求迁移。",
+    category: "evolution",
+  },
+  {
+    date: "2025-01",
+    title: "intel 职责收窄",
+    description:
+      "将 intel 从泛情报官收窄为竞争与战略情报官，专注竞品、定价、渠道、政策与外部威胁，不再承担市场机会判断。",
+    category: "evolution",
+  },
+  {
+    date: "2025-02",
+    title: "chief 定位升级",
+    description:
+      "明确 chief 作为默认入口与最终收口角色，负责问题重写、角色调度和结论统一，不再包办所有分析。",
+    category: "decision",
+  },
+  {
+    date: "2025-02",
+    title: "v2.1 调度规则发布",
+    description:
+      "推出四维判断框架（吸引力、可赢性、战略匹配度、执行负担）和触发补角规则，实现最少必要角色原则。",
+    category: "decision",
+  },
+  {
+    date: "2025-03",
+    title: "周报流水线上线",
+    description:
+      "建立 market 周报 → intel 周报 → chief 周报 → PDF 合并的自动化流程，实现 AI 安全周报机制。",
+    category: "integration",
+  },
+  {
+    date: "2025-03",
+    title: "cybersec-daily 同步",
+    description:
+      "将团队架构、调度规则和历史决策同步到 cybersec-daily 项目，建立公开展示页面。",
+    category: "integration",
+  },
+];
+
+export const DECISION_CASES: DecisionCase[] = [
+  {
+    title: "为什么要把 intel 拆成 market + intel？",
+    context:
+      "早期 intel 承担了市场机会、竞品威胁、政策监管等多重职责，导致角色边界模糊，输出质量不稳定。",
+    decision:
+      "将 intel 拆分为 market（机会判断）和 intel（威胁判断）两个独立角色。",
+    rationale:
+      "机会判断和威胁判断的思维模式完全不同：前者看增长、看窗口、看需求迁移；后者看竞品、看风险、看外部变化。合并在一起会导致角色人格分裂。",
+    outcome:
+      "market 专注'值不值得进'，intel 专注'要不要跟'，两者配合形成完整的外部环境判断。",
+  },
+  {
+    title: "为什么 chief 要做默认入口而不是让老板直接找专家？",
+    context:
+      "老板面对问题时，往往不清楚应该找哪个角色，或者会同时拉上所有角色导致效率低下。",
+    decision:
+      "将 chief 设为默认入口，负责问题重写、角色调度和最终收口。",
+    rationale:
+      "老板的核心价值是做决策，而不是判断应该找谁。chief 作为参谋长，先把问题问对，再决定最少必要角色，最后统一收口，让老板只需要看结论、风险、动作。",
+    outcome:
+      "老板只需要'先找 chief'，chief 会自动判断是否需要 market / intel / product 等角色参与，并最终给出一页式判断。",
+  },
+  {
+    title: "为什么要建立 v2.1 触发补角规则？",
+    context:
+      "早期调度依赖 chief 的临时判断，导致有时会漏掉关键角色，或者拉上不必要的角色。",
+    decision:
+      "建立明确的触发补角规则：进入某个判断层时，自动补入相关角色。",
+    rationale:
+      "通过规则化减少随机性，确保关键角色不会被遗漏。例如，一旦问题进入'先做 / 后做 / 不做'，product 必须参与；一旦进入投资决策，field 或 market 必须做需求验证。",
+    outcome:
+      "调度更加稳定和可预测，减少了因角色缺失导致的判断偏差。",
+  },
+];
