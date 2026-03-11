@@ -1,0 +1,29 @@
+<svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="16" y1="14" x2="306" y2="306" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B2218"/>
+      <stop offset="1" stop-color="#0E3524"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 84) rotate(90) scale(112)">
+      <stop stop-color="#34D399" stop-opacity="0.4"/>
+      <stop offset="1" stop-color="#34D399" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#bg)"/>
+  <circle cx="160" cy="84" r="112" fill="url(#glow)"/>
+  <path d="M92 92L130 74L166 94L208 68L236 88" stroke="#86EFAC" stroke-opacity="0.45" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="130" cy="74" r="5" fill="#BBF7D0"/>
+  <circle cx="166" cy="94" r="5" fill="#BBF7D0"/>
+  <circle cx="208" cy="68" r="5" fill="#BBF7D0"/>
+  <circle cx="236" cy="88" r="5" fill="#BBF7D0"/>
+  <ellipse cx="160" cy="122" rx="44" ry="52" fill="#E3BE9C"/>
+  <path d="M114 108C120 78 142 60 172 63C194 65 206 79 210 108C196 97 184 92 167 91C149 90 131 96 114 108Z" fill="#0C1511"/>
+  <circle cx="143" cy="122" r="4" fill="#0C1511"/>
+  <circle cx="177" cy="122" r="4" fill="#0C1511"/>
+  <path d="M145 144C152 149 168 149 175 144" stroke="#7C573D" stroke-width="4" stroke-linecap="round"/>
+  <path d="M116 198C132 186 146 180 160 180C175 180 189 186 204 198L232 252L245 294H75L88 252L116 198Z" fill="#0A1711"/>
+  <path d="M132 198L160 228L188 198" fill="#ECFFF4"/>
+  <rect x="210" y="214" width="18" height="34" rx="5" fill="#1E3A2E"/>
+  <path d="M219 205V215" stroke="#BBF7D0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M112 239C128 230 145 226 160 226C176 226 192 230 208 239" stroke="#34D399" stroke-opacity="0.34" stroke-width="3" stroke-linecap="round"/>
+</svg>

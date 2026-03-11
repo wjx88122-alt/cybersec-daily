@@ -177,11 +177,18 @@ export default function TeamPage() {
                       className={`rounded-2xl p-4 ${role.id === "chief" ? "panel-accent" : "panel-soft"}`}
                     >
                       <div className="flex items-center justify-between gap-3">
-                        <span
-                          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}
-                        >
-                          {role.code}
-                        </span>
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={role.avatarSrc}
+                            alt={`${role.personaName} 头像`}
+                            className="h-11 w-11 rounded-2xl border border-white/10 bg-white/[0.03] object-cover"
+                          />
+                          <span
+                            className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}
+                          >
+                            {role.code}
+                          </span>
+                        </div>
                         <span className="text-xs text-[#64748b]">{role.phase}</span>
                       </div>
                       <p className="mt-3 text-sm font-semibold text-[#f0f6fc]">
@@ -193,6 +200,7 @@ export default function TeamPage() {
                       <p className="mt-1 text-sm leading-6 text-[#94a3b8]">
                         {role.shortLabel} · 记忆册「{role.memoryName}」
                       </p>
+                      <p className="mt-2 text-xs leading-5 text-[#94a3b8]">{role.signatureLine}</p>
                     </div>
                   ))}
                 </div>

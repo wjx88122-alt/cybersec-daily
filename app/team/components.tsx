@@ -126,7 +126,7 @@ export function RoleCard({ role }: { role: Role }) {
       />
 
       <div className="relative flex flex-wrap items-start justify-between gap-3">
-        <div>
+        <div className="min-w-[240px] flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
               {role.emoji}
@@ -152,9 +152,21 @@ export function RoleCard({ role }: { role: Role }) {
           <p className="mt-1 text-sm text-[#dbe4ee]">{role.chineseName}</p>
           <p className="mt-1 text-sm text-[#94a3b8]">{role.shortLabel}</p>
         </div>
-        <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
-          {role.phase}
-        </span>
+        <div className="flex flex-col items-end gap-3">
+          <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+            {role.phase}
+          </span>
+          <div className="rounded-[26px] border border-white/10 bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+            <img
+              src={role.avatarSrc}
+              alt={`${role.personaName} 头像`}
+              className="h-24 w-24 rounded-[22px] object-cover"
+            />
+          </div>
+          <p className="max-w-[140px] text-right text-[11px] leading-5 text-[#94a3b8]">
+            {role.signatureLine}
+          </p>
+        </div>
       </div>
 
       <div className="relative mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
@@ -199,6 +211,9 @@ export function RoleCard({ role }: { role: Role }) {
           </p>
           <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
             他的记忆册叫「{role.memoryName}」。
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
+            签名句：{role.signatureLine}
           </p>
         </div>
         <div className="panel-soft rounded-2xl p-4">
