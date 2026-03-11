@@ -23,7 +23,7 @@ import {
 export const metadata: Metadata = {
   title: "总裁辅助团队 | 家兴的网络安全日报",
   description:
-    "展示家兴最新的 7 角色总裁辅助团队、v2.1 调度规则，以及 AI 安全周报生成机制。",
+    "展示家兴最新的 7 位人格化总裁辅助幕僚、v2.1 调度规则，以及带记忆系统的 AI 安全周报机制。",
 };
 
 export default function TeamPage() {
@@ -65,33 +65,33 @@ export default function TeamPage() {
                 </span>
               </div>
               <h1 className="mt-5 text-3xl font-semibold leading-tight text-[#f0f6fc] sm:text-5xl">
-                先找 <span className="gradient-text">chief</span>
-                ，再由 chief 只叫最该上桌的人。
+                先找 <span className="gradient-text">沈策（chief）</span>
+                ，再由他把最该上桌的人叫来。
               </h1>
               <p className="mt-4 max-w-3xl text-sm leading-7 text-[#94a3b8] sm:text-base">
-                这页不是团队介绍，而是一套可直接调用的 AI 幕僚编制。团队已从 6 角色升级到 7 角色：chief 负责入口与收口，market 看机会，intel 看威胁，product 做取舍，pmo 管推进，field 验证一线，studio 统一表达。
+                这页不是抽象的角色列表，而是一套可直接调用、有人名有人设的 AI 幕僚编制。现在团队由沈策负责入口与收口，林岚看机会，顾闻盯威胁，纪衡做取舍，程准管推进，陆野验证一线，苏墨统一表达；每个人还有自己的“记忆册”，让系统更像一支真的参谋班子。
               </p>
 
               <div className="mt-6 flex flex-wrap gap-2">
                 <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1.5 text-sm text-[#f0f6fc]">
-                  默认入口: chief
+                  默认入口: 沈策
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
-                  7 位幕僚角色
+                  7 位有名字的幕僚
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
                   3 个 Team 分区
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
-                  周报自动生成机制
+                  角色记忆自动生成机制
                 </span>
               </div>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-4">
-                <StatCard value={String(ROLES.length)} label="可调用角色" accentClass="text-[#e5ff00]" />
+                <StatCard value={String(ROLES.length)} label="可调用幕僚" accentClass="text-[#e5ff00]" />
                 <StatCard value="3" label="Team 页面分区" accentClass="text-violet-300" />
                 <StatCard value={String(DISPATCH_CARDS.length)} label="核心调度规则组" accentClass="text-cyan-300" />
-                <StatCard value={String(DECISION_ARCHIVE.length)} label="已归档问题" accentClass="text-emerald-300" />
+                <StatCard value={String(DECISION_ARCHIVE.length)} label="已归档问答" accentClass="text-emerald-300" />
               </div>
 
               <div className="mt-6 grid gap-3 lg:grid-cols-[1.15fr_0.85fr]">
@@ -144,11 +144,11 @@ export default function TeamPage() {
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-[#dbe4ee]">
                   {[
-                    "1. chief 先重写问题",
-                    "2. market 看机会 / intel 看威胁",
-                    "3. product 定先做 / 后做 / 不做",
-                    "4. pmo 拆节奏，field 做验证，studio 统一表达",
-                    "5. 最后仍由 chief 收口",
+                    "1. 沈策先重写问题",
+                    "2. 林岚看机会 / 顾闻看威胁",
+                    "3. 纪衡定先做 / 后做 / 不做",
+                    "4. 程准拆节奏，陆野做验证，苏墨统一表达",
+                    "5. 最后仍由沈策收口",
                   ].map((step, index, arr) => (
                     <div key={step} className="flex items-center gap-2">
                       <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5">
@@ -185,10 +185,13 @@ export default function TeamPage() {
                         <span className="text-xs text-[#64748b]">{role.phase}</span>
                       </div>
                       <p className="mt-3 text-sm font-semibold text-[#f0f6fc]">
+                        {role.personaName}
+                      </p>
+                      <p className="mt-1 text-sm leading-6 text-[#dbe4ee]">
                         {role.chineseName}
                       </p>
                       <p className="mt-1 text-sm leading-6 text-[#94a3b8]">
-                        {role.shortLabel}
+                        {role.shortLabel} · 记忆册「{role.memoryName}」
                       </p>
                     </div>
                   ))}
@@ -203,10 +206,10 @@ export default function TeamPage() {
                 <div className="mt-4 space-y-4">
                   <div className="panel-accent rounded-2xl p-4">
                     <p className="text-sm font-semibold text-[#f0f6fc]">
-                      先 chief，后专家，最后还是 chief
+                      先沈策，后专家，最后还是沈策
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
-                      你不需要先判断应该叫谁。chief 负责判断问题类型、决定谁上场、按什么顺序上场，以及最后怎么收口。
+                      你不需要先判断应该叫谁。沈策负责判断问题类型、决定谁上场、按什么顺序上场，以及最后怎么收口。
                     </p>
                   </div>
                   <div className="panel-soft rounded-2xl p-4">
@@ -214,7 +217,7 @@ export default function TeamPage() {
                       决策档案只收录网络安全问答，并且只存公开过程
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
-                      后续只归档网络安全相关的提问、团队回答、可公开复用的形成过程和最终结果，便于查询与追溯，但不会暴露内部隐藏推理链路。
+                      后续只归档网络安全相关的提问、团队回答、可公开复用的形成过程和最终结果；名字、人设、记忆册会保留，但不会暴露内部隐藏推理链路。
                     </p>
                   </div>
                 </div>
@@ -268,7 +271,7 @@ export default function TeamPage() {
             <SectionTitle
               eyebrow="Roster"
               title="7 位角色，一眼看懂人设、边界与上场方式"
-              description="团队从旧的 6 角色升级为 7 角色。最大的变化是新增 market，并把 intel 收窄为竞争与战略情报官，让“机会”和“威胁”彻底分开。"
+              description="团队从旧的 6 角色升级为 7 角色。最大的变化是新增林岚（market），并把顾闻（intel）收窄为竞争与战略情报官，让“机会”和“威胁”彻底分开。"
             />
             <div className="grid gap-4 xl:grid-cols-2">
               {ROLES.map((role) => (
@@ -283,7 +286,7 @@ export default function TeamPage() {
             <SectionTitle
               eyebrow="Dispatch v2.1"
               title="这支团队现在怎么调度"
-              description="重点不再是“把所有人都拉上来”，而是 chief 用最少必要角色解决问题，并且在进入某个判断层时自动补角。"
+              description="重点不再是“把所有人都拉上来”，而是由沈策用最少必要角色解决问题，并且在进入某个判断层时自动补角。"
             />
             <div className="grid gap-4 xl:grid-cols-3">
               {DISPATCH_CARDS.map((card) => (
@@ -318,9 +321,9 @@ export default function TeamPage() {
                     周报输入怎么分工
                   </p>
                   <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
-                    <li>• market：机会、需求迁移、区域变化、增长信号</li>
-                    <li>• intel：竞品、定价、渠道、政策、外部威胁</li>
-                    <li>• chief：一页纸结论、风险、本周动作、待拍板事项</li>
+                    <li>• 林岚：机会、需求迁移、区域变化、增长信号</li>
+                    <li>• 顾闻：竞品、定价、渠道、政策、外部威胁</li>
+                    <li>• 沈策：一页纸结论、风险、本周动作、待拍板事项</li>
                   </ul>
                 </div>
                 <div className="panel-deep rounded-2xl p-5">
@@ -331,7 +334,7 @@ export default function TeamPage() {
                     <li>• 汇总为 AI 安全周报合并版</li>
                     <li>• 自动转成 PDF</li>
                     <li>• 自动推送到 WhatsApp</li>
-                    <li>• 适合先看 chief，再按需下钻 market / intel</li>
+                    <li>• 适合先看沈策，再按需下钻林岚 / 顾闻</li>
                   </ul>
                 </div>
               </div>
@@ -380,7 +383,7 @@ export default function TeamPage() {
             <SectionTitle
               eyebrow="Prompt Templates"
               title="老板日常可以直接调用的模板"
-              description="模板也跟着 v2.1 更新：先 chief，后最少必要角色，最后统一收口。"
+              description="模板也跟着 v2.1 更新：先沈策，后最少必要角色，最后统一收口。"
             />
             <div className="grid gap-4 xl:grid-cols-2">
               {PROMPTS.map((item) => (

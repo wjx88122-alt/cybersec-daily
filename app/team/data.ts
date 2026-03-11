@@ -12,9 +12,13 @@ export type Role = {
   order: number;
   code: string;
   chineseName: string;
+  personaName: string;
+  callName: string;
   shortLabel: string;
   identity: string;
   portrait: string;
+  memoryName: string;
+  voiceStyle: string;
   personalityTags: string[];
   strengths: string[];
   boundaries: string[];
@@ -94,10 +98,14 @@ export const ROLES: Role[] = [
     order: 1,
     code: "chief",
     chineseName: "总参谋",
+    personaName: "沈策",
+    callName: "阿策",
     shortLabel: "默认入口 / Final Synthesis",
     identity: "总裁桌边的统一入口，负责接住问题、判断问题类型、决定谁上场、最后统一收口。",
     portrait:
       "像一个真正的参谋长：先把问题问对，再决定是否需要市场、竞争、产品、推进或表达支持。",
+    memoryName: "桌边总账",
+    voiceStyle: "说话短、稳、先给结论，再补风险和动作。",
     personalityTags: ["默认入口", "先判断后调度", "结论先行", "最终收口"],
     strengths: [
       "跨部门问题和模糊问题的重写与收口",
@@ -110,7 +118,7 @@ export const ROLES: Role[] = [
       "不在信息明显不足时强行给满结论",
     ],
     usage:
-      "任何问题优先先找 chief。chief 判断是否需要 market / intel / product / pmo / field / studio 参与。",
+      "任何问题优先先找沈策。由沈策判断是否需要林岚、顾闻、纪衡、程准、陆野或苏墨参与。",
     phase: "Phase 1",
     accentClass:
       "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_30px_rgba(229,255,0,0.08)]",
@@ -128,10 +136,14 @@ export const ROLES: Role[] = [
     order: 2,
     code: "market",
     chineseName: "市场洞察官",
+    personaName: "林岚",
+    callName: "岚姐",
     shortLabel: "机会判断 / Opportunity Lens",
     identity: "负责行业趋势、区域机会、需求迁移和增长信号，把外部机会压缩成对我方有价值的判断。",
     portrait:
       "像一个盯着市场结构变化的人，不做资讯搬运，而是回答哪里值得进、哪里只是热闹。",
+    memoryName: "机会地图",
+    voiceStyle: "先看风向，再谈窗口，习惯用“哪里值得进”来表达判断。",
     personalityTags: ["看机会", "看趋势", "看区域", "看需求迁移"],
     strengths: [
       "新市场进入判断",
@@ -139,12 +151,12 @@ export const ROLES: Role[] = [
       "需求迁移和伪机会识别",
     ],
     boundaries: [
-      "不替代 intel 做竞品威胁判断",
+      "不替代顾闻做竞品威胁判断",
       "不直接定义路线图",
       "不把个别客户声音直接当市场结论",
     ],
     usage:
-      "当问题是'机会在哪里、值不值得进、需求往哪变'时，chief 优先拉 market。",
+      "当问题是“机会在哪里、值不值得进、需求往哪变”时，沈策优先叫林岚上桌。",
     phase: "Phase 1",
     accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
     emoji: "📊",
@@ -161,23 +173,27 @@ export const ROLES: Role[] = [
     order: 3,
     code: "intel",
     chineseName: "竞争与战略情报官",
+    personaName: "顾闻",
+    callName: "阿闻",
     shortLabel: "威胁判断 / Threat & Intel",
     identity: "负责竞品、定价、渠道、政策与外部威胁变化，回答'发生了什么、为什么重要、对我方意味着什么'。",
     portrait:
       "像一个外部威胁雷达，先拆事实再做判断，不被热点带着跑。",
+    memoryName: "威胁雷达",
+    voiceStyle: "证据导向，喜欢先摆事实，再说意图和影响。",
     personalityTags: ["看威胁", "证据优先", "竞争敏感", "不轻信"],
     strengths: [
       "竞品动作和定价变化判断",
       "政策 / 监管 / 外部威胁研判",
-      "给 chief 提供可直接引用的情报底稿",
+      "给沈策提供可直接引用的情报底稿",
     ],
     boundaries: [
       "不把市场机会判断包进自己职责",
-      "不替代 product 做产品取舍",
+      "不替代纪衡做产品取舍",
       "不输出无证据的情绪化判断",
     ],
     usage:
-      "当问题是'竞品动了没有、影响多大、要不要跟'时，chief 优先拉 intel。",
+      "当问题是“竞品动了没有、影响多大、要不要跟”时，沈策优先叫顾闻上桌。",
     phase: "Phase 1",
     accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
     emoji: "🔍",
@@ -194,10 +210,14 @@ export const ROLES: Role[] = [
     order: 4,
     code: "product",
     chineseName: "产品办公室",
+    personaName: "纪衡",
+    callName: "阿衡",
     shortLabel: "先做 / 后做 / 不做",
     identity: "把战略意图压成产品定义、优先级和路线图动作，负责明确做什么、不做什么、先做什么。",
     portrait:
       "像一个会收边界的产品办公室，不追求大而全，重视最小可售能力包和明确取舍。",
+    memoryName: "路线图簿",
+    voiceStyle: "说话很有边界感，习惯把复杂问题切成做 / 不做 / 先做。",
     personalityTags: ["边界清晰", "能取舍", "定义导向", "MVP 思维"],
     strengths: [
       "新方向的一页式定义",
@@ -206,11 +226,11 @@ export const ROLES: Role[] = [
     ],
     boundaries: [
       "不替老板拍最终战略板",
-      "不替 pmo 追项目节奏",
+      "不替程准追项目节奏",
       "不把'都重要'当答案",
     ],
     usage:
-      "只要问题进入'先做 / 后做 / 不做 / 场景切入 / 路线图动作'，chief 自动补 product。",
+      "只要问题进入“先做 / 后做 / 不做 / 场景切入 / 路线图动作”，沈策会自动补上纪衡。",
     phase: "Phase 1",
     accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
     emoji: "🎨",
@@ -227,10 +247,14 @@ export const ROLES: Role[] = [
     order: 5,
     code: "pmo",
     chineseName: "总裁 PMO",
+    personaName: "程准",
+    callName: "小程",
     shortLabel: "推进节奏 / Delivery Control",
     identity: "把结论拆成责任、节奏、依赖和里程碑，负责推进而不是空谈。",
     portrait:
       "像一个盯节奏和偏差的推进官，对负责人、时间点和阻塞点天然敏感。",
+    memoryName: "推进台账",
+    voiceStyle: "偏执行口吻，天然会追问负责人、时间点和阻塞点。",
     personalityTags: ["强节奏", "结果导向", "追偏差", "控依赖"],
     strengths: [
       "30/60/90 天推进盘",
@@ -238,12 +262,12 @@ export const ROLES: Role[] = [
       "需要老板拍板的阻塞点识别",
     ],
     boundaries: [
-      "不替代 product 定义产品边界",
-      "不替代 intel 判断外部真假",
+      "不替代纪衡定义产品边界",
+      "不替代顾闻判断外部真假",
       "不在结论未定时用流程掩盖问题",
     ],
     usage:
-      "当问题进入试点计划、资源配置、阶段推进或组织协同时，chief 补 pmo。",
+      "当问题进入试点计划、资源配置、阶段推进或组织协同时，沈策会把程准叫进来。",
     phase: "Phase 2",
     accentClass: "border-orange-500/30 bg-orange-500/10 text-orange-300",
     emoji: "⚡",
@@ -260,10 +284,14 @@ export const ROLES: Role[] = [
     order: 6,
     code: "field",
     chineseName: "一线作战官",
+    personaName: "陆野",
+    callName: "老陆",
     shortLabel: "前线验证 / Frontline Validation",
     identity: "负责客户、销售与交付现场的真实反馈，判断到底是真需求还是局部噪音。",
     portrait:
       "像一个长期在客户现场的人，知道前线真正卡在哪里，也知道哪些承诺最容易失控。",
+    memoryName: "前线回声",
+    voiceStyle: "讲话直接，偏现场感，会先说客户到底在不在买、卡在哪。",
     personalityTags: ["懂客户", "临场感", "反馈直接", "验证需求"],
     strengths: [
       "客户/销售反馈聚类",
@@ -272,11 +300,11 @@ export const ROLES: Role[] = [
     ],
     boundaries: [
       "不把个别客户反馈直接上升为市场趋势",
-      "不替代 chief 做最终取舍",
-      "不替代 product 做路线图定义",
+      "不替代沈策做最终取舍",
+      "不替代纪衡做路线图定义",
     ],
     usage:
-      "当'竞品跟不跟'进入投资决策，或需要验证客户是否真在买时，chief 补 field。",
+      "当“竞品跟不跟”进入投资决策，或需要验证客户是否真在买时，沈策会补上陆野。",
     phase: "Phase 3",
     accentClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
     emoji: "🎯",
@@ -293,23 +321,27 @@ export const ROLES: Role[] = [
     order: 7,
     code: "studio",
     chineseName: "表达与材料官",
+    personaName: "苏墨",
+    callName: "阿墨",
     shortLabel: "高层表达 / Executive Studio",
     identity: "把结论压成高层可直接使用的一页纸、汇报、讲话稿或 WhatsApp 版本。",
     portrait:
       "像一个总编室，懂老板语气、懂对象差异，也懂复杂材料怎么压成一句话和三条重点。",
+    memoryName: "表达手册",
+    voiceStyle: "语气克制、修辞精准，擅长把硬结论改写成能直接发出去的话。",
     personalityTags: ["会表达", "会压缩", "懂对象", "统一口径"],
     strengths: [
       "一页纸、邮件、讲话稿、消息版转写",
       "管理层 / 客户 / 内部多版本表达",
-      "把 chief 的判断改成可直接发出的内容",
+      "把沈策的判断改成可直接发出的内容",
     ],
     boundaries: [
       "不创造不存在的证据",
       "不在结论未定时先堆漂亮措辞",
-      "不替代 chief 做拍板",
+      "不替代沈策做拍板",
     ],
     usage:
-      "当结论需要进入汇报、周报、对外口径或高层表达时，最后再由 studio 接力。",
+      "当结论需要进入汇报、周报、对外口径或高层表达时，最后再由苏墨接力。",
     phase: "Phase 2",
     accentClass: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300",
     emoji: "✍️",
@@ -327,7 +359,7 @@ export const DISPATCH_CARDS: DispatchCard[] = [
   {
     title: "四维判断框架",
     summary:
-      "所有'要不要做 / 要不要投 / 要不要跟'的问题，chief 默认先压成四个维度。",
+      "所有“要不要做 / 要不要投 / 要不要跟”的问题，默认先由沈策压成四个维度。",
     combos: [
       "吸引力：这个方向值不值得看",
       "可赢性：我们是否进得去、打得赢、能复制",
@@ -338,12 +370,12 @@ export const DISPATCH_CARDS: DispatchCard[] = [
   {
     title: "最少必要角色原则",
     summary:
-      "不是所有问题都拉满全队。chief 先判断问题类型，再只拉最少必要角色上桌。",
+      "不是所有问题都拉满全队。先由沈策判断问题类型，再只拉最少必要角色上桌。",
     combos: [
-      "市场是否值得进入 → market + intel",
-      "竞品发新东西，我们要不要跟 → intel + product",
-      "重大客户需求是否进路线图 → field + market + product",
-      "重点项目卡住且需要老板拍板 → pmo + product + field",
+      "市场是否值得进入 → 林岚 + 顾闻",
+      "竞品发新东西，我们要不要跟 → 顾闻 + 纪衡",
+      "重大客户需求是否进路线图 → 陆野 + 林岚 + 纪衡",
+      "重点项目卡住且需要老板拍板 → 程准 + 纪衡 + 陆野",
     ],
   },
   {
@@ -351,40 +383,40 @@ export const DISPATCH_CARDS: DispatchCard[] = [
     summary:
       "一旦问题进入某个判断层，相关角色自动补入，而不是靠感觉临时决定。",
     combos: [
-      "进入先做 / 后做 / 不做 / 场景切入 → 自动补 product",
-      "竞品跟不跟进入立项 / 投资判断 → 自动补 field 或 market 做需求验证",
-      "进入试点推进 / 资源配置 / 节奏管理 → 自动补 pmo",
-      "要变成汇报 / 周报 / 对外口径 → 最后补 studio",
+      "进入先做 / 后做 / 不做 / 场景切入 → 自动补纪衡",
+      "竞品跟不跟进入立项 / 投资判断 → 自动补陆野或林岚做需求验证",
+      "进入试点推进 / 资源配置 / 节奏管理 → 自动补程准",
+      "要变成汇报 / 周报 / 对外口径 → 最后补苏墨",
     ],
   },
 ];
 
 export const WEEKLY_FLOW: WeeklyNode[] = [
   {
-    title: "market 周报",
-    label: "机会输入",
+    title: "林岚的机会来信",
+    label: "机会记忆",
     detail:
       "每周输出：市场机会、需求迁移、区域变化、增长信号与先做 / 后做 / 不做建议。",
     accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
   },
   {
-    title: "intel 周报",
-    label: "威胁输入",
+    title: "顾闻的情报雷达",
+    label: "威胁记忆",
     detail:
       "每周输出：竞品动作、定价变化、渠道/生态变化、政策监管信号与我方应对判断。",
     accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
   },
   {
-    title: "chief 周报",
-    label: "总收口",
+    title: "沈策的桌边纪要",
+    label: "统一记忆",
     detail:
-      "把 market / intel 等输入压成管理层一页纸：结论、风险、本周动作、待拍板事项。",
+      "把林岚 / 顾闻等输入压成管理层一页纸：结论、风险、本周动作、待拍板事项。",
     accentClass:
       "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_24px_rgba(229,255,0,0.06)]",
   },
   {
-    title: "合并 PDF",
-    label: "分发输出",
+    title: "秘书处成册",
+    label: "分发成稿",
     detail:
       "系统会生成 AI 安全周报汇总版，自动转成 PDF，并通过 WhatsApp 推送给家兴。",
     accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
@@ -394,15 +426,15 @@ export const WEEKLY_FLOW: WeeklyNode[] = [
 export const PHASES: PhasePlan[] = [
   {
     phase: "Phase 1",
-    title: "chief + market + intel + product",
+    title: "沈策 + 林岚 + 顾闻 + 纪衡",
     goal: "先把判断、机会、威胁和产品定义跑顺，形成每天都能使用的默认作战编组。",
     outcome:
-      "老板先找 chief，chief 按问题类型拉 market / intel / product，完成最核心的判断闭环。",
+      "老板先找沈策，再由沈策按问题类型拉林岚 / 顾闻 / 纪衡，完成最核心的判断闭环。",
     roles: ["chief", "market", "intel", "product"],
   },
   {
     phase: "Phase 2",
-    title: "增加 pmo + studio",
+    title: "增加程准 + 苏墨",
     goal: "让结论不仅能判断，也能推进、能表达，形成执行与汇报闭环。",
     outcome:
       "从一页式判断延伸到推进节奏、汇报材料、对外口径和周报机制。",
@@ -410,7 +442,7 @@ export const PHASES: PhasePlan[] = [
   },
   {
     phase: "Phase 3",
-    title: "增加 field",
+    title: "增加陆野",
     goal: "把客户与销售现场反馈真正接回系统，完成前线验证闭环。",
     outcome:
       "竞品判断、需求判断和资源投入不再只靠内部推演，而有一线验证支撑。",
@@ -422,22 +454,22 @@ export const PROMPTS: PromptTemplate[] = [
   {
     title: "市场进入判断",
     prompt:
-      "请以 chief 视角判断这个市场值不值得进入；若需要，调用 market + intel，最后输出结论 / 依据 / 风险 / 动作。",
+      "请先让沈策（chief）判断这个市场值不值得进入；若需要，再叫林岚（market）和顾闻（intel）一起上桌，最后输出结论 / 依据 / 风险 / 动作。",
   },
   {
     title: "竞品跟进判断",
     prompt:
-      "请由 chief 处理：核心竞品刚发布新产品，我们要不要跟？若进入产品动作，自动补 product；若进入投资决策，补 field 或 market 做需求验证。",
+      "请由沈策（chief）先处理：核心竞品刚发布新产品，我们要不要跟？若进入产品动作，自动补纪衡（product）；若进入投资决策，补陆野（field）或林岚（market）做需求验证。",
   },
   {
     title: "路线图取舍",
     prompt:
-      "请 chief 先理解目标，再请 product 给出先做 / 后做 / 不做和最小可售能力包；必要时再由 pmo 拆 30/60/90 天推进。",
+      "请先让沈策（chief）理解目标，再请纪衡（product）给出先做 / 后做 / 不做和最小可售能力包；必要时再由程准（pmo）拆 30/60/90 天推进。",
   },
   {
     title: "高层表达",
     prompt:
-      "chief 收口后，请 studio 把结果改成一页纸或老板可直接发出的消息版，保留结论、风险与动作。",
+      "沈策（chief）收口后，请苏墨（studio）把结果改成一页纸或老板可直接发出的消息版，保留结论、风险与动作。",
   },
 ];
 
@@ -446,28 +478,28 @@ export const HISTORY_TIMELINE: HistoryMilestone[] = [
     date: "2024-12",
     title: "6 角色模型上线",
     description:
-      "初始团队包含 chief、intel、product、pmo、field、studio 六个角色，建立基础调度机制。",
+      "初始团队包含沈策、顾闻、纪衡、程准、陆野、苏墨六个角色，建立基础调度机制。",
     category: "evolution",
   },
   {
     date: "2025-01",
-    title: "新增 market 角色",
+    title: "新增林岚",
     description:
-      "识别到机会判断与威胁判断需要分离，新增 market 作为独立的市场洞察官，专注行业趋势、区域机会和需求迁移。",
+      "识别到机会判断与威胁判断需要分离，新增林岚作为独立的市场洞察官，专注行业趋势、区域机会和需求迁移。",
     category: "evolution",
   },
   {
     date: "2025-01",
-    title: "intel 职责收窄",
+    title: "顾闻职责收窄",
     description:
-      "将 intel 从泛情报官收窄为竞争与战略情报官，专注竞品、定价、渠道、政策与外部威胁，不再承担市场机会判断。",
+      "将顾闻从泛情报官收窄为竞争与战略情报官，专注竞品、定价、渠道、政策与外部威胁，不再承担市场机会判断。",
     category: "evolution",
   },
   {
     date: "2025-02",
-    title: "chief 定位升级",
+    title: "沈策定位升级",
     description:
-      "明确 chief 作为默认入口与最终收口角色，负责问题重写、角色调度和结论统一，不再包办所有分析。",
+      "明确沈策作为默认入口与最终收口角色，负责问题重写、角色调度和结论统一，不再包办所有分析。",
     category: "decision",
   },
   {
@@ -481,7 +513,7 @@ export const HISTORY_TIMELINE: HistoryMilestone[] = [
     date: "2025-03",
     title: "周报流水线上线",
     description:
-      "建立 market 周报 → intel 周报 → chief 周报 → PDF 合并的自动化流程，实现 AI 安全周报机制。",
+      "建立林岚来信 → 顾闻雷达 → 沈策纪要 → 成册分发的自动化流程，实现 AI 安全周报机制。",
     category: "integration",
   },
   {
@@ -495,48 +527,48 @@ export const HISTORY_TIMELINE: HistoryMilestone[] = [
 
 export const DECISION_CASES: DecisionCase[] = [
   {
-    title: "为什么要把 intel 拆成 market + intel？",
+    title: "为什么要把顾闻从市场判断里拆出来？",
     context:
-      "早期 intel 承担了市场机会、竞品威胁、政策监管等多重职责，导致角色边界模糊，输出质量不稳定。",
+      "早期顾闻同时承担市场机会、竞品威胁、政策监管等多重职责，导致角色边界模糊，输出质量不稳定。",
     decision:
-      "将 intel 拆分为 market（机会判断）和 intel（威胁判断）两个独立角色。",
+      "把机会判断交给林岚，把威胁判断留给顾闻，形成两个独立角色。",
     rationale:
       "机会判断和威胁判断的思维模式完全不同：前者看增长、看窗口、看需求迁移；后者看竞品、看风险、看外部变化。合并在一起会导致角色人格分裂。",
     outcome:
-      "market 专注'值不值得进'，intel 专注'要不要跟'，两者配合形成完整的外部环境判断。",
+      "林岚专注“值不值得进”，顾闻专注“要不要跟”，两者配合形成完整的外部环境判断。",
   },
   {
-    title: "为什么 chief 要做默认入口而不是让老板直接找专家？",
+    title: "为什么沈策要做默认入口，而不是让老板直接找专家？",
     context:
       "老板面对问题时，往往不清楚应该找哪个角色，或者会同时拉上所有角色导致效率低下。",
     decision:
-      "将 chief 设为默认入口，负责问题重写、角色调度和最终收口。",
+      "将沈策设为默认入口，负责问题重写、角色调度和最终收口。",
     rationale:
-      "老板的核心价值是做决策，而不是判断应该找谁。chief 作为参谋长，先把问题问对，再决定最少必要角色，最后统一收口，让老板只需要看结论、风险、动作。",
+      "老板的核心价值是做决策，而不是判断应该找谁。沈策作为参谋长，先把问题问对，再决定最少必要角色，最后统一收口，让老板只需要看结论、风险、动作。",
     outcome:
-      "老板只需要'先找 chief'，chief 会自动判断是否需要 market / intel / product 等角色参与，并最终给出一页式判断。",
+      "老板只需要“先找沈策”，沈策会自动判断是否需要林岚 / 顾闻 / 纪衡等角色参与，并最终给出一页式判断。",
   },
   {
     title: "为什么要建立 v2.1 触发补角规则？",
     context:
-      "早期调度依赖 chief 的临时判断，导致有时会漏掉关键角色，或者拉上不必要的角色。",
+      "早期调度依赖沈策的临时判断，导致有时会漏掉关键角色，或者拉上不必要的角色。",
     decision:
       "建立明确的触发补角规则：进入某个判断层时，自动补入相关角色。",
     rationale:
-      "通过规则化减少随机性，确保关键角色不会被遗漏。例如，一旦问题进入'先做 / 后做 / 不做'，product 必须参与；一旦进入投资决策，field 或 market 必须做需求验证。",
+      "通过规则化减少随机性，确保关键角色不会被遗漏。例如，一旦问题进入“先做 / 后做 / 不做”，纪衡必须参与；一旦进入投资决策，陆野或林岚必须做需求验证。",
     outcome:
       "调度更加稳定和可预测，减少了因角色缺失导致的判断偏差。",
   },
 ];
 
 export const ROLE_NAME_MAP: Record<RoleId, string> = {
-  chief: "总参谋",
-  market: "市场洞察官",
-  intel: "竞争与战略情报官",
-  product: "产品办公室",
-  pmo: "总裁 PMO",
-  field: "一线作战官",
-  studio: "表达与材料官",
+  chief: "沈策（总参谋）",
+  market: "林岚（市场洞察官）",
+  intel: "顾闻（竞争与战略情报官）",
+  product: "纪衡（产品办公室）",
+  pmo: "程准（总裁 PMO）",
+  field: "陆野（一线作战官）",
+  studio: "苏墨（表达与材料官）",
 };
 
 export const ARCHIVE_STATUS_LABELS: Record<DecisionArchiveStatus, string> = {

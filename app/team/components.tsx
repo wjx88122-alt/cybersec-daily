@@ -144,8 +144,12 @@ export function RoleCard({ role }: { role: Role }) {
                 默认入口
               </span>
             )}
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#dbe4ee]">
+              {role.callName}
+            </span>
           </div>
-          <h3 className="mt-3 text-2xl font-semibold text-[#f0f6fc]">{role.chineseName}</h3>
+          <h3 className="mt-3 text-2xl font-semibold text-[#f0f6fc]">{role.personaName}</h3>
+          <p className="mt-1 text-sm text-[#dbe4ee]">{role.chineseName}</p>
           <p className="mt-1 text-sm text-[#94a3b8]">{role.shortLabel}</p>
         </div>
         <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
@@ -185,7 +189,18 @@ export function RoleCard({ role }: { role: Role }) {
         </div>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid gap-4 lg:grid-cols-4">
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            人格化设定
+          </p>
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">
+            {role.personaName} · {role.callName}
+          </p>
+          <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
+            他的记忆册叫「{role.memoryName}」。
+          </p>
+        </div>
         <div className="panel-soft rounded-2xl p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
             思考框架
@@ -197,6 +212,12 @@ export function RoleCard({ role }: { role: Role }) {
             工作脑回路
           </p>
           <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.workingPattern}</p>
+        </div>
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            说话方式
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.voiceStyle}</p>
         </div>
         <div className="panel-soft rounded-2xl p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">

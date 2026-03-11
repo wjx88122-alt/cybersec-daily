@@ -68,7 +68,7 @@ export default function TeamHistoryPage() {
                 </p>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
                   <li>• 角色演进：6 → 7</li>
-                  <li>• 架构转折：market 新增 / intel 收窄 / chief 升级</li>
+                  <li>• 架构转折：林岚新增 / 顾闻收窄 / 沈策升级</li>
                   <li>• 机制升级：v2.1 调度 + 周报流水线</li>
                   <li>• 系统同步：公开页面与知识库化</li>
                 </ul>
@@ -166,7 +166,7 @@ export default function TeamHistoryPage() {
                     </li>
                     <li className="flex gap-2.5">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563eb]" />
-                      <span>周报流水线机制（market → intel → chief → PDF）</span>
+                      <span>周报流水线机制（林岚 → 顾闻 → 沈策 → 成册）</span>
                     </li>
                     <li className="flex gap-2.5">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563eb]" />

@@ -186,7 +186,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
                     type="text"
                     name="q"
                     defaultValue={q}
-                    placeholder="例如：DA-003 / chief / v2.1 / 竞品 / 回答 / market"
+                    placeholder="例如：DA-003 / 沈策 / v2.1 / 竞品 / 回答 / 林岚"
                     className="panel-deep mt-3 w-full rounded-2xl px-4 py-3 text-sm text-[#f0f6fc] outline-none placeholder:text-[#64748b]"
                   />
                 </label>
