@@ -176,12 +176,12 @@ export default function TeamPage() {
                       key={role.id}
                       className={`rounded-2xl p-4 ${role.id === "chief" ? "panel-accent" : "panel-soft"}`}
                     >
-                      <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
                           <img
                             src={role.avatarSrc}
                             alt={`${role.personaName} 头像`}
-                            className="h-11 w-11 rounded-2xl border border-white/10 bg-white/[0.03] object-cover"
+                            className="h-14 w-14 rounded-[20px] border border-[#50f7ff]/20 bg-[linear-gradient(145deg,rgba(80,247,255,0.1),rgba(15,23,42,0.35))] object-cover shadow-[0_0_20px_rgba(80,247,255,0.14)] sm:h-16 sm:w-16"
                           />
                           <span
                             className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}

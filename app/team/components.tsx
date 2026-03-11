@@ -152,18 +152,18 @@ export function RoleCard({ role }: { role: Role }) {
           <p className="mt-1 text-sm text-[#dbe4ee]">{role.chineseName}</p>
           <p className="mt-1 text-sm text-[#94a3b8]">{role.shortLabel}</p>
         </div>
-        <div className="flex flex-col items-end gap-3">
+        <div className="flex flex-col items-end gap-3 sm:gap-4">
           <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
             {role.phase}
           </span>
-          <div className="rounded-[26px] border border-white/10 bg-white/[0.03] p-1 shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <div className="rounded-[30px] border border-[#50f7ff]/20 bg-[linear-gradient(145deg,rgba(80,247,255,0.14),rgba(15,23,42,0.35))] p-1.5 shadow-[0_0_30px_rgba(80,247,255,0.14),inset_0_1px_0_rgba(255,255,255,0.08)]">
             <img
               src={role.avatarSrc}
               alt={`${role.personaName} 头像`}
-              className="h-24 w-24 rounded-[22px] object-cover"
+              className="h-32 w-32 rounded-[26px] border border-white/10 object-cover sm:h-36 sm:w-36"
             />
           </div>
-          <p className="max-w-[140px] text-right text-[11px] leading-5 text-[#94a3b8]">
+          <p className="max-w-[190px] text-right text-xs leading-6 text-[#94a3b8]">
             {role.signatureLine}
           </p>
         </div>
