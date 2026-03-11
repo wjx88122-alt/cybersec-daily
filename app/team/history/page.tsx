@@ -10,9 +10,9 @@ import {
 } from "../components";
 
 export const metadata: Metadata = {
-  title: "决策档案 | 总裁辅助团队",
+  title: "进化历程 | 总裁辅助团队",
   description:
-    "记录总裁辅助团队从 6 角色到 7 角色的演进历程、关键决策理由和代表性案例。",
+    "记录总裁辅助团队从 6 角色到 7 角色的演进历程、关键架构转折和同步里程碑。",
 };
 
 export default function TeamHistoryPage() {
@@ -37,40 +37,40 @@ export default function TeamHistoryPage() {
         <NavBar active="团队" />
 
         <main className="mx-auto max-w-[1320px] px-4 py-6 sm:py-8">
-          <TeamTabs active="history" />
+          <TeamTabs active="evolution" />
 
           <section className="glass glass-premium rounded-3xl p-6 sm:p-8">
             <div className="top-shine" />
             <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-300">
-                Decision Archive
-              </span>
-              <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                决策档案
-              </span>
-            </div>
-            <h1 className="mt-5 text-3xl font-semibold leading-tight text-[#f0f6fc] sm:text-5xl">
-              从 6 角色到 7 角色，每一步都有<span className="gradient-text">明确理由</span>
-            </h1>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-[#94a3b8] sm:text-base">
-              这里记录的是这套团队为什么会变成现在这样：哪些角色被新增、哪些职责被收窄、为什么 chief 成为默认入口，以及 v2.1 调度规则是如何固定下来的。
-            </p>
-            <p className="mt-3 max-w-3xl text-sm leading-6 text-[#64748b]">
-              这页只保留可公开复用的决策逻辑，不展示隐藏推理过程。
-            </p>
+                  <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-300">
+                    Evolution Journey
+                  </span>
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+                    进化历程
+                  </span>
+                </div>
+                <h1 className="mt-5 text-3xl font-semibold leading-tight text-[#f0f6fc] sm:text-5xl">
+                  这支团队不是一次设计完的，而是沿着<span className="gradient-text">问题演进</span>长出来的。
+                </h1>
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-[#94a3b8] sm:text-base">
+                  进化历程聚焦的是宏观变化：角色怎么从 6 个变成 7 个、调度规则为什么升级到 v2.1、周报机制何时并入系统，以及为什么最终同步到 cybersec-daily。
+                </p>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-[#64748b]">
+                  这里看的是团队演进主线，不是逐条问题归档。逐条提问与结果请看“决策档案”。
+                </p>
               </div>
 
               <div className="panel-deep rounded-[28px] p-5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
-                  Archive Scope
+                  Evolution Scope
                 </p>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
                   <li>• 角色演进：6 → 7</li>
-                  <li>• 调度规则：v2.1 固化</li>
-                  <li>• 输出形式：周报 / PDF / 公开展示页</li>
-                  <li>• 案例类型：架构、决策、集成</li>
+                  <li>• 架构转折：market 新增 / intel 收窄 / chief 升级</li>
+                  <li>• 机制升级：v2.1 调度 + 周报流水线</li>
+                  <li>• 系统同步：公开页面与知识库化</li>
                 </ul>
               </div>
             </div>
@@ -78,12 +78,12 @@ export default function TeamHistoryPage() {
             <div className="mt-6 grid gap-3 sm:grid-cols-4">
               <StatCard
                 value={String(HISTORY_TIMELINE.length)}
-                label="架构演进里程碑"
+                label="演进里程碑"
                 accentClass="text-blue-300"
               />
               <StatCard
-                value={String(DECISION_CASES.length)}
-                label="关键决策案例"
+                value="6→7"
+                label="角色结构变化"
                 accentClass="text-violet-300"
               />
               <StatCard value="v2.1" label="当前调度版本" accentClass="text-[#e5ff00]" />
@@ -98,20 +98,20 @@ export default function TeamHistoryPage() {
                 这页看什么
               </p>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
-                <li>• 团队从 6 角色扩展到 7 角色的关键节点</li>
-                <li>• market / intel / chief 等核心定位为什么这样定义</li>
-                <li>• 调度规则、周报流水线与对外展示如何并轨</li>
+                <li>• 哪些问题推动了团队结构变化</li>
+                <li>• 哪些里程碑让团队从角色集合变成工作系统</li>
+                <li>• 团队定义如何与公开页面同步</li>
               </ul>
             </div>
             <div className="glass glass-premium rounded-3xl p-6">
               <div className="top-shine" />
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                记录原则
+                如何与决策档案配合
               </p>
               <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
-                <li>• 只记录值得复用的架构调整与判断原则</li>
-                <li>• 重点回答“为什么这样设计”，不是只列结果</li>
-                <li>• 保持与 cybersec-daily 当前展示页一致</li>
+                <li>• 进化历程回答“团队为什么变成现在这样”</li>
+                <li>• 决策档案回答“某次网络安全提问是怎么处理并落地的”</li>
+                <li>• 一个看主线，一个看逐条归档</li>
               </ul>
             </div>
           </section>
@@ -131,9 +131,9 @@ export default function TeamHistoryPage() {
 
           <section className="mt-14 border-t border-white/6 pt-10">
             <SectionTitle
-              eyebrow="Decision Cases"
-              title="三个代表性决策案例"
-              description="这些案例回答的是团队设计背后的关键问题：为什么要拆分角色、为什么 chief 是默认入口、为什么需要触发补角规则。"
+              eyebrow="Turning Points"
+              title="三个关键转折说明"
+              description="这些说明不是逐条问题档案，而是帮助你快速理解团队演进中最重要的三个结构性转折。"
             />
             <div className="grid gap-6">
               {DECISION_CASES.map((decisionCase) => (
@@ -147,7 +147,7 @@ export default function TeamHistoryPage() {
               <SectionTitle
                 eyebrow="Integration Milestone"
                 title="cybersec-daily 同步里程碑"
-                description="2025 年 3 月，团队架构、调度规则和历史决策正式同步到 cybersec-daily 项目，开始作为公开页面持续维护。"
+                description="2025 年 3 月，团队架构、调度规则和历史演进正式同步到 cybersec-daily 项目，开始作为公开页面持续维护。"
               />
 
               <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -170,7 +170,7 @@ export default function TeamHistoryPage() {
                     </li>
                     <li className="flex gap-2.5">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563eb]" />
-                      <span>演进时间线和关键决策案例</span>
+                      <span>进化时间线与关键转折说明</span>
                     </li>
                   </ul>
                 </div>
@@ -186,24 +186,24 @@ export default function TeamHistoryPage() {
                     </li>
                     <li className="flex gap-2.5">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
-                      <span>记录决策理由，避免未来重复讨论相同问题</span>
+                      <span>记录演进主线，避免未来重复解释为什么这样设计</span>
+                    </li>
+                    <li className="flex gap-2.5">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
+                      <span>为逐条问题档案提供结构背景</span>
                     </li>
                     <li className="flex gap-2.5">
                       <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
                       <span>保持团队定义与实际使用的一致性</span>
-                    </li>
-                    <li className="flex gap-2.5">
-                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
-                      <span>为未来的团队演进提供历史参考</span>
                     </li>
                   </ul>
                 </div>
               </div>
 
               <div className="panel-accent mt-6 rounded-2xl p-5">
-                <p className="text-sm font-semibold text-[#f0f6fc]">这个页面本身就是一个里程碑</p>
+                <p className="text-sm font-semibold text-[#f0f6fc]">现在的“进化历程”只讲主线</p>
                 <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
-                  当你看到这个页面时，意味着团队架构已经从内部工作方法变成了可公开访问、可持续维护的知识库页面。
+                  如果你想看某一次具体的网络安全提问是怎么被处理、做了什么决定、最后落了什么结果，请切换到新的“决策档案”页查询。
                 </p>
               </div>
             </div>

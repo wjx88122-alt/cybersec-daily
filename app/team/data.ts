@@ -68,6 +68,26 @@ export type DecisionCase = {
   outcome: string;
 };
 
+export type DecisionArchiveStatus = "active" | "settled" | "shipped";
+
+export type DecisionArchiveEntry = {
+  id: string;
+  archiveNo: string;
+  date: string;
+  askedAt: string;
+  title: string;
+  question: string;
+  answer: string;
+  publicProcess: string[];
+  result: string;
+  adoptedVersion: string;
+  relatedPages: { label: string; href: string }[];
+  relatedMilestones: string[];
+  tags: string[];
+  roles: RoleId[];
+  status: DecisionArchiveStatus;
+};
+
 export const ROLES: Role[] = [
   {
     id: "chief",
@@ -508,3 +528,79 @@ export const DECISION_CASES: DecisionCase[] = [
       "调度更加稳定和可预测，减少了因角色缺失导致的判断偏差。",
   },
 ];
+
+export const ROLE_NAME_MAP: Record<RoleId, string> = {
+  chief: "总参谋",
+  market: "市场洞察官",
+  intel: "竞争与战略情报官",
+  product: "产品办公室",
+  pmo: "总裁 PMO",
+  field: "一线作战官",
+  studio: "表达与材料官",
+};
+
+export const ARCHIVE_STATUS_LABELS: Record<DecisionArchiveStatus, string> = {
+  active: "进行中",
+  settled: "已定版",
+  shipped: "已落地",
+};
+
+export const DECISION_ARCHIVE_SCOPE = "只收录网络安全相关的问答档案";
+
+export const DECISION_ARCHIVE: DecisionArchiveEntry[] = [
+  {
+    id: "ai-firewall-trend-definition",
+    archiveNo: "DA-001",
+    date: "2026-03",
+    askedAt: "2026-03-11 11:25 GMT+8",
+    title: "AI 变化下传统防火墙怎么变，以及如何定义下一代 AI 防火墙",
+    question:
+      "针对 AI 的变化传统的防火墙会有什么变化？我该如何抓住趋势定义下一代 AI 防火墙？",
+    answer:
+      "团队回答是：传统防火墙不会消失，但会从主角降级为底座。下一代 AI 防火墙不该只是“带 AI 能力的防火墙”，而应该定义为企业 AI / Agent 的执行安全控制层，核心是控制 AI 能看到什么、调用什么、说什么、做什么。",
+    publicProcess: [
+      "先判断问题性质：这不是单点功能问题，而是网络安全产品范式迁移问题，需要同时看技术边界和采购逻辑。",
+      "把传统防火墙能力与 AI 时代新增控制对象拆开：传统层继续管流量、会话和边界；AI 层新增 prompt、context、tool call、output、action 等控制面。",
+      "再从产品定义收口：下一代 AI 防火墙的价值不在“更聪明地看流量”，而在“更稳定地约束 AI 决策与执行”。",
+      "最后用可落地路线图表达：先做 AI egress / 模型访问控制，再延伸到 agent tool governance、RAG / context 安全、审批审计与行为分析。",
+    ],
+    result:
+      "形成产品定义方向：下一代 AI 防火墙 = AI Runtime Security Control Plane / AI 执行防火墙；核心模块包括模型与 agent 身份、prompt/context policy、tool use governance、output firewall、action approval、RAG security、agent behavior analytics、audit & replay。",
+    adoptedVersion: "AI Firewall Product Thesis v1.0",
+    relatedPages: [
+      { label: "决策档案", href: "/team/decisions" },
+      { label: "团队总览", href: "/team" },
+    ],
+    relatedMilestones: ["AI 防火墙产品定义", "网络安全问答归档"],
+    tags: ["AI 防火墙", "AI 安全", "Agent 安全", "产品定义", "网络安全"],
+    roles: ["chief", "intel", "product", "studio"],
+    status: "settled",
+  },
+];
+
+export function getDecisionArchiveEntry(slug: string) {
+  const normalized = decodeURIComponent(slug).toLowerCase();
+  return DECISION_ARCHIVE.find(
+    (entry) => entry.id.toLowerCase() === normalized || entry.archiveNo.toLowerCase() === normalized,
+  );
+}
+
+export function getRelatedDecisionEntries(currentId: string, limit = 3) {
+  const current = DECISION_ARCHIVE.find((entry) => entry.id === currentId);
+  if (!current) return [];
+
+  return DECISION_ARCHIVE.filter((entry) => entry.id !== currentId)
+    .map((entry) => {
+      const sharedTags = entry.tags.filter((tag) => current.tags.includes(tag)).length;
+      const sharedRoles = entry.roles.filter((role) => current.roles.includes(role)).length;
+      const sharedMilestones = entry.relatedMilestones.filter((item) =>
+        current.relatedMilestones.includes(item),
+      ).length;
+      const score = sharedTags * 3 + sharedRoles * 2 + sharedMilestones * 2;
+      return { entry, score };
+    })
+    .filter((item) => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((item) => item.entry);
+}

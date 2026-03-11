@@ -1,10 +1,12 @@
 import Link from "next/link";
+import { ARCHIVE_STATUS_LABELS, ROLE_NAME_MAP } from "./data";
 import type {
   Role,
   DispatchCard,
   WeeklyNode,
   HistoryMilestone,
   DecisionCase,
+  DecisionArchiveEntry,
 } from "./data";
 
 export function SectionTitle({
@@ -32,10 +34,11 @@ export function SectionTitle({
   );
 }
 
-export function TeamTabs({ active }: { active: "overview" | "history" }) {
+export function TeamTabs({ active }: { active: "overview" | "evolution" | "decisions" }) {
   const items = [
     { id: "overview", href: "/team", label: "团队总览", note: "Roster / Dispatch" },
-    { id: "history", href: "/team/history", label: "决策档案", note: "Timeline / Cases" },
+    { id: "evolution", href: "/team/history", label: "进化历程", note: "Timeline / Milestones" },
+    { id: "decisions", href: "/team/decisions", label: "决策档案", note: "Questions / Results" },
   ] as const;
 
   return (
@@ -116,7 +119,9 @@ export function RoleCard({ role }: { role: Role }) {
     >
       <div
         className={`pointer-events-none absolute inset-x-0 top-0 h-24 opacity-80 ${
-          isChief ? "bg-[radial-gradient(circle_at_top,rgba(229,255,0,0.14),transparent_68%)]" : "bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.12),transparent_68%)]"
+          isChief
+            ? "bg-[radial-gradient(circle_at_top,rgba(229,255,0,0.14),transparent_68%)]"
+            : "bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.12),transparent_68%)]"
         }`}
       />
 
@@ -309,6 +314,148 @@ export function DecisionCaseCard({ decisionCase }: { decisionCase: DecisionCase 
           </p>
           <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{decisionCase.outcome}</p>
         </div>
+      </div>
+    </article>
+  );
+}
+
+export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) {
+  return (
+    <article className="glass glass-premium rounded-3xl p-6 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href={`/team/decisions/${entry.archiveNo}`}
+              className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8] transition hover:border-white/20 hover:text-[#f0f6fc]"
+            >
+              {entry.archiveNo}
+            </Link>
+            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+              {entry.date}
+            </span>
+            <span className="panel-accent rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#f0f6fc]">
+              {ARCHIVE_STATUS_LABELS[entry.status]}
+            </span>
+          </div>
+          <h3 className="mt-4 text-xl font-semibold text-[#f0f6fc]">
+            <Link href={`/team/decisions/${entry.archiveNo}`} className="transition hover:text-[#e5ff00]">
+              {entry.title}
+            </Link>
+          </h3>
+          <p className="mt-2 text-sm text-[#94a3b8]">提问时间：{entry.askedAt}</p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {entry.roles.map((roleId) => (
+            <span
+              key={roleId}
+              className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]"
+            >
+              {ROLE_NAME_MAP[roleId]}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            提问
+          </p>
+          <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">{entry.question}</p>
+        </div>
+
+        <div className="panel-accent rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            团队回答
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#f0f6fc]">{entry.answer}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="panel-deep rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            公开决策过程
+          </p>
+          <ul className="mt-3 space-y-3 text-sm leading-6 text-[#dbe4ee]">
+            {entry.publicProcess.map((step) => (
+              <li key={step} className="flex gap-2.5">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
+                <span>{step}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
+        <div className="panel-accent rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            结果 / 后续动作
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#f0f6fc]">{entry.result}</p>
+        </div>
+
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            最终采用版本
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{entry.adoptedVersion}</p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            关联页面
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {entry.relatedPages.map((page) => (
+              <Link
+                key={page.href}
+                href={page.href}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#dbe4ee] transition hover:border-white/20 hover:text-[#f0f6fc]"
+              >
+                {page.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            关联里程碑 / 标签
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {entry.relatedMilestones.map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-200"
+              >
+                {item}
+              </span>
+            ))}
+            {entry.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#dbe4ee]"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-5 flex justify-end">
+        <Link
+          href={`/team/decisions/${entry.archiveNo}`}
+          className="text-sm font-semibold text-[#e5ff00] transition hover:text-[#f5ff66]"
+        >
+          查看详情 →
+        </Link>
       </div>
     </article>
   );

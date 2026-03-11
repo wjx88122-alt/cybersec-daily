@@ -9,6 +9,7 @@ import {
   PHASES,
   PROMPTS,
   HISTORY_TIMELINE,
+  DECISION_ARCHIVE,
 } from "./data";
 import {
   SectionTitle,
@@ -79,17 +80,18 @@ export default function TeamPage() {
                   7 位幕僚角色
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
-                  v2.1 调度规则
+                  3 个 Team 分区
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-sm text-[#dbe4ee]">
                   周报自动生成机制
                 </span>
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <div className="mt-6 grid gap-3 sm:grid-cols-4">
                 <StatCard value={String(ROLES.length)} label="可调用角色" accentClass="text-[#e5ff00]" />
-                <StatCard value="2" label="Team 页面分区" accentClass="text-violet-300" />
+                <StatCard value="3" label="Team 页面分区" accentClass="text-violet-300" />
                 <StatCard value={String(DISPATCH_CARDS.length)} label="核心调度规则组" accentClass="text-cyan-300" />
+                <StatCard value={String(DECISION_ARCHIVE.length)} label="已归档问题" accentClass="text-emerald-300" />
               </div>
 
               <div className="mt-6 grid gap-3 lg:grid-cols-[1.15fr_0.85fr]">
@@ -172,11 +174,7 @@ export default function TeamPage() {
                   {ROLES.map((role) => (
                     <div
                       key={role.id}
-                      className={`rounded-2xl p-4 ${
-                        role.id === "chief"
-                          ? "panel-accent"
-                          : "panel-soft"
-                      }`}
+                      className={`rounded-2xl p-4 ${role.id === "chief" ? "panel-accent" : "panel-soft"}`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <span
@@ -213,34 +211,56 @@ export default function TeamPage() {
                   </div>
                   <div className="panel-soft rounded-2xl p-4">
                     <p className="text-sm font-semibold text-[#f0f6fc]">
-                      不是所有问题都要全队出动
+                      决策档案只收录网络安全问答，并且只存公开过程
                     </p>
                     <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
-                      v2.1 的升级重点不是加更多角色，而是让 chief 只调用最少必要角色，并按四维判断框架稳定收口。
+                      后续只归档网络安全相关的提问、团队回答、可公开复用的形成过程和最终结果，便于查询与追溯，但不会暴露内部隐藏推理链路。
                     </p>
                   </div>
                 </div>
               </div>
 
-              <Link
-                href="/team/history"
-                className="glass glass-premium block rounded-3xl p-6 transition-all hover:-translate-y-0.5 hover:border-[#e5ff00]/20 hover:bg-white/[0.04]"
-              >
-                <div className="top-shine" />
-                <div className="flex items-center justify-between gap-3">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
-                    Archive Preview
+              <div className="grid gap-4 md:grid-cols-2">
+                <Link
+                  href="/team/history"
+                  className="glass glass-premium block rounded-3xl p-6 transition-all hover:-translate-y-0.5 hover:border-[#e5ff00]/20 hover:bg-white/[0.04]"
+                >
+                  <div className="top-shine" />
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
+                      Evolution Preview
+                    </p>
+                    <span className="rounded-full border border-blue-500/30 bg-blue-500/10 px-2.5 py-1 text-[11px] font-semibold text-blue-300">
+                      {HISTORY_TIMELINE.length} 条里程碑
+                    </span>
+                  </div>
+                  <h2 className="mt-4 text-xl font-semibold text-[#f0f6fc]">查看这套团队是怎么一步步长出来的</h2>
+                  <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
+                    进化历程聚焦 6→7 角色演进、关键架构转折和系统同步里程碑。
                   </p>
-                  <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-300">
-                    {HISTORY_TIMELINE.length} 条里程碑
-                  </span>
-                </div>
-                <h2 className="mt-4 text-xl font-semibold text-[#f0f6fc]">看看这套团队为什么会长成现在这样</h2>
-                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
-                  决策档案页记录了 6→7 角色演进、market 的新增、intel 的收窄、chief 的默认入口定位，以及 v2.1 调度规则的形成过程。
-                </p>
-                <p className="mt-4 text-sm font-semibold text-[#e5ff00]">进入决策档案 →</p>
-              </Link>
+                  <p className="mt-4 text-sm font-semibold text-[#e5ff00]">进入进化历程 →</p>
+                </Link>
+
+                <Link
+                  href="/team/decisions"
+                  className="glass glass-premium block rounded-3xl p-6 transition-all hover:-translate-y-0.5 hover:border-[#e5ff00]/20 hover:bg-white/[0.04]"
+                >
+                  <div className="top-shine" />
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#64748b]">
+                      Decision Archive
+                    </p>
+                    <span className="rounded-full border border-violet-500/30 bg-violet-500/10 px-2.5 py-1 text-[11px] font-semibold text-violet-300">
+                      {DECISION_ARCHIVE.length} 条问题
+                    </span>
+                  </div>
+                  <h2 className="mt-4 text-xl font-semibold text-[#f0f6fc]">按网络安全问答检索：提问、回答、过程、结果</h2>
+                  <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
+                    决策档案页只归档网络安全相关的问答，记录你的提问、团队回答、形成回答的公开过程和最终结果，并支持按关键词、角色、状态查询。
+                  </p>
+                  <p className="mt-4 text-sm font-semibold text-[#e5ff00]">进入决策档案 →</p>
+                </Link>
+              </div>
             </div>
           </section>
 
@@ -326,7 +346,10 @@ export default function TeamPage() {
             />
             <div className="grid gap-4 lg:grid-cols-3">
               {PHASES.map((phase) => (
-                <article key={phase.phase} className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5">
+                <article
+                  key={phase.phase}
+                  className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5"
+                >
                   <div className="flex items-center justify-between gap-3">
                     <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
                       {phase.phase}
@@ -361,7 +384,10 @@ export default function TeamPage() {
             />
             <div className="grid gap-4 xl:grid-cols-2">
               {PROMPTS.map((item) => (
-                <article key={item.title} className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+                <article
+                  key={item.title}
+                  className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]"
+                >
                   <div className="flex items-center justify-between gap-3">
                     <h3 className="text-lg font-semibold text-[#f0f6fc]">{item.title}</h3>
                     <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
