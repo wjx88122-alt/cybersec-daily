@@ -9,6 +9,10 @@ import {
 const cardCls = "glass rounded-xl border border-black/[0.06] bg-white/[0.72]";
 const actionCls =
   "inline-flex items-center justify-center rounded-lg border px-3 py-1.5 text-xs font-medium transition-all";
+const softPanelCls = "rounded-xl border border-slate-200 bg-slate-50/90 p-4";
+const subCardCls = "rounded-xl border border-slate-200 bg-slate-50/90 p-4";
+const codeBlockCls =
+  "mt-3 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-4 text-[11px] text-slate-800";
 
 const RECOMMENDED_OBJECTS = [
   {
@@ -75,30 +79,36 @@ export default function HuaweiIsdbPage() {
   const providerMap = new Map(HUAWEI_ISDB_PROVIDERS.map((item) => [item.id, item]));
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <div
+      className="min-h-screen"
+      style={{
+        background:
+          "radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 28%), linear-gradient(180deg, #f8fafc 0%, #eef4fb 100%)",
+      }}
+    >
       <NavBar active="MDR" />
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         <div className="space-y-3">
           <Link
             href="/mdr/huawei"
-            className="inline-flex items-center text-xs text-[#94a3b8] hover:text-[#64748b] transition-colors"
+            className="inline-flex items-center text-xs text-slate-500 hover:text-slate-700 transition-colors"
           >
             ← 返回华为防火墙
           </Link>
           <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <div className="text-[11px] uppercase tracking-[0.24em] text-[#94a3b8]">
+              <div className="text-[11px] uppercase tracking-[0.24em] text-slate-500">
                 Huawei SD-WAN
               </div>
-              <h1 className="mt-1 text-2xl font-bold text-[#1a1a2e]">
+              <h1 className="mt-1 text-2xl font-bold text-slate-950">
                 ISDB 地址库生成器
               </h1>
-              <p className="mt-2 max-w-3xl text-sm text-[#64748b]">
+              <p className="mt-2 max-w-3xl text-sm text-slate-600">
                 按华为防火墙可导入的 ISP 地址文件格式输出，每行一个 CIDR，适合
                 SD-WAN / 智能选路 / PBR 场景。数据源使用官方公开网段 feed，按下载时实时聚合。
               </p>
             </div>
-            <div className={`${cardCls} px-4 py-3 text-xs text-[#64748b]`}>
+            <div className={`${cardCls} px-4 py-3 text-xs text-slate-600`}>
               <div>导出日期：{today}</div>
               <div className="mt-1">格式：纯 CIDR 列表 `.csv`</div>
             </div>
@@ -108,8 +118,8 @@ export default function HuaweiIsdbPage() {
         <section className={`${cardCls} p-5`}>
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div>
-              <h2 className="text-base font-semibold text-[#1a1a2e]">预置 Bundle</h2>
-              <p className="mt-1 text-xs text-[#64748b]">
+              <h2 className="text-base font-semibold text-slate-950">预置 Bundle</h2>
+              <p className="mt-1 text-xs text-slate-600">
                 直接下载聚合好的地址库，适合快速导入到华为防火墙。
               </p>
             </div>
@@ -123,13 +133,13 @@ export default function HuaweiIsdbPage() {
 
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {HUAWEI_ISDB_BUNDLES.map((bundle) => (
-              <div key={bundle.id} className="rounded-xl border border-black/[0.06] bg-black/[0.02] p-4">
+              <div key={bundle.id} className={subCardCls}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-[#1a1a2e]">{bundle.label}</div>
-                    <div className="mt-1 text-xs text-[#64748b]">{bundle.description}</div>
+                    <div className="text-sm font-semibold text-slate-950">{bundle.label}</div>
+                    <div className="mt-1 text-xs text-slate-600">{bundle.description}</div>
                   </div>
-                  <code className="rounded bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-[#64748b]">
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
                     {bundle.id}
                   </code>
                 </div>
@@ -138,7 +148,7 @@ export default function HuaweiIsdbPage() {
                   {bundle.providerIds.map((providerId) => (
                     <span
                       key={providerId}
-                      className="rounded-full border border-black/[0.06] bg-white px-2 py-1 text-[10px] text-[#64748b]"
+                      className="rounded-full border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-600"
                     >
                       {providerMap.get(providerId)?.label}
                     </span>
@@ -148,13 +158,13 @@ export default function HuaweiIsdbPage() {
                 <div className="mt-4 flex gap-2">
                   <a
                     href={`/api/huawei/isdb?bundle=${bundle.id}`}
-                    className={`${actionCls} flex-1 border-black/[0.08] bg-white text-[#1a1a2e] hover:bg-black/[0.03]`}
+                    className={`${actionCls} flex-1 border-slate-200 bg-white text-slate-900 hover:bg-slate-100`}
                   >
                     下载 CSV
                   </a>
                   <a
                     href={`/api/huawei/isdb?bundle=${bundle.id}&format=json`}
-                    className={`${actionCls} border-black/[0.08] bg-black/[0.03] text-[#64748b] hover:bg-black/[0.05]`}
+                    className={`${actionCls} border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200`}
                   >
                     JSON
                   </a>
@@ -166,21 +176,21 @@ export default function HuaweiIsdbPage() {
 
         <section className={`${cardCls} p-5`}>
           <div>
-            <h2 className="text-base font-semibold text-[#1a1a2e]">单独 Provider 导出</h2>
-            <p className="mt-1 text-xs text-[#64748b]">
+            <h2 className="text-base font-semibold text-slate-950">单独 Provider 导出</h2>
+            <p className="mt-1 text-xs text-slate-600">
               按官方网段源单独导出，适合为不同 SaaS / 云平台建立独立地址库对象。
             </p>
           </div>
 
           <div className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {HUAWEI_ISDB_PROVIDERS.map((provider) => (
-              <div key={provider.id} className="rounded-xl border border-black/[0.06] bg-black/[0.02] p-4">
+              <div key={provider.id} className={subCardCls}>
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="text-sm font-semibold text-[#1a1a2e]">{provider.label}</div>
-                    <div className="mt-1 text-xs text-[#64748b]">{provider.description}</div>
+                    <div className="text-sm font-semibold text-slate-950">{provider.label}</div>
+                    <div className="mt-1 text-xs text-slate-600">{provider.description}</div>
                   </div>
-                  <code className="rounded bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-[#64748b]">
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
                     {provider.id}
                   </code>
                 </div>
@@ -202,13 +212,13 @@ export default function HuaweiIsdbPage() {
                 <div className="mt-4 flex gap-2">
                   <a
                     href={`/api/huawei/isdb?providers=${provider.id}`}
-                    className={`${actionCls} flex-1 border-black/[0.08] bg-white text-[#1a1a2e] hover:bg-black/[0.03]`}
+                    className={`${actionCls} flex-1 border-slate-200 bg-white text-slate-900 hover:bg-slate-100`}
                   >
                     下载 CSV
                   </a>
                   <a
                     href={`/api/huawei/isdb?providers=${provider.id}&format=json`}
-                    className={`${actionCls} border-black/[0.08] bg-black/[0.03] text-[#64748b] hover:bg-black/[0.05]`}
+                    className={`${actionCls} border-slate-200 bg-slate-100 text-slate-700 hover:bg-slate-200`}
                   >
                     JSON
                   </a>
@@ -233,17 +243,17 @@ export default function HuaweiIsdbPage() {
 
         <section className="grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
           <div className={`${cardCls} p-5`}>
-            <h2 className="text-base font-semibold text-[#1a1a2e]">
+            <h2 className="text-base font-semibold text-slate-950">
               推荐对象命名
             </h2>
-            <p className="mt-1 text-xs text-[#64748b]">
+            <p className="mt-1 text-xs text-slate-600">
               导入后建议统一采用 `ISDB_*` 前缀，后面接用途或服务域，便于后续规则复用。
             </p>
 
             <div className="mt-4 overflow-x-auto">
               <table className="min-w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-black/[0.06] text-[11px] uppercase tracking-[0.16em] text-[#94a3b8]">
+                  <tr className="border-b border-slate-200 text-[11px] uppercase tracking-[0.16em] text-slate-500">
                     <th className="py-2 pr-4">Bundle</th>
                     <th className="py-2 pr-4">对象名</th>
                     <th className="py-2">用途</th>
@@ -251,24 +261,24 @@ export default function HuaweiIsdbPage() {
                 </thead>
                 <tbody>
                   {RECOMMENDED_OBJECTS.map((item) => (
-                    <tr key={item.objectName} className="border-b border-black/[0.04] align-top">
-                      <td className="py-3 pr-4 text-[11px] text-[#64748b]">
-                        <code className="rounded bg-black/[0.05] px-1.5 py-0.5">
+                    <tr key={item.objectName} className="border-b border-slate-100 align-top">
+                      <td className="py-3 pr-4 text-[11px] text-slate-600">
+                        <code className="rounded bg-slate-100 px-1.5 py-0.5">
                           {item.bundle}
                         </code>
                       </td>
-                      <td className="py-3 pr-4 text-[12px] font-medium text-[#1a1a2e]">
+                      <td className="py-3 pr-4 text-[12px] font-medium text-slate-950">
                         <code>{item.objectName}</code>
                       </td>
-                      <td className="py-3 text-[12px] text-[#64748b]">{item.usage}</td>
+                      <td className="py-3 text-[12px] text-slate-600">{item.usage}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <div className="mt-4 rounded-xl bg-black/[0.03] p-4 text-sm text-[#64748b]">
-              <div className="text-[11px] font-medium text-[#1a1a2e]">
+            <div className={`${softPanelCls} mt-4 text-sm text-slate-700`}>
+              <div className="text-[11px] font-medium text-slate-950">
                 命名补充
               </div>
               <div className="mt-2 space-y-1">
@@ -283,10 +293,10 @@ export default function HuaweiIsdbPage() {
           <div className={`${cardCls} p-5`}>
             <div className="flex items-center justify-between gap-3 flex-wrap">
               <div>
-                <h2 className="text-base font-semibold text-[#1a1a2e]">
+                <h2 className="text-base font-semibold text-slate-950">
                   选路规则模板
                 </h2>
-                <p className="mt-1 text-xs text-[#64748b]">
+                <p className="mt-1 text-xs text-slate-600">
                   下面是偏工程化的策略示意，不是某个具体版本的厂商 CLI 原生命令。
                 </p>
               </div>
@@ -299,23 +309,23 @@ export default function HuaweiIsdbPage() {
               {POLICY_TEMPLATES.map((item) => (
                 <div
                   key={item.routeName}
-                  className="rounded-xl border border-black/[0.06] bg-black/[0.02] p-4"
+                  className={subCardCls}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-[#1a1a2e]">
+                      <div className="text-sm font-semibold text-slate-950">
                         {item.title}
                       </div>
-                      <div className="mt-1 text-xs text-[#64748b]">
+                      <div className="mt-1 text-xs text-slate-600">
                         {item.summary}
                       </div>
                     </div>
-                    <code className="rounded bg-black/[0.05] px-1.5 py-0.5 text-[10px] text-[#64748b]">
+                    <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
                       {item.routeName}
                     </code>
                   </div>
 
-                  <pre className="mt-3 overflow-x-auto rounded-xl bg-[#1e293b] p-4 text-[11px] text-green-400">
+                  <pre className={codeBlockCls}>
 {`# 1) 地址库对象
 address-set ${item.objectName}
 
@@ -326,18 +336,18 @@ rule ${item.routeName}
   priority 10`}
                   </pre>
 
-                  <div className="mt-3 space-y-1 text-[12px] text-[#64748b]">
+                  <div className="mt-3 space-y-1 text-[12px] text-slate-600">
                     <p>
-                      <span className="text-[#94a3b8]">地址对象:</span>{" "}
-                      <code className="text-[#1a1a2e]">{item.objectName}</code>
+                      <span className="text-slate-500">地址对象:</span>{" "}
+                      <code className="text-slate-950">{item.objectName}</code>
                     </p>
                     <p>
-                      <span className="text-[#94a3b8]">策略对象:</span>{" "}
-                      <code className="text-[#1a1a2e]">{item.routeName}</code>
+                      <span className="text-slate-500">策略对象:</span>{" "}
+                      <code className="text-slate-950">{item.routeName}</code>
                     </p>
                     <p>
-                      <span className="text-[#94a3b8]">目标出口:</span>{" "}
-                      <code className="text-[#1a1a2e]">{item.nextHop}</code>
+                      <span className="text-slate-500">目标出口:</span>{" "}
+                      <code className="text-slate-950">{item.nextHop}</code>
                     </p>
                     <p>{item.note}</p>
                   </div>
@@ -349,17 +359,17 @@ rule ${item.routeName}
 
         <section className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
           <div className={`${cardCls} p-5`}>
-            <h2 className="text-base font-semibold text-[#1a1a2e]">华为加载说明</h2>
-            <div className="mt-3 space-y-2 text-sm text-[#64748b]">
+            <h2 className="text-base font-semibold text-slate-950">华为加载说明</h2>
+            <div className="mt-3 space-y-2 text-sm text-slate-600">
               <p>1. 下载本页导出的 `.csv` 文件，内容为纯 CIDR 列表，每行一个地址段。</p>
-              <p>2. 华为 GUI 一般可在 <span className="font-mono text-[#1a1a2e]">Network &gt; Smart Policy Routing &gt; ISP Address Import</span> 进入导入。</p>
+              <p>2. 华为 GUI 一般可在 <span className="font-mono text-slate-950">Network &gt; Smart Policy Routing &gt; ISP Address Import</span> 进入导入。</p>
               <p>3. 导入后，给地址库对象命名，再在 SD-WAN / 智能选路 / 策略路由规则里引用它。</p>
               <p>4. 这类库本质是“地址库”，适合做目的地址匹配，不包含端口、协议和域名语义。</p>
             </div>
 
-            <div className="mt-4 rounded-xl bg-[#1e293b] p-4">
-              <div className="text-[11px] text-gray-400">运维侧下载与校验模板</div>
-              <pre className="mt-2 overflow-x-auto text-[11px] text-green-400">
+            <div className={softPanelCls + " mt-4"}>
+              <div className="text-[11px] text-slate-500">运维侧下载与校验模板</div>
+              <pre className="mt-2 overflow-x-auto text-[11px] text-slate-800">
 {`# 把 https://your-host.example 替换成你的部署地址或本机地址
 # 例如: http://localhost:3000
 
@@ -385,9 +395,9 @@ curl "https://your-host.example/api/huawei/isdb?bundle=sdwan-core&format=json"`}
               </pre>
             </div>
 
-            <div className="mt-4 rounded-xl bg-black/[0.03] p-4">
-              <div className="text-[11px] font-medium text-[#1a1a2e]">CSV 内容示例</div>
-              <pre className="mt-2 overflow-x-auto text-[11px] text-[#64748b]">
+            <div className={softPanelCls + " mt-4"}>
+              <div className="text-[11px] font-medium text-slate-950">CSV 内容示例</div>
+              <pre className="mt-2 overflow-x-auto text-[11px] text-slate-700">
 {`13.107.128.0/22
 40.96.0.0/13
 52.96.0.0/14
@@ -398,20 +408,20 @@ curl "https://your-host.example/api/huawei/isdb?bundle=sdwan-core&format=json"`}
           </div>
 
           <div className={`${cardCls} p-5`}>
-            <h2 className="text-base font-semibold text-[#1a1a2e]">GUI / 策略模板</h2>
-            <div className="mt-3 space-y-3 text-sm text-[#64748b]">
+            <h2 className="text-base font-semibold text-slate-950">GUI / 策略模板</h2>
+            <div className="mt-3 space-y-3 text-sm text-slate-600">
               <div>
-                <div className="text-[11px] font-medium text-[#1a1a2e]">GUI 导入流程</div>
+                <div className="text-[11px] font-medium text-slate-950">GUI 导入流程</div>
                 <div className="mt-1 space-y-1">
-                  <p>• 打开 <span className="font-mono text-[#1a1a2e]">Network &gt; Smart Policy Routing &gt; ISP Address Import</span></p>
-                  <p>• 新建地址库对象，例如 <span className="font-mono text-[#1a1a2e]">ISDB_M365_WORLDWIDE</span></p>
+                  <p>• 打开 <span className="font-mono text-slate-950">Network &gt; Smart Policy Routing &gt; ISP Address Import</span></p>
+                  <p>• 新建地址库对象，例如 <span className="font-mono text-slate-950">ISDB_M365_WORLDWIDE</span></p>
                   <p>• 选择本页下载的 `.csv` 文件并导入</p>
                   <p>• 在智能选路 / PBR 规则中，把目的地址匹配到这个地址库对象</p>
                 </div>
               </div>
 
               <div>
-                <div className="text-[11px] font-medium text-[#1a1a2e]">命名建议</div>
+                <div className="text-[11px] font-medium text-slate-950">命名建议</div>
                 <div className="mt-1 space-y-1">
                   <p>• `ISDB_AZURE_PUBLIC`</p>
                   <p>• `ISDB_M365_WORLDWIDE`</p>
@@ -420,7 +430,7 @@ curl "https://your-host.example/api/huawei/isdb?bundle=sdwan-core&format=json"`}
               </div>
 
               <div>
-                <div className="text-[11px] font-medium text-[#1a1a2e]">策略示意</div>
+                <div className="text-[11px] font-medium text-slate-950">策略示意</div>
                 <div className="mt-1 space-y-1">
                   <p>• 目的地址命中 `ISDB_M365_WORLDWIDE` 时，优先走低时延互联网出口</p>
                   <p>• 目的地址命中 `ISDB_AZURE_PUBLIC` 时，导向与 Azure 互联质量更稳定的 WAN 链路</p>
@@ -429,9 +439,9 @@ curl "https://your-host.example/api/huawei/isdb?bundle=sdwan-core&format=json"`}
               </div>
             </div>
 
-            <div className="mt-4 border-t border-black/[0.06] pt-4">
-              <h3 className="text-[11px] font-medium text-[#1a1a2e]">设计边界</h3>
-              <div className="mt-2 space-y-2 text-sm text-[#64748b]">
+            <div className="mt-4 border-t border-slate-200 pt-4">
+              <h3 className="text-[11px] font-medium text-slate-950">设计边界</h3>
+              <div className="mt-2 space-y-2 text-sm text-slate-600">
                 <p>• 这里导出的不是 FortiGate 风格的“服务签名库”，而是华为可导入的地址库文件。</p>
                 <p>• 只收录有官方公开网段源的服务，避免手写或抓 DNS 造成快速失效。</p>
                 <p>• GitHub Meta API 本身不覆盖所有 GitHub 业务边界，适合作为工程化近似库，不是合同级承诺。</p>
