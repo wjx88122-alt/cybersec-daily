@@ -508,12 +508,20 @@ export default function HuaweiPage() {
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="mb-6">
           <a href="/mdr" className="text-xs text-[#94a3b8] hover:text-[#64748b] transition-colors">← MDR 工单系统</a>
-          <div className="flex items-center gap-3 mt-1">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-500 flex items-center justify-center text-white font-bold text-sm">HW</div>
-            <div>
-              <h1 className="text-xl font-bold text-[#1a1a2e]">华为防火墙处置下发</h1>
-              <p className="text-xs text-[#94a3b8]">{config.model} · RESTCONF API · {config.host ? `${config.host}:${config.port}` : "未配置"}</p>
+          <div className="mt-1 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-red-600 to-red-500 flex items-center justify-center text-white font-bold text-sm">HW</div>
+              <div>
+                <h1 className="text-xl font-bold text-[#1a1a2e]">华为防火墙处置下发</h1>
+                <p className="text-xs text-[#94a3b8]">{config.model} · RESTCONF API · {config.host ? `${config.host}:${config.port}` : "未配置"}</p>
+              </div>
             </div>
+            <a
+              href="/mdr/huawei/isdb"
+              className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-600/20 bg-red-600/10 px-3 py-1.5 text-xs font-medium text-red-600 transition-all hover:bg-red-600/20"
+            >
+              📦 SD-WAN ISDB 库
+            </a>
           </div>
         </div>
         <div className="glass rounded-xl p-3 mb-6 flex items-center justify-between">
