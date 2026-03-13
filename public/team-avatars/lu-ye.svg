@@ -1,36 +1,55 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 陆野 - 一线作战官：务实、直接、接地气 -->
   <defs>
-    <linearGradient id="ly-bg" x1="18" y1="10" x2="302" y2="310" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#041111"/>
-      <stop offset="0.56" stop-color="#0b2423"/>
-      <stop offset="1" stop-color="#04080d"/>
+    <linearGradient id="ly-bg" x1="0" y1="0" x2="320" y2="320">
+      <stop stop-color="#0a1a14"/>
+      <stop offset="1" stop-color="#1a3a2a"/>
     </linearGradient>
-    <radialGradient id="ly-halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 102) rotate(90) scale(130)">
-      <stop stop-color="#39f3a6" stop-opacity="0.92"/>
-      <stop offset="1" stop-color="#39f3a6" stop-opacity="0"/>
+    <radialGradient id="ly-glow" cx="0.5" cy="0.3">
+      <stop stop-color="#10b981" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#10b981" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="ly-suit" x1="160" y1="204" x2="160" y2="308" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#112a2a"/>
-      <stop offset="1" stop-color="#050d12"/>
-    </linearGradient>
   </defs>
-  <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#ly-bg)"/>
-  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#39f3a6" stroke-opacity="0.16" stroke-width="2"/>
-  <circle cx="160" cy="106" r="118" fill="url(#ly-halo)"/>
-  <path d="M44 258H276" stroke="#57f8ff" stroke-opacity="0.08" stroke-width="2"/>
-  <path d="M44 278H276" stroke="#57f8ff" stroke-opacity="0.08" stroke-width="2"/>
-  <path d="M60 310L80 232L104 204C121 182 140 172 160 172C180 172 199 182 216 204L240 232L260 310H60Z" fill="url(#ly-suit)"/>
-  <path d="M124 191L160 224L196 191L210 208L187 310H133L110 208L124 191Z" fill="#ebf4f5"/>
-  <path d="M145 193L160 211L175 193L182 310H138L145 193Z" fill="#61ffd0" fill-opacity="0.9"/>
-  <ellipse cx="160" cy="147" rx="61" ry="74" fill="#e1bea7"/>
-  <path d="M111 167C124 177 138 182 160 182C182 182 196 177 209 167" fill="#000" fill-opacity="0.06"/>
-  <path d="M88 121C98 71 129 45 172 47C208 49 233 76 237 120C220 109 207 101 188 98C183 83 173 71 159 69C131 65 104 87 88 121Z" fill="#081419"/>
-  <path d="M122 136C132 128 142 126 153 127" stroke="#3e2c23" stroke-width="4" stroke-linecap="round"/>
-  <path d="M167 127C178 126 188 128 198 136" stroke="#3e2c23" stroke-width="4" stroke-linecap="round"/>
-  <ellipse cx="137" cy="147" rx="5" ry="6" fill="#111827"/>
-  <ellipse cx="183" cy="147" rx="5" ry="6" fill="#111827"/>
-  <path d="M160 151V163" stroke="#b78a73" stroke-width="3" stroke-linecap="round"/>
-  <path d="M138 173C148 181 173 181 182 173" stroke="#8d6758" stroke-width="4" stroke-linecap="round"/>
-  <path d="M109 223C126 212 143 207 160 207C177 207 194 212 211 223" stroke="#39f3a6" stroke-opacity="0.34" stroke-width="3" stroke-linecap="round"/>
-  <path d="M84 140L116 132" stroke="#39f3a6" stroke-width="4" stroke-linecap="round" stroke-opacity="0.84"/><path d="M84 157H124" stroke="#57f8ff" stroke-width="3" stroke-linecap="round" stroke-opacity="0.4"/>
+
+  <!-- 背景 -->
+  <rect width="320" height="320" rx="48" fill="url(#ly-bg)"/>
+  <circle cx="160" cy="110" r="150" fill="url(#ly-glow)"/>
+
+  <!-- 服装 - 工装/夹克 -->
+  <path d="M70 280 L110 195 L160 170 L210 195 L250 280 Z" fill="#1a2820"/>
+  <path d="M132 192 L160 208 L188 192 L160 320 Z" fill="#10b981" opacity="0.25"/>
+  <rect x="148" y="230" width="24" height="8" rx="2" fill="#10b981" opacity="0.4"/>
+
+  <!-- 头部 - 放大 -->
+  <ellipse cx="160" cy="128" rx="79" ry="91" fill="#d4a87a"/>
+
+  <!-- 发型 - 短发、硬朗、略乱 -->
+  <path d="M81 98 Q79 43 160 36 Q241 43 239 98 Q235 88 223 75 Q198 57 160 55 Q122 57 97 75 Q85 88 81 98 Z" fill="#2a2520"/>
+  <path d="M92 82 Q98 70 108 62" stroke="#1a1510" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M228 82 Q222 70 212 62" stroke="#1a1510" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M115 68 L125 75" stroke="#1a1510" stroke-width="2" stroke-linecap="round"/>
+  <path d="M205 68 L195 75" stroke="#1a1510" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- 眉毛 - 浓眉、自然 -->
+  <path d="M113 113 Q128 109 148 112" stroke="#3a2a20" stroke-width="5" stroke-linecap="round"/>
+  <path d="M172 112 Q192 109 207 113" stroke="#3a2a20" stroke-width="5" stroke-linecap="round"/>
+
+  <!-- 眼睛 - 坚定、直视 -->
+  <ellipse cx="128" cy="137" rx="8" ry="10" fill="#2a2520"/>
+  <ellipse cx="192" cy="137" rx="8" ry="10" fill="#2a2520"/>
+  <circle cx="130" cy="135" r="3" fill="#10b981" opacity="0.8"/>
+  <circle cx="194" cy="135" r="3" fill="#10b981" opacity="0.8"/>
+
+  <!-- 鼻子 -->
+  <path d="M160 144 L160 165" stroke="#c49870" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M155 165 Q160 167 165 165" stroke="#c49870" stroke-width="2.5"/>
+
+  <!-- 嘴 - 微笑、亲和 -->
+  <path d="M140 184 Q160 189 180 184" stroke="#9a7a5a" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- 标志性元素 - 对讲机/通讯设备 -->
+  <rect x="68" y="135" width="12" height="28" rx="3" fill="#10b981" opacity="0.6"/>
+  <circle cx="74" cy="145" r="2.5" fill="#10b981"/>
+  <rect x="70" y="155" width="8" height="3" rx="1" fill="#10b981" opacity="0.8"/>
+  <path d="M74 163 L74 170" stroke="#10b981" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
 </svg>

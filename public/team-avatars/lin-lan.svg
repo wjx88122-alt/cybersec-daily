@@ -1,36 +1,55 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 林岚 - 市场洞察官：敏锐、优雅、前瞻性 -->
   <defs>
-    <linearGradient id="ll-bg" x1="18" y1="10" x2="302" y2="310" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#04111d"/>
-      <stop offset="0.56" stop-color="#0b1d31"/>
-      <stop offset="1" stop-color="#030710"/>
+    <linearGradient id="ll-bg" x1="0" y1="0" x2="320" y2="320">
+      <stop stop-color="#1a0f2e"/>
+      <stop offset="1" stop-color="#2d1b4e"/>
     </linearGradient>
-    <radialGradient id="ll-halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 102) rotate(90) scale(130)">
-      <stop stop-color="#63f3ff" stop-opacity="0.92"/>
-      <stop offset="1" stop-color="#63f3ff" stop-opacity="0"/>
+    <radialGradient id="ll-glow" cx="0.5" cy="0.3">
+      <stop stop-color="#a78bfa" stop-opacity="0.2"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="ll-suit" x1="160" y1="204" x2="160" y2="308" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#10233a"/>
-      <stop offset="1" stop-color="#06101a"/>
-    </linearGradient>
   </defs>
-  <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#ll-bg)"/>
-  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#63f3ff" stroke-opacity="0.16" stroke-width="2"/>
-  <circle cx="160" cy="106" r="118" fill="url(#ll-halo)"/>
-  <path d="M44 258H276" stroke="#8cffdb" stroke-opacity="0.08" stroke-width="2"/>
-  <path d="M44 278H276" stroke="#8cffdb" stroke-opacity="0.08" stroke-width="2"/>
-  <path d="M60 310L80 232L104 204C121 182 140 172 160 172C180 172 199 182 216 204L240 232L260 310H60Z" fill="url(#ll-suit)"/>
-  <path d="M124 191L160 224L196 191L210 208L187 310H133L110 208L124 191Z" fill="#f1f7fb"/>
-  <path d="M145 193L160 211L175 193L182 310H138L145 193Z" fill="#86ffe7" fill-opacity="0.9"/>
-  <ellipse cx="160" cy="147" rx="61" ry="74" fill="#e8c6b2"/>
-  <path d="M111 167C124 177 138 182 160 182C182 182 196 177 209 167" fill="#000" fill-opacity="0.06"/>
-  <path d="M88 121C96 72 126 42 171 42C207 42 232 66 239 117C230 102 216 92 198 90C192 67 177 56 161 55C135 54 109 79 88 121Z" fill="#09131d"/>
-  <path d="M123 136C132 128 142 125 152 126" stroke="#3e2c23" stroke-width="4" stroke-linecap="round"/>
-  <path d="M168 126C178 125 188 128 197 136" stroke="#3e2c23" stroke-width="4" stroke-linecap="round"/>
-  <ellipse cx="137" cy="147" rx="5" ry="6" fill="#111827"/>
-  <ellipse cx="183" cy="147" rx="5" ry="6" fill="#111827"/>
-  <path d="M160 151V163" stroke="#b78a73" stroke-width="3" stroke-linecap="round"/>
-  <path d="M139 173C148 180 172 180 181 173" stroke="#8d6758" stroke-width="4" stroke-linecap="round"/>
-  <path d="M109 223C126 212 143 207 160 207C177 207 194 212 211 223" stroke="#63f3ff" stroke-opacity="0.34" stroke-width="3" stroke-linecap="round"/>
-  <path d="M227 117L264 100" stroke="#63f3ff" stroke-width="4" stroke-linecap="round" stroke-opacity="0.82"/><path d="M235 134H278" stroke="#8cffdb" stroke-width="3" stroke-linecap="round" stroke-opacity="0.42"/>
+
+  <!-- 背景 -->
+  <rect width="320" height="320" rx="48" fill="url(#ll-bg)"/>
+  <circle cx="160" cy="110" r="150" fill="url(#ll-glow)"/>
+
+  <!-- 服装 - 职业套装 -->
+  <path d="M70 280 L110 195 L160 168 L210 195 L250 280 Z" fill="#1a1030"/>
+  <path d="M135 190 L160 210 L185 190 L160 320 Z" fill="#c084fc" opacity="0.3"/>
+
+  <!-- 头部 - 放大 -->
+  <ellipse cx="160" cy="125" rx="78" ry="90" fill="#e8c4a8"/>
+
+  <!-- 发型 - 中长发、波浪、有层次 -->
+  <path d="M82 95 Q80 45 160 38 Q240 45 238 95 Q234 125 225 145 L215 160 Q210 172 203 185 L190 200 Q178 207 160 207 Q142 207 130 200 L117 185 Q110 172 105 160 L95 145 Q86 125 82 95 Z" fill="#2a1a3a"/>
+  <path d="M95 105 Q102 75 160 68 Q218 75 225 105" stroke="#1a0a2a" stroke-width="2.5" fill="none"/>
+  <path d="M90 125 Q96 145 108 160" stroke="#1a0a2a" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <path d="M230 125 Q224 145 212 160" stroke="#1a0a2a" stroke-width="2.5" fill="none" opacity="0.5"/>
+
+  <!-- 眉毛 - 细长、上扬 -->
+  <path d="M115 108 Q128 105 148 108" stroke="#3a2a4a" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M172 108 Q192 105 205 108" stroke="#3a2a4a" stroke-width="3.5" stroke-linecap="round"/>
+
+  <!-- 眼睛 - 明亮、有神 -->
+  <ellipse cx="130" cy="132" rx="8" ry="10" fill="#2a1a3a"/>
+  <ellipse cx="190" cy="132" rx="8" ry="10" fill="#2a1a3a"/>
+  <circle cx="132" cy="130" r="3" fill="#a78bfa"/>
+  <circle cx="192" cy="130" r="3" fill="#a78bfa"/>
+
+  <!-- 鼻子 -->
+  <path d="M160 138 L160 158" stroke="#d4a890" stroke-width="3" stroke-linecap="round"/>
+  <path d="M155 158 Q160 160 165 158" stroke="#d4a890" stroke-width="2.5"/>
+
+  <!-- 嘴 - 微笑、自信 -->
+  <path d="M140 178 Q160 184 180 178" stroke="#a86a5a" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- 耳环 - 优雅配饰 -->
+  <circle cx="82" cy="145" r="6" fill="#a78bfa" opacity="0.8"/>
+  <circle cx="238" cy="145" r="6" fill="#a78bfa" opacity="0.8"/>
+
+  <!-- 装饰元素 - 趋势线 -->
+  <path d="M45 90 L65 72 L85 84 L105 62" stroke="#a78bfa" stroke-width="2.5" stroke-linecap="round" opacity="0.5"/>
+  <circle cx="105" cy="62" r="4" fill="#a78bfa" opacity="0.7"/>
 </svg>
