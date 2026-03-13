@@ -1,40 +1,43 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="ll-bg" x1="22" y1="10" x2="298" y2="310" gradientUnits="userSpaceOnUse">
+    <linearGradient id="ll-bg" x1="18" y1="10" x2="302" y2="310" gradientUnits="userSpaceOnUse">
       <stop stop-color="#03101D"/>
-      <stop offset="0.55" stop-color="#0A1B30"/>
-      <stop offset="1" stop-color="#040813"/>
+      <stop offset="0.56" stop-color="#0A1D31"/>
+      <stop offset="1" stop-color="#030710"/>
     </linearGradient>
-    <radialGradient id="ll-halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 90) rotate(90) scale(122)">
-      <stop stop-color="#55F6FF" stop-opacity="0.92"/>
-      <stop offset="1" stop-color="#55F6FF" stop-opacity="0"/>
+    <radialGradient id="ll-halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(160 96) rotate(90) scale(132)">
+      <stop stop-color="#60F5FF" stop-opacity="0.94"/>
+      <stop offset="1" stop-color="#60F5FF" stop-opacity="0"/>
     </radialGradient>
-    <linearGradient id="ll-jacket" x1="160" y1="184" x2="160" y2="294" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#102037"/>
-      <stop offset="1" stop-color="#050C17"/>
+    <linearGradient id="ll-suit" x1="160" y1="196" x2="160" y2="306" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#11243B"/>
+      <stop offset="1" stop-color="#06101A"/>
     </linearGradient>
-    <linearGradient id="ll-visor" x1="120" y1="120" x2="199" y2="120" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#50F7FF"/>
-      <stop offset="1" stop-color="#8BFFDA"/>
+    <linearGradient id="ll-visor" x1="110" y1="142" x2="210" y2="142" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#60F5FF"/>
+      <stop offset="1" stop-color="#96FFD8"/>
     </linearGradient>
   </defs>
   <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#ll-bg)"/>
-  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#50F7FF" stroke-opacity="0.18" stroke-width="2"/>
-  <path d="M46 56L118 56" stroke="#50F7FF" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
-  <path d="M202 56H274" stroke="#8BFFDA" stroke-opacity="0.2" stroke-width="3" stroke-linecap="round"/>
-  <path d="M42 248H278" stroke="#7DD3FC" stroke-opacity="0.08"/>
-  <path d="M42 268H278" stroke="#7DD3FC" stroke-opacity="0.08"/>
-  <circle cx="160" cy="92" r="104" fill="url(#ll-halo)"/>
-  <path d="M96 292L108 214L125 191C136 179 148 173 160 173C172 173 184 179 195 191L212 214L224 292H96Z" fill="url(#ll-jacket)"/>
-  <path d="M132 182L160 210L188 182L200 198L181 292H139L120 198L132 182Z" fill="#EDF4FB"/>
-  <ellipse cx="160" cy="120" rx="39" ry="49" fill="#E7C5AF"/>
-  <path d="M120 108C124 83 136 60 160 60C187 60 201 73 209 93C199 86 189 84 179 84C154 84 137 92 120 108Z" fill="#091521"/>
-  <path d="M122 104C138 72 151 62 174 62C193 62 206 76 210 98C204 123 188 146 166 150C146 153 128 142 119 122C116 116 117 110 122 104Z" fill="#07131E" fill-opacity="0.78"/>
-  <path d="M121 122H198" stroke="url(#ll-visor)" stroke-width="8" stroke-linecap="round"/>
-  <path d="M137 140C145 147 175 147 183 140" stroke="#8F6A58" stroke-width="4" stroke-linecap="round"/>
-  <path d="M204 104L230 92" stroke="#50F7FF" stroke-width="3" stroke-linecap="round" stroke-opacity="0.84"/>
-  <path d="M208 118H244" stroke="#50F7FF" stroke-width="2" stroke-linecap="round" stroke-opacity="0.5"/>
-  <circle cx="231" cy="92" r="4" fill="#8BFFDA"/>
-  <path d="M92 230C116 220 136 216 160 216C184 216 204 220 228 230" stroke="#50F7FF" stroke-opacity="0.24" stroke-width="3" stroke-linecap="round"/>
-  <path d="M116 248H204" stroke="#8BFFDA" stroke-opacity="0.16" stroke-width="2"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#60F5FF" stroke-opacity="0.18" stroke-width="2"/>
+  <path d="M46 58L120 58" stroke="#60F5FF" stroke-opacity="0.16" stroke-width="3" stroke-linecap="round"/>
+  <path d="M202 58H276" stroke="#96FFD8" stroke-opacity="0.18" stroke-width="3" stroke-linecap="round"/>
+  <path d="M42 250H278" stroke="#96FFD8" stroke-opacity="0.08" stroke-width="2"/>
+  <path d="M42 270H278" stroke="#96FFD8" stroke-opacity="0.08" stroke-width="2"/>
+  <circle cx="160" cy="102" r="116" fill="url(#ll-halo)"/>
+  <path d="M62 310L78 228L102 201C119 181 138 172 160 172C182 172 201 181 218 201L242 228L258 310H62Z" fill="url(#ll-suit)"/>
+  <path d="M124 188L160 222L196 188L210 206L186 310H134L110 206L124 188Z" fill="#F2F7FB"/>
+  <path d="M146 190L160 208L174 190L181 310H139L146 190Z" fill="#7EF8E6" fill-opacity="0.88"/>
+  <ellipse cx="160" cy="145" rx="60" ry="72" fill="#E8C6B2"/>
+  M92 120C102 68 132 44 172 44C207 44 234 69 238 117C228 101 214 90 196 88C187 61 169 52 150 53C130 54 112 77 92 120Z
+  <path d="M110 142H210" stroke="url(#ll-visor)" stroke-width="8" stroke-linecap="round"/>
+  <path d="M123 134C132 126 142 123 152 124" stroke="#3F2C22" stroke-width="4" stroke-linecap="round"/><path d="M170 124C179 123 189 126 198 134" stroke="#3F2C22" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="137" cy="145" r="5" fill="#0B1120"/>
+  <circle cx="183" cy="145" r="5" fill="#0B1120"/>
+  <path d="M160 148V160" stroke="#B98D77" stroke-width="3" stroke-linecap="round"/>
+  <path d="M138 171C147 179 173 179 182 171" stroke="#8D6756" stroke-width="4" stroke-linecap="round"/>
+  <path d="M110 220C126 209 142 204 160 204C178 204 194 209 210 220" stroke="#60F5FF" stroke-opacity="0.54" stroke-width="3" stroke-linecap="round"/>
+  <path d="M96 250H224" stroke="#96FFD8" stroke-opacity="0.14" stroke-width="2"/>
+  <path d="M110 270H210" stroke="#96FFD8" stroke-opacity="0.1" stroke-width="2"/>
+  <path d="M228 111L264 95" stroke="#60F5FF" stroke-width="4" stroke-linecap="round" stroke-opacity="0.88"/><path d="M236 128H278" stroke="#96FFD8" stroke-width="3" stroke-linecap="round" stroke-opacity="0.52"/><circle cx="266" cy="95" r="5" fill="#96FFD8"/><path d="M98 244C126 231 146 227 160 227C174 227 194 231 222 244" stroke="#60F5FF" stroke-opacity="0.24" stroke-width="4" stroke-linecap="round"/>
 </svg>
