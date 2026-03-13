@@ -58,11 +58,16 @@ export function isLikelyUntranslated(item: FeedItem) {
 
   const titleLooksChinese = isChinese(title);
   const summaryLooksChinese = isChinese(summary);
+  const needsTitleTranslation = Boolean(title) && !titleLooksChinese;
+  const needsSummaryTranslation = Boolean(summary) && !summaryLooksChinese;
 
   const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
   const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
 
-  return !titleZh || !summaryZh || titleCopiedFromSource || summaryCopiedFromSource;
+  return (
+    (needsTitleTranslation && (!titleZh || titleCopiedFromSource)) ||
+    (needsSummaryTranslation && (!summaryZh || summaryCopiedFromSource))
+  );
 }
 
 function createTranslationHealth(
