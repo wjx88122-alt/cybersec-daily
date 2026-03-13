@@ -76,6 +76,18 @@ export type DecisionCase = {
 
 export type DecisionArchiveStatus = "active" | "settled" | "shipped";
 
+export type DecisionArchiveDecompositionItem = {
+  title: string;
+  detail: string;
+  owner: RoleId;
+};
+
+export type DecisionArchiveExecutionItem = {
+  role: RoleId;
+  task: string;
+  output: string;
+};
+
 export type DecisionArchiveEntry = {
   id: string;
   archiveNo: string;
@@ -85,6 +97,9 @@ export type DecisionArchiveEntry = {
   question: string;
   answer: string;
   publicProcess: string[];
+  decomposition: DecisionArchiveDecompositionItem[];
+  execution: DecisionArchiveExecutionItem[];
+  synthesis: string;
   result: string;
   adoptedVersion: string;
   relatedPages: { label: string; href: string }[];
@@ -612,6 +627,52 @@ export const DECISION_ARCHIVE: DecisionArchiveEntry[] = [
       "再从产品定义收口：下一代 AI 防火墙的价值不在“更聪明地看流量”，而在“更稳定地约束 AI 决策与执行”。",
       "最后用可落地路线图表达：先做 AI egress / 模型访问控制，再延伸到 agent tool governance、RAG / context 安全、审批审计与行为分析。",
     ],
+    decomposition: [
+      {
+        title: "问题重写：先定义这是范式迁移，不是功能微调",
+        detail: "先把问题从“防火墙加什么 AI 能力”重写成“AI 时代企业究竟需要什么新的安全控制层”，避免一开始就陷入 feature 讨论。",
+        owner: "chief",
+      },
+      {
+        title: "外部变化拆解：区分旧控制面和新增控制面",
+        detail: "把传统边界防火墙继续负责的流量、会话、边界控制，与 AI 新增的 prompt、context、tool call、output、action 控制面拆开。",
+        owner: "intel",
+      },
+      {
+        title: "产品定义：把新增控制面压成模块",
+        detail: "将 AI Runtime Security Control Plane 拆成身份、策略、tool governance、output firewall、审批、RAG security、审计回放等能力模块。",
+        owner: "product",
+      },
+      {
+        title: "表达压缩：把结论改成高层可直接使用的话",
+        detail: "把复杂技术判断压成一句清晰定义：下一代 AI 防火墙是企业 AI / Agent 的执行安全控制层。",
+        owner: "studio",
+      },
+    ],
+    execution: [
+      {
+        role: "chief",
+        task: "判定问题类型并设计主判断框架。",
+        output: "明确这是一条网络安全产品范式升级命题，后续讨论必须围绕“控制对象改变”展开。",
+      },
+      {
+        role: "intel",
+        task: "拆解 AI 时代新增风险对象和攻击面。",
+        output: "沉淀出 prompt / context / tool call / output / action 五类新增控制对象。",
+      },
+      {
+        role: "product",
+        task: "把判断转成产品定义与演进路线。",
+        output: "形成 AI egress、tool governance、RAG security、approval、audit 等模块化路线图。",
+      },
+      {
+        role: "studio",
+        task: "把定义改写成老板和客户都能带走的版本。",
+        output: "输出“AI Runtime Security Control Plane / AI 执行防火墙”的统一口径。",
+      },
+    ],
+    synthesis:
+      "最终由沈策把顾闻的控制面拆解、纪衡的产品模块和苏墨的高层口径合并成一个完整结论：传统防火墙继续做底座，新增一层面向 AI / Agent 执行链的安全控制层，作为下一代 AI 防火墙的核心定义。",
     result:
       "形成产品定义方向：下一代 AI 防火墙 = AI Runtime Security Control Plane / AI 执行防火墙；核心模块包括模型与 agent 身份、prompt/context policy、tool use governance、output firewall、action approval、RAG security、agent behavior analytics、audit & replay。",
     adoptedVersion: "AI Firewall Product Thesis v1.0",
@@ -640,6 +701,52 @@ export const DECISION_ARCHIVE: DecisionArchiveEntry[] = [
       "随后评估工程可持续性：如果深度 fork，上游快速迭代会带来持续适配成本；因此应优先选 sidecar / proxy / wrapper 的低耦合形态，只依赖稳定接口并建立自动兼容测试。",
       "最后结合现有产品做组合收口：把 EDR 升级为 Agent Runtime Security，把防火墙升级为 Agent Network Guard，把管理控制台升级为 Agent Governance Console，形成真正能拦、能审、能运营的企业方案。",
     ],
+    decomposition: [
+      {
+        title: "方向判断：先决定值不值得进入 Agent 安全赛道",
+        detail: "把 OpenClaw 的安全问题放到更大的 Agent Runtime 风险里看，先判断这是不是一个足够大的产品机会。",
+        owner: "chief",
+      },
+      {
+        title: "威胁建模：识别 Agent 的真实高风险点",
+        detail: "围绕命令执行、文件读写、跨渠道动作、出网和密钥接触，拆出为什么 Agent 比传统 Copilot 更危险。",
+        owner: "intel",
+      },
+      {
+        title: "架构拆解：把 Secure Layer 模块化",
+        detail: "把入口鉴权、策略引擎、工具 broker、沙箱、密钥 broker、审计检测拆成 6 个可独立演进的模块。",
+        owner: "product",
+      },
+      {
+        title: "方案封装：把现有产品能力并入整体方案",
+        detail: "把 EDR、防火墙、控制台分别映射成 Agent Runtime Security、Agent Network Guard、Agent Governance Console。",
+        owner: "studio",
+      },
+    ],
+    execution: [
+      {
+        role: "chief",
+        task: "确定产品切入点不是“更强 Agent”，而是“更可控 Agent”。",
+        output: "把问题从 OpenClaw 单品安全升级为企业级 Agent Security 方向。",
+      },
+      {
+        role: "intel",
+        task: "给出 Agent 风险的威胁视角和市场缺口。",
+        output: "明确企业最稀缺的是可审计、可隔离、可阻断的 Agent 运行环境。",
+      },
+      {
+        role: "product",
+        task: "确定产品形态与工程边界。",
+        output: "提出 sidecar / proxy / wrapper 路线，避免深度 fork，并沉淀 6 模块架构。",
+      },
+      {
+        role: "studio",
+        task: "把零散能力写成可卖的组合方案。",
+        output: "形成“Secure OpenClaw Layer + EDR + 防火墙 + 控制台”的统一方案口径。",
+      },
+    ],
+    synthesis:
+      "最终汇总不是把 OpenClaw 做成一个封闭 fork，而是把它当成第一个适配对象：外层由策略、审批、沙箱、密钥隔离和审计能力接管，内层继续复用 OpenClaw 的对话与工具编排，形成一套可持续演进的 Agent Security Layer。",
     result:
       "形成产品方向：不做深度 fork，优先做 Secure OpenClaw / Agent Security Layer；同时明确 6 个核心模块（Ingress Gateway、Policy Engine、Tool Broker、Sandbox Runtime、Secret Broker、Audit + Detection），并沉淀为首版产品策略档案。",
     adoptedVersion: "Secure OpenClaw / Agent Security Thesis v1.0",
@@ -668,6 +775,62 @@ export const DECISION_ARCHIVE: DecisionArchiveEntry[] = [
       "同时把客户需求与对手动作放在一起看：客户开始从“买安全产品”转向“买业务可控、AI 可用、数据不出事、运维更省人”，而主流厂商正在围绕平台化、场景化和生态化重组竞争。",
       "最后收口为三个管理动作：把 AI 安全升级为一级战略，以 SASE / 零信任做一体化入口，并在 2026 年就提前抢占智算安全卡位。",
     ],
+    decomposition: [
+      {
+        title: "判断框架：先把问题从“四选一”改成“角色分工”",
+        detail: "先不急着给排名，而是先看各方向在未来三年分别承担新增市场、规模入口、平台底座还是竞争护城河的哪种角色。",
+        owner: "chief",
+      },
+      {
+        title: "机会扫描：看哪里真有预算和窗口",
+        detail: "围绕 AI 上线、算力建设、访问重构、远程协同等趋势，识别最可能形成新增预算和复制场景的方向。",
+        owner: "market",
+      },
+      {
+        title: "竞争拆解：把客户需求与对手动作对齐",
+        detail: "把奇安信、深信服、华为、启明星辰等厂商的主线动作，与客户采购逻辑一起比对，看哪些方向更容易形成强竞争与差异化空间。",
+        owner: "intel",
+      },
+      {
+        title: "产品结构：把四个方向装进同一战略版图",
+        detail: "把 AI 驱动安全、智算安全、SASE、零信任分别映射到能力底座、新增市场、规模入口和平台底座的位置。",
+        owner: "product",
+      },
+      {
+        title: "管理表达：把长报告压成一页结论",
+        detail: "把复杂分析压成管理层可直接拍板的三条动作建议和年度优先级。",
+        owner: "studio",
+      },
+    ],
+    execution: [
+      {
+        role: "chief",
+        task: "设定判断口径和最终排序逻辑。",
+        output: "明确这是三年资源配置问题，不是四个方向平均下注。",
+      },
+      {
+        role: "market",
+        task: "判断四个方向的预算属性与增长窗口。",
+        output: "确认 AI 驱动安全和智算安全最接近新增预算，SASE 最接近规模化入口。",
+      },
+      {
+        role: "intel",
+        task: "扫描主流厂商动作与竞争格局。",
+        output: "识别出平台化、场景化、生态化正在成为未来三年的主竞争逻辑。",
+      },
+      {
+        role: "product",
+        task: "把排序转成可执行的产品线结构。",
+        output: "形成 AI 安全升格、SASE/零信任一体化、智算安全卡位三条主动作。",
+      },
+      {
+        role: "studio",
+        task: "沉淀成管理层能直接使用的报告与摘要。",
+        output: "产出《中国政企网络安全机会分析》成稿及一页式结论。",
+      },
+    ],
+    synthesis:
+      "最终由沈策把林岚的机会判断、顾闻的竞争拆解、纪衡的产品结构和苏墨的管理表达压成统一答案：AI 驱动安全与智算安全要优先抢位，SASE 负责规模入口，零信任则作为平台底座继续整合而不是单独讲故事。",
     result:
       "形成《2026-2028 中国政企网络安全机会分析》完整报告，并沉淀出年度战略动作：AI 安全升格、SASE/零信任一体化推进、2026 抢智算安全样板项目与生态卡位。",
     adoptedVersion: "中国政企网络安全机会分析 v1.0",
@@ -696,6 +859,62 @@ export const DECISION_ARCHIVE: DecisionArchiveEntry[] = [
       "随后把产品讲法改成方案讲法：围绕行业场景、组合打法、销售异议处理和渠道作战口诀，把“单品参数”压缩为“入口能拦、终端能查、事件能闭环”的业务闭环。",
       "最后收口为可直接使用的大会资产：标题、副标题、14 页 PPT 框架、行业打法、渠道话术、销售话术和 8~10 分钟演讲稿，保证销售与渠道可直接复制。",
     ],
+    decomposition: [
+      {
+        title: "大会主线：先定“讲什么”，不是先堆内容",
+        detail: "先决定大会不是做技术秀，而是要把 AI 安全讲成一套能出货的业务方案。",
+        owner: "chief",
+      },
+      {
+        title: "市场视角：判断渠道最容易复制的机会点",
+        detail: "围绕客户焦虑、预算基础、可复制性和服务空间，判断哪些产品和场景最适合渠道主推。",
+        owner: "market",
+      },
+      {
+        title: "威胁与证据：给“AI 对抗 AI”补上现实支撑",
+        detail: "把 AI 威胁升级、客户采购逻辑和行业现实证据补齐，避免方案只剩口号。",
+        owner: "intel",
+      },
+      {
+        title: "前线验证：把方案改成销售能讲、客户能听的版本",
+        detail: "从客户视角验证防火墙和 EDR 为什么是当前最容易成交、最容易做联动扩展的两类产品。",
+        owner: "field",
+      },
+      {
+        title: "成册表达：把结论落成大会资产包",
+        detail: "把主标题、副标题、PPT 框架、演讲稿、行业打法和渠道话术整合成完整材料。",
+        owner: "studio",
+      },
+    ],
+    execution: [
+      {
+        role: "chief",
+        task: "确定大会最终想卖的不是技术，而是业务闭环。",
+        output: "明确“AI 对抗 AI”必须被讲成一套可成交、可复制、可服务化的方案。",
+      },
+      {
+        role: "market",
+        task: "筛选最适合渠道复制的场景和产品。",
+        output: "确认防火墙和 EDR 同时满足新需求、老预算、易复制、可服务化四个条件。",
+      },
+      {
+        role: "intel",
+        task: "补足威胁演进、行业数据和外部证据。",
+        output: "形成 AI 威胁升级与客户采购逻辑的事实支撑。",
+      },
+      {
+        role: "field",
+        task: "把方案转换成销售与渠道可用的话术。",
+        output: "沉淀出客户异议处理、行业场景打法和成交口诀。",
+      },
+      {
+        role: "studio",
+        task: "形成大会可直接使用的物料。",
+        output: "输出完整 Markdown / HTML / PDF 大会资产包和 8~10 分钟演讲稿。",
+      },
+    ],
+    synthesis:
+      "最后的汇总方式不是把大家的观点并排摆出来，而是由沈策先收主线、陆野校验成交逻辑、苏墨统一语言，最终把整场大会压成一句话：用 AI 升级防火墙，用 AI 强化 EDR，用边界 + 终端联动方案把“AI 对抗 AI”从概念变成订单。",
     result:
       "产出《AI 对抗 AI：渠道伙伴大会内容体系》完整材料（Markdown / HTML / PDF），可直接用于大会演讲、销售培训和渠道复制，并明确防火墙 + EDR 是当前最适合规模化推广的两类 AI 安全产品。",
     adoptedVersion: "AI 对抗 AI 渠道大会内容体系 v1.0",

@@ -426,6 +426,53 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
         </div>
       </div>
 
+      <div className="mt-4 grid gap-4 xl:grid-cols-2">
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            任务分解
+          </p>
+          <div className="mt-3 space-y-3">
+            {entry.decomposition.map((item) => (
+              <div key={item.title} className="panel-deep rounded-xl p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-sm font-semibold leading-6 text-[#f0f6fc]">{item.title}</p>
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+                    {ROLE_NAME_MAP[item.owner]}
+                  </span>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{item.detail}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="panel-soft rounded-2xl p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+            角色执行
+          </p>
+          <div className="mt-3 space-y-3">
+            {entry.execution.map((item) => (
+              <div key={`${item.role}-${item.task}`} className="panel-deep rounded-xl p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#dbe4ee]">
+                    {ROLE_NAME_MAP[item.role]}
+                  </span>
+                  <p className="text-sm font-semibold leading-6 text-[#f0f6fc]">{item.task}</p>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{item.output}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-4 panel-deep rounded-2xl p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+          最终汇总
+        </p>
+        <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{entry.synthesis}</p>
+      </div>
+
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="panel-accent rounded-2xl p-4">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">

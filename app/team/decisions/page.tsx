@@ -18,7 +18,7 @@ import {
 export const metadata: Metadata = {
   title: "决策档案 | 总裁辅助团队",
   description:
-    "只归档网络安全相关的提问、团队回答、公开决策过程与结果，并支持按关键词、状态与角色查询。",
+    "只归档网络安全相关的提问、团队回答、任务分解、角色执行、公开过程与结果，并支持按关键词、状态与角色查询。",
 };
 
 type DecisionArchivePageProps = {
@@ -52,6 +52,9 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
       entry.result,
       entry.adoptedVersion,
       ...entry.publicProcess,
+      ...entry.decomposition.flatMap((item) => [item.title, item.detail, ROLE_NAME_MAP[item.owner]]),
+      ...entry.execution.flatMap((item) => [item.task, item.output, ROLE_NAME_MAP[item.role]]),
+      entry.synthesis,
       ...entry.tags,
       ...entry.relatedMilestones,
       ...entry.relatedPages.map((page) => page.label),
@@ -105,7 +108,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
                   只把<span className="gradient-text">网络安全相关问答</span>沉淀进决策档案。
                 </h1>
                 <p className="mt-4 max-w-3xl text-sm leading-7 text-[#94a3b8] sm:text-base">
-                  这里不再收录团队架构、页面结构或产品组织类问题，只归档网络安全相关的提问、团队回答、回答形成过程，以及最后产生的结果与后续动作。每条记录还带有编号、提问时间、最终采用版本、关联页面与关联里程碑，支持按关键词、状态、角色检索。
+                  这里不再收录团队架构、页面结构或产品组织类问题，只归档网络安全相关的提问、团队回答、任务怎么分解、各角色分别做了什么、最后如何统一收口，以及最终产生的结果与后续动作。每条记录还带有编号、提问时间、最终采用版本、关联页面与关联里程碑，支持按关键词、状态、角色检索。
                 </p>
                 <p className="mt-3 max-w-3xl text-sm leading-6 text-[#64748b]">
                   当前范围：{DECISION_ARCHIVE_SCOPE}。为了保持边界清晰，这里归档的是公开决策过程，不展示内部隐藏推理链路。
@@ -117,7 +120,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
                   Archive Rules
                 </p>
                 <ul className="mt-4 space-y-3 text-sm leading-6 text-[#dbe4ee]">
-                  <li>• 每条记录都包含：提问 / 团队回答 / 公开过程 / 结果</li>
+                  <li>• 每条记录都包含：提问 / 团队回答 / 任务分解 / 角色执行 / 最终汇总 / 结果</li>
                   <li>• 只收录网络安全相关问答</li>
                   <li>• 团队架构、页面结构、组织设计问题不进入这里</li>
                   <li>• 与“进化历程”互补：一个看网络安全问答，一个看宏观演进主线</li>
@@ -162,6 +165,8 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
                 <li>• question：你的原始提问</li>
                 <li>• answer：团队最终回答</li>
                 <li>• publicProcess：公开可复用的形成过程</li>
+                <li>• decomposition：任务如何被拆下去</li>
+                <li>• execution / synthesis：各角色干了什么，最后如何汇总</li>
                 <li>• result：结果 / 后续动作</li>
                 <li>• archiveNo / askedAt / adoptedVersion / relatedPages / relatedMilestones</li>
               </ul>
@@ -172,7 +177,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
             <SectionTitle
               eyebrow="Query"
               title="按关键词、状态、角色查询"
-              description="可以搜提问内容、团队回答、结果关键词，也可以按角色或状态筛选。"
+              description="可以搜提问、回答、任务分解、角色执行、最终汇总和结果关键词，也可以按角色或状态筛选。"
             />
 
             <form method="get" className="glass glass-premium rounded-3xl p-5">
@@ -186,7 +191,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
                     type="text"
                     name="q"
                     defaultValue={q}
-                    placeholder="例如：DA-003 / 沈策 / v2.1 / 竞品 / 回答 / 林岚"
+                    placeholder="例如：DA-003 / 沈策 / 任务分解 / 汇总 / 智算安全 / EDR"
                     className="panel-deep mt-3 w-full rounded-2xl px-4 py-3 text-sm text-[#f0f6fc] outline-none placeholder:text-[#64748b]"
                   />
                 </label>
@@ -252,7 +257,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
               description={
                 q || status !== "all" || role !== "all"
                   ? `当前筛选到 ${filtered.length} 条记录。`
-                  : "以下记录展示了关键提问、团队回答、形成过程与结果如何被归档为可查询条目。"
+                  : "以下记录展示了关键提问、团队回答、任务分解、角色执行、最终汇总与结果如何被归档为可查询条目。"
               }
             />
 
