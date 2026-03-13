@@ -74,6 +74,62 @@ const POLICY_TEMPLATES = [
   },
 ] as const;
 
+const SECURITY_POLICY_TEMPLATES = [
+  {
+    title: "只放行 Microsoft 365 Optimize 的 HTTPS",
+    summary: "允许办公终端访问 M365 Optimize 地址库的 443 流量。",
+    policyName: "SEC_M365_OPT_PERMIT",
+    objectName: "ISDB_M365_OPTIMIZE",
+    service: "https",
+    action: "permit",
+    note: "如果设备版本支持直接引用 ISP 地址集，可把 `destination-address address-set` 替换成对应 `isp/address-set` 引用方式。",
+    config: `security-policy
+ rule name SEC_M365_OPT_PERMIT
+  source-zone trust
+  destination-zone untrust
+  destination-address address-set ISDB_M365_OPTIMIZE
+  service https
+  action permit`,
+  },
+  {
+    title: "只允许 GitHub HTTPS，其他端口阻断",
+    summary: "先放行 443，再用下一条 deny 规则压掉 GitHub 地址库上的其他服务。",
+    policyName: "SEC_GITHUB_WEBONLY",
+    objectName: "ISDB_GITHUB",
+    service: "https",
+    action: "permit + deny",
+    note: "这类模板要保证 permit 规则排在 deny 规则前面。",
+    config: `security-policy
+ rule name SEC_GITHUB_WEBONLY_PERMIT
+  source-zone trust
+  destination-zone untrust
+  destination-address address-set ISDB_GITHUB
+  service https
+  action permit
+
+ rule name SEC_GITHUB_WEBONLY_DENY
+  source-zone trust
+  destination-zone untrust
+  destination-address address-set ISDB_GITHUB
+  action deny`,
+  },
+  {
+    title: "显式阻断 Sovereign / 非授权云实例",
+    summary: "适合需要把 Azure China / USGov 与默认互联网出口隔离开的场景。",
+    policyName: "SEC_AZURE_SOV_DENY",
+    objectName: "ISDB_AZURE_SOVEREIGN",
+    service: "any",
+    action: "deny",
+    note: "建议放在默认 permit 互联网访问规则之前，避免先被泛放行策略命中。",
+    config: `security-policy
+ rule name SEC_AZURE_SOV_DENY
+  source-zone trust
+  destination-zone untrust
+  destination-address address-set ISDB_AZURE_SOVEREIGN
+  action deny`,
+  },
+] as const;
+
 export default function HuaweiIsdbPage() {
   const today = new Date().toISOString().slice(0, 10);
   const providerMap = new Map(HUAWEI_ISDB_PROVIDERS.map((item) => [item.id, item]));
@@ -448,6 +504,77 @@ curl "https://your-host.example/api/huawei/isdb?bundle=sdwan-core&format=json"`}
                 <p>• Microsoft 365 这里使用官方 Worldwide endpoints Web Service，只抽取其中带 IP 的项目。</p>
                 <p>• 不同华为型号和版本菜单位置可能略有差异，导入前建议先在测试策略上验证命中。</p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        <section className={`${cardCls} p-5`}>
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <div>
+              <h2 className="text-base font-semibold text-slate-950">
+                安全策略模板
+              </h2>
+              <p className="mt-1 text-xs text-slate-600">
+                下面这组模板面向 `security-policy`，用于访问控制，不是做链路选路。
+                如果你设备版本不支持直接在安全策略里引用 ISP 地址集，就把同样的
+                CIDR 导入成 `address-set` 后再引用。
+              </p>
+            </div>
+            <div className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-[11px] text-slate-600">
+              安全策略看“允不允许”，PBR / SD-WAN 看“走哪条链路”
+            </div>
+          </div>
+
+          <div className="mt-4 space-y-4">
+            {SECURITY_POLICY_TEMPLATES.map((item) => (
+              <div
+                key={item.policyName}
+                className="rounded-xl border border-slate-200 bg-slate-50/90 p-4"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-sm font-semibold text-slate-950">
+                      {item.title}
+                    </div>
+                    <div className="mt-1 text-xs text-slate-600">
+                      {item.summary}
+                    </div>
+                  </div>
+                  <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] text-slate-600">
+                    {item.policyName}
+                  </code>
+                </div>
+
+                <pre className={codeBlockCls}>{item.config}</pre>
+
+                <div className="mt-3 grid gap-2 text-[12px] text-slate-600 md:grid-cols-2">
+                  <p>
+                    <span className="text-slate-500">地址对象:</span>{" "}
+                    <code className="text-slate-950">{item.objectName}</code>
+                  </p>
+                  <p>
+                    <span className="text-slate-500">服务对象:</span>{" "}
+                    <code className="text-slate-950">{item.service}</code>
+                  </p>
+                  <p>
+                    <span className="text-slate-500">动作:</span>{" "}
+                    <code className="text-slate-950">{item.action}</code>
+                  </p>
+                  <p>{item.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+            <div className="text-[11px] font-medium text-slate-950">
+              下发顺序建议
+            </div>
+            <div className="mt-2 space-y-1">
+              <p>1. 先导入地址库对象或 ISP 地址集对象。</p>
+              <p>2. 再创建 `permit` 规则。</p>
+              <p>3. 需要做服务收口时，再在后面补一条更宽的 `deny` 规则。</p>
+              <p>4. 最后再看是否需要额外挂到 PBR / SD-WAN 做链路分流。</p>
             </div>
           </div>
         </section>
