@@ -8,8 +8,8 @@ import {
   getDecisionArchiveEntry,
   getRelatedDecisionEntries,
 } from "../../data";
-import type { RoleId } from "../../data";
 import { SectionTitle, TeamTabs } from "../../components";
+import DecisionDiscussionReplay from "../../DecisionDiscussionReplay";
 
 type DecisionDetailPageProps = {
   params: Promise<{ slug: string }>;
@@ -38,59 +38,6 @@ export default async function DecisionDetailPage({ params }: DecisionDetailPageP
   if (!entry) notFound();
 
   const related = getRelatedDecisionEntries(entry.id, 3);
-  const timelineSteps: Array<{
-    phase: string;
-    title: string;
-    body: string;
-    note: string;
-    role?: RoleId;
-    tone: "question" | "decompose" | "execute" | "answer" | "synthesis" | "result";
-  }> = [
-    {
-      phase: "01",
-      title: "提出问题",
-      body: entry.question,
-      note: `提问时间：${entry.askedAt}`,
-      tone: "question",
-    },
-    ...entry.decomposition.map((item, index) => ({
-      phase: `02-${index + 1}`,
-      title: item.title,
-      body: item.detail,
-      note: "任务分解",
-      role: item.owner,
-      tone: "decompose" as const,
-    })),
-    ...entry.execution.map((item, index) => ({
-      phase: `03-${index + 1}`,
-      title: item.task,
-      body: item.output,
-      note: "角色执行",
-      role: item.role,
-      tone: "execute" as const,
-    })),
-    {
-      phase: "04",
-      title: "形成团队回答",
-      body: entry.answer,
-      note: "统一答案",
-      tone: "answer",
-    },
-    {
-      phase: "05",
-      title: "最终汇总",
-      body: entry.synthesis,
-      note: "统一收口",
-      tone: "synthesis",
-    },
-    {
-      phase: "06",
-      title: "结果 / 后续动作",
-      body: entry.result,
-      note: entry.adoptedVersion,
-      tone: "result",
-    },
-  ];
 
   return (
     <div className="min-h-screen overflow-hidden" style={{ background: "var(--bg)" }}>
@@ -159,63 +106,12 @@ export default async function DecisionDetailPage({ params }: DecisionDetailPageP
 
           <section className="mt-14 border-t border-white/6 pt-10">
             <SectionTitle
-              eyebrow="Timeline Demo"
-              title="按时间流演示整个决策过程"
-              description="从提问、拆解、执行、形成回答，到最终汇总和结果，整条链路会沿时间轴自动流动，方便你一眼看出这次决策是怎么长出来的。"
+              eyebrow="Discussion Replay"
+              title="拟人化复现他们讨论这件事的过程"
+              description="每个角色都以名字、身份和头像出场，按真实分工顺序自动发言，让你直观看到是谁先接住问题、谁负责拆解、谁给出判断、谁最后统一收口。"
             />
 
-            <div className="decision-flow glass glass-premium rounded-3xl p-6 sm:p-8">
-              <div className="top-shine" />
-              <div className="mb-6 flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
-                  AUTO PLAY
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
-                  时间流：提问 → 分解 → 执行 → 回答 → 汇总 → 结果
-                </span>
-              </div>
-
-              <div className="decision-flow-track relative pl-14">
-                <div className="decision-flow-line" />
-                <div className="decision-flow-progress" />
-
-                <ol className="space-y-5">
-                  {timelineSteps.map((step, index) => (
-                    <li
-                      key={`${step.phase}-${step.title}`}
-                      className="decision-flow-step relative"
-                      style={{
-                        ["--step-index" as string]: index,
-                        ["--step-count" as string]: timelineSteps.length,
-                      }}
-                    >
-                      <span className={`decision-flow-node decision-flow-node--${step.tone}`} />
-                      <div className={`decision-flow-card decision-flow-card--${step.tone} rounded-2xl p-4 sm:p-5`}>
-                        <div className="flex flex-wrap items-start justify-between gap-3">
-                          <div>
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] font-semibold text-[#94a3b8]">
-                                {step.phase}
-                              </span>
-                              <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#dbe4ee]">
-                                {step.note}
-                              </span>
-                              {step.role && (
-                                <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#dbe4ee]">
-                                  {ROLE_NAME_MAP[step.role]}
-                                </span>
-                              )}
-                            </div>
-                            <h3 className="mt-3 text-lg font-semibold text-[#f0f6fc]">{step.title}</h3>
-                          </div>
-                        </div>
-                        <p className="mt-3 text-sm leading-7 text-[#cdd9e5]">{step.body}</p>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            </div>
+            <DecisionDiscussionReplay entry={entry} />
           </section>
 
           <section className="mt-14 border-t border-white/6 pt-10">
