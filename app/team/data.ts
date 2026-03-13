@@ -624,6 +624,90 @@ export const DECISION_ARCHIVE: DecisionArchiveEntry[] = [
     roles: ["chief", "intel", "product", "studio"],
     status: "settled",
   },
+  {
+    id: "secure-openclaw-layer-strategy",
+    archiveNo: "DA-002",
+    date: "2026-03",
+    askedAt: "2026-03-13 08:07 GMT+8",
+    title: "OpenClaw 安全问题是否值得进入，以及如何定义 Secure OpenClaw Layer",
+    question:
+      "OpenClaw 的安全问题能不能形成新赛道？如果值得做，Secure OpenClaw Layer 应该是什么形态，又如何避免被 OpenClaw 快速迭代拖着反复适配？",
+    answer:
+      "团队回答是：可以做，而且值得做，但不建议做一个深度修改 OpenClaw 内核的“安全版 fork”。更合理的方向是做 Secure OpenClaw Layer / Agent Security Layer：把 OpenClaw 当成首个适配对象，在外层增加策略、审批、沙箱、密钥隔离和审计控制面，并复用现有 EDR、防火墙和管理控制台形成联动闭环。",
+    publicProcess: [
+      "先判断赛道价值：Agent 具备命令执行、文件读写、工具调用和跨渠道动作能力，天然属于高风险执行体，市场真正缺的是可控、可隔离、可审计的企业级运行环境。",
+      "再拆产品边界：OpenClaw 继续负责对话与工具编排，Secure Layer 负责入口鉴权、策略判断、审批、沙箱、密钥托管与全链路审计，避免把安全能力硬塞进上游内核。",
+      "随后评估工程可持续性：如果深度 fork，上游快速迭代会带来持续适配成本；因此应优先选 sidecar / proxy / wrapper 的低耦合形态，只依赖稳定接口并建立自动兼容测试。",
+      "最后结合现有产品做组合收口：把 EDR 升级为 Agent Runtime Security，把防火墙升级为 Agent Network Guard，把管理控制台升级为 Agent Governance Console，形成真正能拦、能审、能运营的企业方案。",
+    ],
+    result:
+      "形成产品方向：不做深度 fork，优先做 Secure OpenClaw / Agent Security Layer；同时明确 6 个核心模块（Ingress Gateway、Policy Engine、Tool Broker、Sandbox Runtime、Secret Broker、Audit + Detection），并沉淀为首版产品策略档案。",
+    adoptedVersion: "Secure OpenClaw / Agent Security Thesis v1.0",
+    relatedPages: [
+      { label: "决策档案", href: "/team/decisions" },
+      { label: "团队总览", href: "/team" },
+    ],
+    relatedMilestones: ["Agent Security 产品方向", "OpenClaw 安全化归档"],
+    tags: ["OpenClaw", "Agent Security", "AI 安全", "运行时安全", "EDR", "防火墙"],
+    roles: ["chief", "intel", "product", "studio"],
+    status: "settled",
+  },
+  {
+    id: "china-enterprise-cybersecurity-3y-opportunity",
+    archiveNo: "DA-003",
+    date: "2026-03",
+    askedAt: "2026-03-12",
+    title: "未来三年中国政企网络安全最值得押注的方向是什么",
+    question:
+      "未来三年中国政企网络安全最值得押注的方向是什么？AI 驱动安全、智算安全、SASE、零信任该如何排优先级，并分别承担什么战略角色？",
+    answer:
+      "团队回答是：未来三年不是普遍高增长，而是结构性高增长。建议押注顺序为 AI 驱动安全 = 智算安全 > SASE > 零信任：AI 安全要升格为产品线一级战略，智算安全要尽快抢卡位，SASE 作为最清晰的规模入口，而零信任应更多作为平台底座而非单独讲故事。",
+    publicProcess: [
+      "先重写问题：不是在四个方向里平均分配资源，而是要判断哪些方向真正对应新增预算、可复制场景和三年战略价值。",
+      "再按预算属性、商业化清晰度、客户采购逻辑和竞争强度逐项比较 AI 驱动安全、智算安全、SASE 与零信任，识别出谁是新增市场、谁是规模入口、谁更适合作为底座能力。",
+      "同时把客户需求与对手动作放在一起看：客户开始从“买安全产品”转向“买业务可控、AI 可用、数据不出事、运维更省人”，而主流厂商正在围绕平台化、场景化和生态化重组竞争。",
+      "最后收口为三个管理动作：把 AI 安全升级为一级战略，以 SASE / 零信任做一体化入口，并在 2026 年就提前抢占智算安全卡位。",
+    ],
+    result:
+      "形成《2026-2028 中国政企网络安全机会分析》完整报告，并沉淀出年度战略动作：AI 安全升格、SASE/零信任一体化推进、2026 抢智算安全样板项目与生态卡位。",
+    adoptedVersion: "中国政企网络安全机会分析 v1.0",
+    relatedPages: [
+      { label: "决策档案", href: "/team/decisions" },
+      { label: "团队总览", href: "/team" },
+    ],
+    relatedMilestones: ["中国政企网安三年机会分析", "产品线年度战略规划"],
+    tags: ["网络安全", "AI 安全", "智算安全", "SASE", "零信任", "中国政企"],
+    roles: ["chief", "market", "intel", "product", "studio"],
+    status: "shipped",
+  },
+  {
+    id: "ai-vs-ai-channel-conference-system",
+    archiveNo: "DA-004",
+    date: "2026-03",
+    askedAt: "2026-03-12",
+    title: "渠道伙伴大会如何把“AI 对抗 AI”讲成可成交的业务方案",
+    question:
+      "渠道伙伴大会该如何把“AI 对抗 AI”讲成客户愿意买、渠道愿意推、销售愿意复制的业务方案？防火墙和 EDR 在这套叙事里应该扮演什么角色？",
+    answer:
+      "团队回答是：不要泛讲 AI 概念，而要把防火墙和 EDR 定义为 AI 时代最先起量的两个控制点。防火墙负责入口与访问控制，EDR 负责终端与执行闭环；“AI 对抗 AI”要被表达成一套边界 + 终端联动的标准化业务方案，而不是技术口号。",
+    publicProcess: [
+      "先判断大会主线：客户不会为 AI 概念付费，只会为风险降低、效率提升和结果可见付费，因此内容必须先讲威胁升级，再讲控制点重构。",
+      "再锁定最容易起量的产品：在 AI 时代，防火墙仍是入口控制点，EDR 仍是执行落点，二者既有预算基础，又最容易被渠道和客户理解。",
+      "随后把产品讲法改成方案讲法：围绕行业场景、组合打法、销售异议处理和渠道作战口诀，把“单品参数”压缩为“入口能拦、终端能查、事件能闭环”的业务闭环。",
+      "最后收口为可直接使用的大会资产：标题、副标题、14 页 PPT 框架、行业打法、渠道话术、销售话术和 8~10 分钟演讲稿，保证销售与渠道可直接复制。",
+    ],
+    result:
+      "产出《AI 对抗 AI：渠道伙伴大会内容体系》完整材料（Markdown / HTML / PDF），可直接用于大会演讲、销售培训和渠道复制，并明确防火墙 + EDR 是当前最适合规模化推广的两类 AI 安全产品。",
+    adoptedVersion: "AI 对抗 AI 渠道大会内容体系 v1.0",
+    relatedPages: [
+      { label: "决策档案", href: "/team/decisions" },
+      { label: "团队总览", href: "/team" },
+    ],
+    relatedMilestones: ["AI 对抗 AI 渠道大会内容体系", "渠道作战话术库"],
+    tags: ["渠道", "防火墙", "EDR", "AI 安全", "业务方案", "销售话术"],
+    roles: ["chief", "market", "intel", "field", "studio"],
+    status: "shipped",
+  },
 ];
 
 export function getDecisionArchiveEntry(slug: string) {
