@@ -1,5 +1,5 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 沈策 - 总参谋：沉稳、锐利、决断力强 -->
+  <!-- 沈策 - 总参谋：沉稳、锐利、决断力强 - 插画风格 -->
   <defs>
     <linearGradient id="sc-bg" x1="0" y1="0" x2="320" y2="320">
       <stop stop-color="#0a0e1a"/>
@@ -19,35 +19,38 @@
   <path d="M80 280 L120 200 L160 180 L200 200 L240 280 Z" fill="#0d1420"/>
   <path d="M140 200 L160 220 L180 200 L160 320 Z" fill="#1a2030"/>
 
-  <!-- 头部 - 放大到占据主要空间 -->
-  <ellipse cx="160" cy="140" rx="75" ry="85" fill="#d4a574"/>
+  <!-- 头部 - 亚洲人肤色 -->
+  <ellipse cx="160" cy="140" rx="75" ry="85" fill="#f4d4a8"/>
 
-  <!-- 发型 - 短发、整齐、有棱角 -->
-  <path d="M85 110 Q85 50 160 45 Q235 50 235 110 Q230 95 220 85 Q200 70 160 68 Q120 70 100 85 Q90 95 85 110 Z" fill="#1a1a2a"/>
-  <path d="M95 100 Q100 80 160 75 Q220 80 225 100" stroke="#0a0a15" stroke-width="2" fill="none"/>
+  <!-- 发型 - 短发、整齐、黑色 -->
+  <path d="M85 110 Q85 50 160 45 Q235 50 235 110 Q230 95 220 85 Q200 70 160 68 Q120 70 100 85 Q90 95 85 110 Z" fill="#1a1a1a"/>
+  <path d="M95 100 Q100 80 160 75 Q220 80 225 100" stroke="#0a0a0a" stroke-width="2" fill="none"/>
 
-  <!-- 眉毛 - 浓眉、微皱、专注 -->
-  <path d="M115 125 Q125 120 145 122" stroke="#2a2a3a" stroke-width="5" stroke-linecap="round"/>
-  <path d="M175 122 Q195 120 205 125" stroke="#2a2a3a" stroke-width="5" stroke-linecap="round"/>
+  <!-- 眉毛 - 浓黑、平直 -->
+  <path d="M115 125 Q130 123 145 125" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
+  <path d="M175 125 Q190 123 205 125" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
 
-  <!-- 眼睛 - 锐利、深邃 -->
-  <ellipse cx="130" cy="145" rx="8" ry="10" fill="#1a1a2a"/>
-  <ellipse cx="190" cy="145" rx="8" ry="10" fill="#1a1a2a"/>
-  <circle cx="132" cy="143" r="2" fill="#e5ff00" opacity="0.8"/>
-  <circle cx="192" cy="143" r="2" fill="#e5ff00" opacity="0.8"/>
+  <!-- 眼睛 - 细长、深邃 -->
+  <path d="M118 145 Q130 143 142 145" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M178 145 Q190 143 202 145" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <ellipse cx="130" cy="145" rx="4" ry="5" fill="#1a1a1a"/>
+  <ellipse cx="190" cy="145" rx="4" ry="5" fill="#1a1a1a"/>
+  <circle cx="131" cy="144" r="1.5" fill="#e5ff00" opacity="0.8"/>
+  <circle cx="191" cy="144" r="1.5" fill="#e5ff00" opacity="0.8"/>
 
-  <!-- 鼻子 -->
-  <path d="M160 150 L160 170" stroke="#b8956a" stroke-width="3" stroke-linecap="round"/>
-  <path d="M155 170 Q160 172 165 170" stroke="#b8956a" stroke-width="2"/>
+  <!-- 鼻子 - 扁平 -->
+  <path d="M160 150 L160 168" stroke="#e4c498" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="156" cy="168" rx="3" ry="2" fill="#e4c498"/>
+  <ellipse cx="164" cy="168" rx="3" ry="2" fill="#e4c498"/>
 
   <!-- 嘴 - 紧抿、坚定 -->
-  <path d="M140 190 Q160 188 180 190" stroke="#8a6a4a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M142 188 Q160 186 178 188" stroke="#c49a7a" stroke-width="3.5" stroke-linecap="round"/>
 
-  <!-- 标志性元素 - 战术耳机 -->
+  <!-- 战术耳机 -->
   <path d="M75 140 Q70 140 70 145 L70 155 Q70 160 75 160" stroke="#e5ff00" stroke-width="3" fill="none" opacity="0.6"/>
   <circle cx="75" cy="152" r="6" fill="#e5ff00" opacity="0.4"/>
 
-  <!-- 光效 - 强调决断力 -->
+  <!-- 光效 -->
   <path d="M240 100 L260 80" stroke="#e5ff00" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
   <path d="M245 120 L270 115" stroke="#e5ff00" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
 </svg>

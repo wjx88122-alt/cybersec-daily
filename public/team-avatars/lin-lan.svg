@@ -19,31 +19,34 @@
   <path d="M70 280 L110 195 L160 168 L210 195 L250 280 Z" fill="#1a1030"/>
   <path d="M135 190 L160 210 L185 190 L160 320 Z" fill="#c084fc" opacity="0.3"/>
 
-  <!-- 头部 - 放大 -->
-  <ellipse cx="160" cy="125" rx="78" ry="90" fill="#e8c4a8"/>
+  <!-- 头部 - 亚洲人肤色 -->
+  <ellipse cx="160" cy="125" rx="78" ry="90" fill="#f4d4a8"/>
 
-  <!-- 发型 - 中长发、波浪、有层次 -->
-  <path d="M82 95 Q80 45 160 38 Q240 45 238 95 Q234 125 225 145 L215 160 Q210 172 203 185 L190 200 Q178 207 160 207 Q142 207 130 200 L117 185 Q110 172 105 160 L95 145 Q86 125 82 95 Z" fill="#2a1a3a"/>
-  <path d="M95 105 Q102 75 160 68 Q218 75 225 105" stroke="#1a0a2a" stroke-width="2.5" fill="none"/>
-  <path d="M90 125 Q96 145 108 160" stroke="#1a0a2a" stroke-width="2.5" fill="none" opacity="0.5"/>
-  <path d="M230 125 Q224 145 212 160" stroke="#1a0a2a" stroke-width="2.5" fill="none" opacity="0.5"/>
+  <!-- 发型 - 中长发、波浪、黑色 -->
+  <path d="M82 95 Q80 45 160 38 Q240 45 238 95 Q234 125 225 145 L215 160 Q210 172 203 185 L190 200 Q178 207 160 207 Q142 207 130 200 L117 185 Q110 172 105 160 L95 145 Q86 125 82 95 Z" fill="#1a1a1a"/>
+  <path d="M95 105 Q102 75 160 68 Q218 75 225 105" stroke="#0a0a0a" stroke-width="2.5" fill="none"/>
+  <path d="M90 125 Q96 145 108 160" stroke="#0a0a0a" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M230 125 Q226 145 212 160" stroke="#0a0a0a" stroke-width="2" fill="none" opacity="0.5"/>
 
-  <!-- 眉毛 - 细长、上扬 -->
-  <path d="M115 108 Q128 105 148 108" stroke="#3a2a4a" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M172 108 Q192 105 205 108" stroke="#3a2a4a" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- 眉毛 - 细长、黑色 -->
+  <path d="M115 108 Q128 106 148 108" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
+  <path d="M172 108 Q192 106 205 108" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
 
-  <!-- 眼睛 - 明亮、有神 -->
-  <ellipse cx="130" cy="132" rx="8" ry="10" fill="#2a1a3a"/>
-  <ellipse cx="190" cy="132" rx="8" ry="10" fill="#2a1a3a"/>
-  <circle cx="132" cy="130" r="3" fill="#a78bfa"/>
-  <circle cx="192" cy="130" r="3" fill="#a78bfa"/>
+  <!-- 眼睛 - 细长杏眼 -->
+  <path d="M118 132 Q130 130 142 132" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M178 132 Q190 130 202 132" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="130" cy="132" rx="4" ry="5" fill="#1a1a1a"/>
+  <ellipse cx="190" cy="132" rx="4" ry="5" fill="#1a1a1a"/>
+  <circle cx="131" cy="131" r="2" fill="#a78bfa"/>
+  <circle cx="191" cy="131" r="2" fill="#a78bfa"/>
 
-  <!-- 鼻子 -->
-  <path d="M160 138 L160 158" stroke="#d4a890" stroke-width="3" stroke-linecap="round"/>
-  <path d="M155 158 Q160 160 165 158" stroke="#d4a890" stroke-width="2.5"/>
+  <!-- 鼻子 - 扁平 -->
+  <path d="M160 138 L160 156" stroke="#e4c498" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="156" cy="156" rx="3" ry="2" fill="#e4c498"/>
+  <ellipse cx="164" cy="156" rx="3" ry="2" fill="#e4c498"/>
 
   <!-- 嘴 - 微笑、自信 -->
-  <path d="M140 178 Q160 184 180 178" stroke="#a86a5a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M142 176 Q160 182 178 176" stroke="#c49a7a" stroke-width="3.5" stroke-linecap="round"/>
 
   <!-- 耳环 - 优雅配饰 -->
   <circle cx="82" cy="145" r="6" fill="#a78bfa" opacity="0.8"/>

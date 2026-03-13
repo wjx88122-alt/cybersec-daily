@@ -19,35 +19,38 @@
   <path d="M75 280 L115 200 L160 175 L205 200 L245 280 Z" fill="#0d1520"/>
   <rect x="145" y="195" width="30" height="125" fill="#1a2535"/>
 
-  <!-- 头部 - 放大 -->
-  <ellipse cx="160" cy="128" rx="80" ry="92" fill="#c9a882"/>
+  <!-- 头部 - 亚洲人肤色 -->
+  <ellipse cx="160" cy="128" rx="80" ry="92" fill="#f4d4a8"/>
 
-  <!-- 发型 - 短发、利落、侧分 -->
-  <path d="M80 98 Q78 42 160 35 Q242 42 240 98 Q236 88 225 76 Q200 58 160 56 Q120 58 95 76 Q84 88 80 98 Z" fill="#1a1a2a"/>
-  <path d="M160 56 Q185 62 210 75" stroke="#0a0a15" stroke-width="2.5" fill="none"/>
-  <path d="M90 85 L102 98" stroke="#0a0a15" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 发型 - 短发、利落、黑色 -->
+  <path d="M80 98 Q78 42 160 35 Q242 42 240 98 Q236 88 225 76 Q200 58 160 56 Q120 58 95 76 Q84 88 80 98 Z" fill="#1a1a1a"/>
+  <path d="M160 56 Q185 62 210 75" stroke="#0a0a0a" stroke-width="2.5" fill="none"/>
+  <path d="M90 85 L102 98" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round"/>
 
-  <!-- 眉毛 - 平直、严肃 -->
-  <path d="M112 111 Q128 108 148 111" stroke="#2a2a3a" stroke-width="5" stroke-linecap="round"/>
-  <path d="M172 111 Q192 108 208 111" stroke="#2a2a3a" stroke-width="5" stroke-linecap="round"/>
+  <!-- 眉毛 - 平直、黑色 -->
+  <path d="M112 111 Q128 109 148 111" stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M172 111 Q192 109 208 111" stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="round"/>
 
   <!-- 眼镜 - 细框、专业 -->
   <circle cx="127" cy="137" r="20" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.6"/>
   <circle cx="193" cy="137" r="20" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.6"/>
   <path d="M147 137 L173 137" stroke="#06b6d4" stroke-width="3" opacity="0.6"/>
 
-  <!-- 眼睛 - 专注、审视 -->
-  <ellipse cx="127" cy="137" rx="7" ry="9" fill="#1a1a2a"/>
-  <ellipse cx="193" cy="137" rx="7" ry="9" fill="#1a1a2a"/>
-  <circle cx="129" cy="135" r="2.5" fill="#06b6d4" opacity="0.9"/>
-  <circle cx="195" cy="135" r="2.5" fill="#06b6d4" opacity="0.9"/>
+  <!-- 眼睛 - 细长、专注 -->
+  <path d="M120 137 Q127 135 134 137" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M186 137 Q193 135 200 137" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <ellipse cx="127" cy="137" rx="4" ry="5" fill="#1a1a1a"/>
+  <ellipse cx="193" cy="137" rx="4" ry="5" fill="#1a1a1a"/>
+  <circle cx="128" cy="136" r="1.5" fill="#06b6d4" opacity="0.9"/>
+  <circle cx="194" cy="136" r="1.5" fill="#06b6d4" opacity="0.9"/>
 
-  <!-- 鼻子 -->
-  <path d="M160 144 L160 165" stroke="#b89872" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M155 165 Q160 167 165 165" stroke="#b89872" stroke-width="2.5"/>
+  <!-- 鼻子 - 扁平 -->
+  <path d="M160 144 L160 163" stroke="#e4c498" stroke-width="2.5" stroke-linecap="round"/>
+  <ellipse cx="156" cy="163" rx="3" ry="2" fill="#e4c498"/>
+  <ellipse cx="164" cy="163" rx="3" ry="2" fill="#e4c498"/>
 
   <!-- 嘴 - 紧闭、思考 -->
-  <path d="M140 184 L180 184" stroke="#8a6a5a" stroke-width="4" stroke-linecap="round"/>
+  <path d="M142 182 L178 182" stroke="#c49a7a" stroke-width="3.5" stroke-linecap="round"/>
 
   <!-- 标志性元素 - 雷达扫描线 -->
   <circle cx="265" cy="110" r="28" stroke="#06b6d4" stroke-width="2.5" fill="none" opacity="0.3"/>
