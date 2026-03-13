@@ -4,9 +4,9 @@ import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
 import { resolveAppBaseUrl } from "@/lib/app-url";
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 function mergeWithExisting(
   fresh: FeedItem[],
@@ -56,25 +56,36 @@ export async function GET(req: NextRequest) {
   ]);
 
   const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const authHeaders = {
+    authorization: `Bearer ${process.env.CRON_SECRET}`,
+  };
 
-  // Trigger image enrichment right after feed refresh so new items are not left without thumbnails.
-  const selfImagesUrl = `${appBaseUrl}/api/images`;
-  fetch(selfImagesUrl, {
-    headers: {
-      authorization: `Bearer ${process.env.CRON_SECRET}`,
-    },
-  }).catch((e) => {
-    console.error("image enrichment trigger failed:", e);
-  });
+  after(async () => {
+    const selfImagesUrl = `${appBaseUrl}/api/images`;
+    try {
+      const imageRes = await fetch(selfImagesUrl, {
+        headers: authHeaders,
+        cache: "no-store",
+      });
+      if (!imageRes.ok) {
+        console.error("image enrichment trigger failed:", imageRes.status);
+      }
+    } catch (e) {
+      console.error("image enrichment trigger failed:", e);
+    }
 
-  // Trigger translation right after feed refresh to keep zh fields up-to-date for new entries.
-  const selfTranslateUrl = `${appBaseUrl}/api/translate`;
-  fetch(selfTranslateUrl, {
-    headers: {
-      authorization: `Bearer ${process.env.CRON_SECRET}`,
-    },
-  }).catch((e) => {
-    console.error("translation trigger failed:", e);
+    const selfTranslateUrl = `${appBaseUrl}/api/translate?scope=recent`;
+    try {
+      const translateRes = await fetch(selfTranslateUrl, {
+        headers: authHeaders,
+        cache: "no-store",
+      });
+      if (!translateRes.ok) {
+        console.error("translation trigger failed:", translateRes.status);
+      }
+    } catch (e) {
+      console.error("translation trigger failed:", e);
+    }
   });
 
   // Generate daily snapshot (best-effort, don't block on failure)
