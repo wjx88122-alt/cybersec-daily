@@ -1,13 +1,32 @@
 import { kv } from "@/lib/kv";
 import { FeedItem } from "@/lib/feeds";
-import { NextResponse } from "next/server";
+import { resolveAppBaseUrl } from "@/lib/app-url";
+import {
+  loadAllFeedItemsFromKv,
+  triggerTranslationRepairIfNeeded,
+} from "@/lib/translation-health";
+import { after, NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const items = await kv.get<FeedItem[]>("feed-a");
-    return NextResponse.json({ items: items ?? [] });
+    const safeItems = items ?? [];
+    const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+
+    after(async () => {
+      const allItems = await loadAllFeedItemsFromKv();
+      await triggerTranslationRepairIfNeeded({
+        items: allItems,
+        appBaseUrl,
+        source: "feed-a:read",
+        reason: "public-feed-read",
+        authToken: process.env.CRON_SECRET,
+      });
+    });
+
+    return NextResponse.json({ items: safeItems });
   } catch {
     return NextResponse.json({ error: "Failed" }, { status: 500 });
   }

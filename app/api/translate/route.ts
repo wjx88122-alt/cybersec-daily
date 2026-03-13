@@ -2,6 +2,10 @@ import { kv } from "@/lib/kv";
 import { translateItems } from "@/lib/translate";
 import { CUTOFF_MS, FeedItem } from "@/lib/feeds";
 import { resolveAppBaseUrl } from "@/lib/app-url";
+import {
+  isLikelyUntranslated,
+  recordTranslationHealthFromItems,
+} from "@/lib/translation-health";
 import { after, NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
@@ -20,27 +24,6 @@ const getTimestamp = (item: FeedItem) => {
 
 function sortByNewest(items: FeedItem[]) {
   return [...items].sort((a, b) => getTimestamp(b) - getTimestamp(a));
-}
-
-function isLikelyUntranslated(item: FeedItem) {
-  const title = normalize(item.title);
-  const summary = normalize(item.summary);
-  const titleZh = normalize(item.titleZh);
-  const summaryZh = normalize(item.summaryZh);
-
-  const titleLooksChinese = isChinese(title);
-  const summaryLooksChinese = isChinese(summary);
-
-  // For non-Chinese source text, zh field equal to source text usually means untranslated copy.
-  const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
-  const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
-
-  return (
-    !titleZh ||
-    !summaryZh ||
-    titleCopiedFromSource ||
-    summaryCopiedFromSource
-  );
 }
 
 function autoFillChineseFields(items: FeedItem[]) {
@@ -218,11 +201,37 @@ export async function GET(req: NextRequest) {
   ).length;
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  // Self-chain: if there are still pending items, fire another translate run
-  // Uses fire-and-forget fetch so this response returns immediately
-  // Limit chain depth to prevent infinite loops
+  await recordTranslationHealthFromItems({
+    items: [...allItems, ...aiItems],
+    source: `translate:${scope}`,
+    extra: {
+      pass: {
+        scope,
+        translated: translationMap.size,
+        pending,
+        recentPending,
+        batchesDone,
+        batchesFailed,
+        elapsedSec: elapsed,
+        reason: req.nextUrl.searchParams.get("reason") ?? null,
+      },
+    },
+  });
+
   const chainCount = parseInt(req.nextUrl.searchParams.get("chain") ?? "0");
-  const MAX_CHAINS = 3;
+  const MAX_CHAINS = scope === "recent" ? 4 : 3;
+  if (scope === "recent" && recentPending > 0 && chainCount < MAX_CHAINS) {
+    const selfUrl = `${appBaseUrl}/api/translate?scope=recent&chain=${chainCount + 1}`;
+    after(() => {
+      void fetch(selfUrl, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        cache: "no-store",
+      }).catch((e) => console.error("translate: recent chained run failed:", e));
+    });
+    console.log(
+      `translate[recent]: ${recentPending} recent items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`,
+    );
+  }
   if (scope === "all" && pending > 0 && chainCount < MAX_CHAINS) {
     const selfUrl = `${appBaseUrl}/api/translate?chain=${chainCount + 1}`;
     after(() => {

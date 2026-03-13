@@ -4,6 +4,10 @@ import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
 import { resolveAppBaseUrl } from "@/lib/app-url";
+import {
+  recordTranslationHealthFromItems,
+  triggerTranslationRepairIfNeeded,
+} from "@/lib/translation-health";
 import { after, NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
@@ -55,6 +59,11 @@ export async function GET(req: NextRequest) {
     kv.set("feed-ai", mergedAI),
   ]);
 
+  await recordTranslationHealthFromItems({
+    items: [...mergedA, ...mergedB, ...mergedAI],
+    source: "cron:feed-refresh",
+  });
+
   const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
   const authHeaders = {
     authorization: `Bearer ${process.env.CRON_SECRET}`,
@@ -74,18 +83,13 @@ export async function GET(req: NextRequest) {
       console.error("image enrichment trigger failed:", e);
     }
 
-    const selfTranslateUrl = `${appBaseUrl}/api/translate?scope=recent`;
-    try {
-      const translateRes = await fetch(selfTranslateUrl, {
-        headers: authHeaders,
-        cache: "no-store",
-      });
-      if (!translateRes.ok) {
-        console.error("translation trigger failed:", translateRes.status);
-      }
-    } catch (e) {
-      console.error("translation trigger failed:", e);
-    }
+    await triggerTranslationRepairIfNeeded({
+      items: [...mergedA, ...mergedB, ...mergedAI],
+      appBaseUrl,
+      source: "cron:feed-refresh",
+      reason: "cron-refresh",
+      authToken: process.env.CRON_SECRET,
+    });
   });
 
   // Generate daily snapshot (best-effort, don't block on failure)
