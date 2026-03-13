@@ -4,26 +4,26 @@ const IMPORTANCE_CONFIG = {
   critical: {
     label: "严重",
     bar: "from-red-500 to-rose-400",
-    badge: "bg-red-500/15 text-red-400 border-red-500/30",
-    accent: "text-red-400",
-    border: "hover:border-red-500/30",
-    glow: "hover:shadow-red-500/10",
+    badge: "bg-red-50 text-red-700 border-red-100",
+    accent: "text-red-600",
+    border: "hover:border-red-200",
+    glow: "hover:shadow-[0_26px_70px_rgba(239,68,68,0.08)]",
   },
   high: {
     label: "高危",
     bar: "from-orange-500 to-amber-400",
-    badge: "bg-orange-500/15 text-orange-400 border-orange-500/30",
-    accent: "text-orange-400",
-    border: "hover:border-orange-500/30",
-    glow: "hover:shadow-orange-500/10",
+    badge: "bg-orange-50 text-orange-700 border-orange-100",
+    accent: "text-orange-600",
+    border: "hover:border-orange-200",
+    glow: "hover:shadow-[0_26px_70px_rgba(249,115,22,0.08)]",
   },
   medium: {
     label: "中等",
     bar: "from-yellow-500 to-yellow-400",
-    badge: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-    accent: "text-yellow-400",
-    border: "hover:border-yellow-500/20",
-    glow: "hover:shadow-yellow-500/10",
+    badge: "bg-yellow-50 text-yellow-700 border-yellow-100",
+    accent: "text-yellow-600",
+    border: "hover:border-yellow-200",
+    glow: "hover:shadow-[0_26px_70px_rgba(234,179,8,0.08)]",
   },
 };
 
@@ -46,7 +46,7 @@ export default function DigestCard({
       href={safeHref}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group relative flex flex-col rounded-xl overflow-hidden border border-white/[0.06] bg-[#0d1117] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40 ${cfg.border} ${cfg.glow}`}
+      className={`group public-panel relative flex flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/88 transition-all duration-300 hover:-translate-y-1 ${cfg.border} ${cfg.glow}`}
     >
       {/* Top gradient bar */}
       <div className={`h-[3px] w-full bg-gradient-to-r ${cfg.bar} shrink-0`} />
@@ -59,32 +59,32 @@ export default function DigestCard({
           >
             {cfg.label}
           </span>
-          <span className="text-[10px] text-[#484f58] bg-white/[0.04] border border-white/[0.06] px-2 py-0.5 rounded-full truncate max-w-[140px]">
+          <span className="truncate rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500 max-w-[140px]">
             {item.category}
           </span>
         </div>
 
         {/* Headline */}
         <h3
-          className={`font-semibold leading-snug mb-2.5 text-[#f0f6fc] group-hover:text-white transition-colors ${featured ? "text-[15px]" : "text-[13px]"}`}
+          className={`mb-2.5 font-semibold leading-snug text-slate-950 transition-colors group-hover:text-slate-800 ${featured ? "text-[18px]" : "text-[15px]"}`}
         >
           {item.headline}
         </h3>
 
         {/* Summary */}
         <p
-          className={`leading-relaxed text-[#8b949e] flex-1 ${featured ? "text-[13px] line-clamp-5" : "text-[12px] line-clamp-3"}`}
+          className={`flex-1 leading-relaxed text-slate-600 ${featured ? "text-[14px] line-clamp-5" : "text-[13px] line-clamp-3"}`}
         >
           {item.summary}
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/[0.05]">
-          <span className="text-[11px] text-[#484f58] truncate max-w-[80%]">
+        <div className="mt-3 flex items-center justify-between border-t border-slate-200/80 pt-3">
+          <span className="truncate max-w-[80%] text-[11px] text-slate-500">
             {item.sourceTitle}
           </span>
           <svg
-            className={`w-3.5 h-3.5 shrink-0 ${cfg.accent} opacity-0 group-hover:opacity-100 transition-opacity`}
+            className={`h-3.5 w-3.5 shrink-0 ${cfg.accent} opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100`}
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"

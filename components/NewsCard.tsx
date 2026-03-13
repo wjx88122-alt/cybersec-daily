@@ -21,33 +21,33 @@ type CategoryIconKind =
   | "news";
 
 const CATEGORY_GRADIENT: Record<string, string> = {
-  综合资讯: "from-blue-950 to-blue-900",
-  深度分析: "from-purple-950 to-purple-900",
-  漏洞预警: "from-red-950 to-red-900",
-  威胁情报: "from-orange-950 to-orange-900",
-  恶意软件: "from-pink-950 to-pink-900",
-  "政府/监管": "from-green-950 to-green-900",
-  "AI 产品": "from-cyan-950 to-cyan-900",
-  "AI 研究": "from-indigo-950 to-indigo-900",
-  "AI 商业": "from-amber-950 to-amber-900",
-  "AI 开发": "from-emerald-950 to-emerald-900",
-  "AI 政策": "from-slate-800 to-slate-700",
-  "AI 洞察": "from-yellow-950 to-yellow-900",
+  综合资讯: "from-[#eff6ff] via-[#dbeafe] to-[#bfdbfe]",
+  深度分析: "from-[#f5f3ff] via-[#ede9fe] to-[#ddd6fe]",
+  漏洞预警: "from-[#fef2f2] via-[#fee2e2] to-[#fecaca]",
+  威胁情报: "from-[#fff7ed] via-[#ffedd5] to-[#fed7aa]",
+  恶意软件: "from-[#fdf2f8] via-[#fce7f3] to-[#fbcfe8]",
+  "政府/监管": "from-[#ecfdf5] via-[#d1fae5] to-[#a7f3d0]",
+  "AI 产品": "from-[#ecfeff] via-[#cffafe] to-[#a5f3fc]",
+  "AI 研究": "from-[#eef2ff] via-[#e0e7ff] to-[#c7d2fe]",
+  "AI 商业": "from-[#fffbeb] via-[#fef3c7] to-[#fde68a]",
+  "AI 开发": "from-[#ecfdf5] via-[#ccfbf1] to-[#99f6e4]",
+  "AI 政策": "from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]",
+  "AI 洞察": "from-[#fefce8] via-[#fef9c3] to-[#fde047]",
 };
 
 const CATEGORY_ACCENT: Record<string, string> = {
-  综合资讯: "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  深度分析: "bg-purple-500/20 text-purple-300 border-purple-500/30",
-  漏洞预警: "bg-red-500/20 text-red-300 border-red-500/30",
-  威胁情报: "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  恶意软件: "bg-pink-500/20 text-pink-300 border-pink-500/30",
-  "政府/监管": "bg-green-500/20 text-green-300 border-green-500/30",
-  "AI 产品": "bg-cyan-500/20 text-cyan-300 border-cyan-500/30",
-  "AI 研究": "bg-indigo-500/20 text-indigo-300 border-indigo-500/30",
-  "AI 商业": "bg-amber-500/20 text-amber-300 border-amber-500/30",
-  "AI 开发": "bg-emerald-500/20 text-emerald-300 border-emerald-500/30",
-  "AI 政策": "bg-slate-500/20 text-slate-300 border-slate-500/30",
-  "AI 洞察": "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
+  综合资讯: "bg-blue-50 text-blue-700 border-blue-100",
+  深度分析: "bg-violet-50 text-violet-700 border-violet-100",
+  漏洞预警: "bg-red-50 text-red-700 border-red-100",
+  威胁情报: "bg-orange-50 text-orange-700 border-orange-100",
+  恶意软件: "bg-pink-50 text-pink-700 border-pink-100",
+  "政府/监管": "bg-emerald-50 text-emerald-700 border-emerald-100",
+  "AI 产品": "bg-cyan-50 text-cyan-700 border-cyan-100",
+  "AI 研究": "bg-indigo-50 text-indigo-700 border-indigo-100",
+  "AI 商业": "bg-amber-50 text-amber-700 border-amber-100",
+  "AI 开发": "bg-teal-50 text-teal-700 border-teal-100",
+  "AI 政策": "bg-slate-100 text-slate-700 border-slate-200",
+  "AI 洞察": "bg-yellow-50 text-yellow-700 border-yellow-100",
 };
 
 const CATEGORY_ICON: Record<string, CategoryIconKind> = {
@@ -200,71 +200,134 @@ export default function NewsCard({
   const imgSrc = !imgError && item.image ? item.image : null;
   const catAccent =
     CATEGORY_ACCENT[item.category] ??
-    "bg-white/10 text-white/60 border-white/10";
+    "bg-slate-100 text-slate-700 border-slate-200";
   const catGradient =
-    CATEGORY_GRADIENT[item.category] ?? "from-gray-900 to-gray-800";
+    CATEGORY_GRADIENT[item.category] ?? "from-slate-100 via-slate-200 to-slate-300";
 
   return (
     <a
       href={item.link}
       target="_blank"
       rel="noopener noreferrer"
-      className="group block rounded-xl overflow-hidden border border-white/[0.06] bg-[#0d1117] hover:border-white/[0.12] hover:bg-[#111820] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40"
+      className={`group block overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/82 shadow-[0_20px_60px_rgba(15,23,42,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] reveal-rise ${
+        hero ? "public-panel-strong" : "public-panel"
+      }`}
     >
-      {/* Image / Placeholder */}
-      <div
-        className={`relative overflow-hidden ${hero ? "aspect-[16/7]" : "aspect-[16/9]"}`}
-      >
-        {imgSrc ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imgSrc}
-            alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={() => setImgError(true)}
-          />
-        ) : (
-          <div
-            className={`w-full h-full flex flex-col items-center justify-center gap-2 bg-gradient-to-br ${catGradient}`}
-          >
-            <span className="opacity-70 text-[#f0f6fc]">
-              <CategoryIcon kind={CATEGORY_ICON[item.category] ?? "news"} />
-            </span>
-            <span className="text-xs text-white/30 font-medium tracking-wide">
-              {item.source}
-            </span>
-          </div>
-        )}
-        {/* Gradient overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        {/* Category badge */}
-        <span
-          className={`absolute bottom-2.5 left-2.5 text-[10px] font-semibold px-2 py-0.5 rounded-full border ${catAccent} backdrop-blur-sm`}
-        >
-          {item.category}
-        </span>
-      </div>
+      {hero ? (
+        <div className="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">
+          <div className="flex flex-col justify-between p-7 sm:p-9 lg:p-11">
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  今日焦点
+                </span>
+                <span
+                  className={`rounded-full border px-3 py-1 text-[10px] font-semibold ${catAccent}`}
+                >
+                  {item.category}
+                </span>
+              </div>
+              <h2 className="mt-5 max-w-[14ch] text-[2rem] font-semibold leading-[1.02] tracking-[-0.05em] text-slate-950 transition-colors group-hover:text-slate-800 sm:text-[2.6rem]">
+                {title}
+              </h2>
+              {summary && (
+                <p className="mt-5 max-w-xl text-[15px] leading-8 text-slate-600 sm:text-base">
+                  {summary}
+                </p>
+              )}
+            </div>
 
-      {/* Content */}
-      <div className="p-4">
-        <h2
-          className={`font-semibold leading-snug mb-2 line-clamp-2 text-[#f0f6fc] group-hover:text-white transition-colors ${hero ? "text-xl" : "text-[14px]"}`}
-        >
-          {title}
-        </h2>
-        {summary && (
-          <p className="text-[13px] leading-relaxed text-[#8b949e]">
-            {summary}
-          </p>
-        )}
-        <div className="flex items-center gap-2 mt-3 text-[11px] text-[#484f58]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#e5ff00]/40 shrink-0" />
-          <span className="truncate font-medium text-[#6e7681]">
-            {item.source}
-          </span>
-          <span className="shrink-0 ml-auto">{timeAgo}</span>
+            <div className="mt-8 flex items-center gap-3 text-[11px] text-slate-500">
+              <span className="inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3 font-medium text-slate-700">
+                {item.source}
+              </span>
+              <span>{timeAgo}</span>
+              <span className="ml-auto inline-flex items-center gap-2 font-medium text-slate-900">
+                阅读详情
+                <svg
+                  className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M17 7H8M17 7v9" />
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <div className="relative min-h-[280px] overflow-hidden bg-slate-100 lg:min-h-full">
+            {imgSrc ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={imgSrc}
+                alt={title}
+                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className={`flex h-full w-full flex-col items-center justify-center gap-3 bg-gradient-to-br ${catGradient}`}>
+                <span className="text-slate-700">
+                  <CategoryIcon kind={CATEGORY_ICON[item.category] ?? "news"} className="h-12 w-12" />
+                </span>
+                <span className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">
+                  {item.source}
+                </span>
+              </div>
+            )}
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.03),rgba(15,23,42,0.04))]" />
+          </div>
         </div>
-      </div>
+      ) : (
+        <>
+          <div className="relative overflow-hidden">
+            <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+              {imgSrc ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imgSrc}
+                  alt={title}
+                  className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <div className={`flex h-full w-full flex-col items-center justify-center gap-2 bg-gradient-to-br ${catGradient}`}>
+                  <span className="text-slate-700/80">
+                    <CategoryIcon kind={CATEGORY_ICON[item.category] ?? "news"} className="h-10 w-10" />
+                  </span>
+                  <span className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">
+                    {item.source}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+              <span
+                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${catAccent}`}
+              >
+                {item.category}
+              </span>
+            </div>
+          </div>
+
+          <div className="p-5">
+            <h2 className="mb-2.5 line-clamp-2 text-[17px] font-semibold leading-[1.35] tracking-[-0.025em] text-slate-950 transition-colors group-hover:text-slate-800">
+              {title}
+            </h2>
+            {summary && (
+              <p className="line-clamp-3 text-[14px] leading-7 text-slate-600">
+                {summary}
+              </p>
+            )}
+            <div className="mt-5 flex items-center gap-2 border-t border-slate-200/80 pt-4 text-[11px] text-slate-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70 shrink-0" />
+              <span className="truncate font-medium text-slate-700">{item.source}</span>
+              <span className="ml-auto shrink-0">{timeAgo}</span>
+            </div>
+          </div>
+        </>
+      )}
     </a>
   );
 }

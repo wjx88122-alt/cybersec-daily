@@ -4,19 +4,19 @@ const SEC_CATEGORIES = ["全部", "综合资讯", "深度分析", "漏洞预警"
 const AI_CATEGORIES = ["全部", "AI 产品", "AI 研究", "AI 商业", "AI 开发", "AI 政策", "AI 洞察"];
 
 const CATEGORY_ACTIVE: Record<string, string> = {
-  全部: "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30",
-  综合资讯: "bg-blue-500/15 text-blue-300 border-blue-500/30",
-  深度分析: "bg-purple-500/15 text-purple-300 border-purple-500/30",
-  漏洞预警: "bg-red-500/15 text-red-300 border-red-500/30",
-  威胁情报: "bg-orange-500/15 text-orange-300 border-orange-500/30",
-  恶意软件: "bg-pink-500/15 text-pink-300 border-pink-500/30",
-  "政府/监管": "bg-green-500/15 text-green-300 border-green-500/30",
-  "AI 产品": "bg-cyan-500/15 text-cyan-300 border-cyan-500/30",
-  "AI 研究": "bg-indigo-500/15 text-indigo-300 border-indigo-500/30",
-  "AI 商业": "bg-amber-500/15 text-amber-300 border-amber-500/30",
-  "AI 开发": "bg-emerald-500/15 text-emerald-300 border-emerald-500/30",
-  "AI 政策": "bg-slate-500/15 text-slate-300 border-slate-500/30",
-  "AI 洞察": "bg-yellow-500/15 text-yellow-300 border-yellow-500/30",
+  全部: "bg-slate-900 text-white border-slate-900 shadow-[0_8px_24px_rgba(15,23,42,0.12)]",
+  综合资讯: "bg-blue-50 text-blue-700 border-blue-100",
+  深度分析: "bg-violet-50 text-violet-700 border-violet-100",
+  漏洞预警: "bg-red-50 text-red-700 border-red-100",
+  威胁情报: "bg-orange-50 text-orange-700 border-orange-100",
+  恶意软件: "bg-pink-50 text-pink-700 border-pink-100",
+  "政府/监管": "bg-emerald-50 text-emerald-700 border-emerald-100",
+  "AI 产品": "bg-cyan-50 text-cyan-700 border-cyan-100",
+  "AI 研究": "bg-indigo-50 text-indigo-700 border-indigo-100",
+  "AI 商业": "bg-amber-50 text-amber-700 border-amber-100",
+  "AI 开发": "bg-teal-50 text-teal-700 border-teal-100",
+  "AI 政策": "bg-slate-100 text-slate-700 border-slate-200",
+  "AI 洞察": "bg-yellow-50 text-yellow-700 border-yellow-100",
 };
 
 export { SEC_CATEGORIES, AI_CATEGORIES };
@@ -37,10 +37,10 @@ export default function CategoryFilter({
         <button
           key={cat}
           onClick={() => onChange(cat)}
-          className={`px-3 py-1 rounded-full text-[12px] font-medium border transition-all duration-150 ${
+          className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all duration-200 ${
             active === cat
               ? CATEGORY_ACTIVE[cat] ?? "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30"
-              : "bg-black/[0.03] text-[#78859b] border-black/[0.06] hover:bg-black/[0.05] hover:text-[#64748b] hover:border-black/[0.08]"
+              : "bg-white/78 text-slate-500 border-slate-200 hover:bg-white hover:text-slate-900 hover:border-slate-300 hover:shadow-[0_8px_20px_rgba(15,23,42,0.05)]"
           }`}
         >
           {cat}
