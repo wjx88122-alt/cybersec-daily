@@ -135,13 +135,7 @@ export default function HuaweiIsdbPage() {
   const providerMap = new Map(HUAWEI_ISDB_PROVIDERS.map((item) => [item.id, item]));
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background:
-          "radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 28%), linear-gradient(180deg, #f8fafc 0%, #eef4fb 100%)",
-      }}
-    >
+    <div className="min-h-screen mdr-shell">
       <NavBar active="MDR" />
       <main className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         <div className="space-y-3">

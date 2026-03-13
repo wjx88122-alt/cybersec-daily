@@ -239,7 +239,7 @@ function ConnPanel({ config, setConfig, test, onTest, onSave }: {
                 {test.version && <div><span className="text-[#94a3b8]">版本:</span> <span className="font-mono text-[#1a1a2e]">{test.version}</span></div>}
               </div>
               {test.raw != null && <details className="mt-2"><summary className="text-[10px] text-[#94a3b8] cursor-pointer">原始响应</summary>
-                <pre className="mt-1 rounded-lg bg-[#1e293b] p-2 text-[10px] text-green-400 overflow-x-auto max-h-40">{JSON.stringify(test.raw, null, 2)}</pre>
+                <pre className="mt-1 max-h-40 overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-2 text-[10px] text-slate-800">{JSON.stringify(test.raw, null, 2)}</pre>
               </details>}
             </div>
           )}
@@ -350,10 +350,10 @@ function DisposePanel({ config, onExecute }: { config: HuaweiConfig; onExecute: 
         {preview && (
           <div className="mt-3 space-y-2">
             {calls.map((call, i) => (
-              <div key={i} className="rounded-lg bg-[#1e293b] p-3 overflow-x-auto">
-                <div className="text-[10px] text-gray-500 mb-1">{call.desc}</div>
-                <div className="font-mono text-[11px] text-cyan-400">{call.method} {call.path}</div>
-                {call.body != null && <pre className="mt-1 font-mono text-[10px] text-green-400 whitespace-pre-wrap">{JSON.stringify(call.body, null, 2)}</pre>}
+              <div key={i} className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-3">
+                <div className="mb-1 text-[10px] text-slate-500">{call.desc}</div>
+                <div className="font-mono text-[11px] text-sky-700">{call.method} {call.path}</div>
+                {call.body != null && <pre className="mt-1 whitespace-pre-wrap font-mono text-[10px] text-slate-800">{JSON.stringify(call.body, null, 2)}</pre>}
               </div>
             ))}
           </div>
@@ -390,15 +390,15 @@ function HistoryItem({ action: a }: { action: DisposalAction }) {
       {showLog && a.restconfLog && (
         <div className="mt-2 space-y-2">
           {a.restconfLog.map((log, i) => (
-            <div key={i} className="rounded-lg bg-[#1e293b] p-2 overflow-x-auto text-[10px]">
+            <div key={i} className="overflow-x-auto rounded-lg border border-slate-200 bg-slate-50 p-2 text-[10px]">
               <div className="flex items-center gap-2 mb-1">
                 <span className={`font-mono font-bold ${log.status >= 200 && log.status < 300 ? "text-green-400" : "text-red-400"}`}>{log.status || "ERR"}</span>
-                <span className="text-cyan-400 font-mono">{log.method} {log.path}</span>
-                <span className="text-gray-500 ml-auto">{log.duration}ms</span>
+                <span className="text-sky-700 font-mono">{log.method} {log.path}</span>
+                <span className="text-slate-500 ml-auto">{log.duration}ms</span>
               </div>
               {log.error && <div className="text-red-400">Error: {log.error}</div>}
-              {log.request != null && <details><summary className="text-gray-500 cursor-pointer">Request Body</summary><pre className="text-green-400 whitespace-pre-wrap mt-1">{JSON.stringify(log.request, null, 2)}</pre></details>}
-              {log.response != null && <details><summary className="text-gray-500 cursor-pointer">Response</summary><pre className="text-cyan-400 whitespace-pre-wrap mt-1">{JSON.stringify(log.response, null, 2)}</pre></details>}
+              {log.request != null && <details><summary className="text-slate-500 cursor-pointer">Request Body</summary><pre className="text-slate-800 whitespace-pre-wrap mt-1">{JSON.stringify(log.request, null, 2)}</pre></details>}
+              {log.response != null && <details><summary className="text-slate-500 cursor-pointer">Response</summary><pre className="text-sky-800 whitespace-pre-wrap mt-1">{JSON.stringify(log.response, null, 2)}</pre></details>}
             </div>
           ))}
         </div>
@@ -448,7 +448,7 @@ function QueryPanel({ config }: { config: HuaweiConfig }) {
       {result && (
         <div className="glass rounded-xl p-4">
           <div className={`text-xs font-medium mb-2 ${result.ok ? "text-green-600" : "text-red-500"}`}>{result.ok ? "✅ 查询成功" : "❌ 查询失败"}</div>
-          <pre className="rounded-lg bg-[#1e293b] p-3 text-[10px] text-green-400 overflow-x-auto max-h-96 whitespace-pre-wrap">{typeof result.data === "string" ? result.data : JSON.stringify(result.data, null, 2)}</pre>
+          <pre className="max-h-96 overflow-x-auto whitespace-pre-wrap rounded-lg border border-slate-200 bg-slate-50 p-3 text-[10px] text-slate-800">{typeof result.data === "string" ? result.data : JSON.stringify(result.data, null, 2)}</pre>
         </div>
       )}
     </div>
@@ -503,7 +503,7 @@ export default function HuaweiPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <div className="min-h-screen mdr-shell">
       <NavBar active="MDR" />
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="mb-6">

@@ -206,7 +206,7 @@ export default function ThreatMap() {
   });
 
   return (
-    <div className="rounded-xl bg-[#040810] border border-white/[0.06] p-4 relative overflow-hidden">
+    <div className="mdr-board-card rounded-xl p-4 relative overflow-hidden">
       {/* Ambient */}
       <div className="absolute inset-0 pointer-events-none" style={{
         background: "radial-gradient(circle at 50% 50%, rgba(37,99,235,0.05) 0%, transparent 70%)",
@@ -215,16 +215,16 @@ export default function ThreatMap() {
       {/* Header */}
       <div className="flex items-center justify-between mb-2 relative z-10">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-300 font-bold tracking-wide">🌍 全球威胁态势感知</span>
+          <span className="text-sm text-slate-800 font-bold tracking-wide">🌍 全球威胁态势感知</span>
           <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
             <span className="text-[10px] text-red-400 font-medium">LIVE</span>
           </span>
         </div>
         <div className="flex items-center gap-5 text-[11px]">
-          <div className="text-center"><div className="text-green-400 font-mono font-bold text-base">{stats.blocked.toLocaleString()}</div><div className="text-gray-600 text-[9px]">累计拦截</div></div>
-          <div className="text-center"><div className="text-red-400 font-mono font-bold text-base">{stats.active}</div><div className="text-gray-600 text-[9px]">活跃攻击</div></div>
-          <div className="text-center"><div className="text-blue-400 font-mono font-bold text-base">{DEFENDED.length}</div><div className="text-gray-600 text-[9px]">防护节点</div></div>
+          <div className="text-center"><div className="text-green-500 font-mono font-bold text-base">{stats.blocked.toLocaleString()}</div><div className="text-slate-500 text-[9px]">累计拦截</div></div>
+          <div className="text-center"><div className="text-red-500 font-mono font-bold text-base">{stats.active}</div><div className="text-slate-500 text-[9px]">活跃攻击</div></div>
+          <div className="text-center"><div className="text-blue-600 font-mono font-bold text-base">{DEFENDED.length}</div><div className="text-slate-500 text-[9px]">防护节点</div></div>
         </div>
       </div>
 
@@ -338,12 +338,12 @@ export default function ThreatMap() {
 
       {/* Latest attack */}
       {latestAttack && (
-        <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/[0.02] border border-white/[0.04] text-[10px] relative z-10">
+        <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-[10px] relative z-10">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: SEV_COLORS[latestAttack.severity].stroke }} />
-          <span className="text-gray-500">最新威胁:</span>
-          <span className="text-gray-300 font-medium">{CITIES[latestAttack.fromKey].label}</span>
-          <span className="text-gray-600">→</span>
-          <span className="text-blue-400 font-medium">{CITIES[latestAttack.toKey].label}</span>
+          <span className="text-slate-500">最新威胁:</span>
+          <span className="text-slate-800 font-medium">{CITIES[latestAttack.fromKey].label}</span>
+          <span className="text-slate-500">→</span>
+          <span className="text-blue-600 font-medium">{CITIES[latestAttack.toKey].label}</span>
           <span className="px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ background: `${SEV_COLORS[latestAttack.severity].stroke}15`, color: SEV_COLORS[latestAttack.severity].stroke }}>
             {latestAttack.type}
           </span>
@@ -352,7 +352,7 @@ export default function ThreatMap() {
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-5 mt-2 text-[9px] text-gray-500 relative z-10">
+      <div className="flex items-center justify-center gap-5 mt-2 text-[9px] text-slate-500 relative z-10">
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" />严重</span>
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" />高危</span>
         <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" />中危</span>

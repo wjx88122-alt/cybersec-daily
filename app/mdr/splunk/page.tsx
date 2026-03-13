@@ -392,7 +392,7 @@ export default function SplunkPage() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <div className="min-h-screen mdr-shell">
       <NavBar active="MDR" />
       <main className="max-w-5xl mx-auto px-4 py-6">
         <div className="mb-6">

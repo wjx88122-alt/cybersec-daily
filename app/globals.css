@@ -24,6 +24,27 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+.mdr-shell {
+  background:
+    radial-gradient(circle at top left, rgba(37,99,235,0.08), transparent 28%),
+    radial-gradient(circle at top right, rgba(14,165,233,0.05), transparent 24%),
+    linear-gradient(180deg, #f8fafc 0%, #eef4fb 100%);
+}
+
+.mdr-board-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.mdr-board-soft {
+  background: rgba(248, 250, 252, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }

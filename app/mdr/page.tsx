@@ -352,7 +352,7 @@ export default function MDRPage() {
   const closedTickets = tickets.filter((t) => t.status === "closed" || t.status === "resolved");
 
   return (
-    <div className="min-h-screen" style={{ background: "var(--bg)" }}>
+    <div className="min-h-screen mdr-shell">
       <NavBar active="MDR" />
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}
