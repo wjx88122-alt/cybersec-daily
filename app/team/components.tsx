@@ -21,15 +21,15 @@ export function SectionTitle({
   return (
     <div className="mb-6">
       <div className="flex items-center gap-3">
-        <span className="h-px w-10 bg-gradient-to-r from-[#e5ff00] to-transparent" />
-        <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94a3b8]">
+        <span className="h-px w-12 bg-gradient-to-r from-slate-400 to-transparent" />
+        <p className="team-eyebrow">
           {eyebrow}
         </p>
       </div>
-      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-[#f0f6fc] sm:text-3xl">
+      <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-950 sm:text-3xl">
         {title}
       </h2>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-[#94a3b8]">{description}</p>
+      <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">{description}</p>
     </div>
   );
 }
@@ -44,7 +44,7 @@ export function TeamTabs({ active }: { active: "overview" | "evolution" | "decis
   return (
     <nav
       aria-label="Team sections"
-      className="glass glass-premium mb-8 flex flex-wrap gap-2 rounded-2xl p-2"
+      className="team-card mb-8 flex flex-wrap gap-2 rounded-[24px] p-2.5"
     >
       {items.map((item) => {
         const isActive = active === item.id;
@@ -54,14 +54,14 @@ export function TeamTabs({ active }: { active: "overview" | "evolution" | "decis
             key={item.id}
             href={item.href}
             aria-current={isActive ? "page" : undefined}
-            className={`min-w-[168px] rounded-xl border px-4 py-3 transition-all ${
+            className={`min-w-[168px] rounded-[18px] border px-4 py-3 transition-all ${
               isActive
-                ? "border-[#e5ff00]/25 bg-[#e5ff00]/10 text-[#f0f6fc] shadow-[0_0_24px_rgba(229,255,0,0.08)]"
-                : "border-transparent bg-transparent text-[#94a3b8] hover:border-white/10 hover:bg-white/[0.03] hover:text-[#f0f6fc]"
+                ? "border-slate-200 bg-white text-slate-950 shadow-[0_14px_36px_rgba(15,23,42,0.08)]"
+                : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white/70 hover:text-slate-900"
             }`}
           >
             <div className="text-sm font-semibold">{item.label}</div>
-            <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-[#64748b]">
+            <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               {item.note}
             </div>
           </Link>
@@ -81,8 +81,8 @@ export function StatCard({
   accentClass: string;
 }) {
   return (
-    <div className="panel-deep rounded-2xl p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+    <div className="team-deep-surface rounded-[20px] p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
         {label}
       </p>
       <p className={`mt-3 text-3xl font-semibold tracking-tight ${accentClass}`}>{value}</p>
@@ -92,11 +92,11 @@ export function StatCard({
 
 function RoleListBlock({ title, items }: { title: string; items: string[] }) {
   return (
-    <div className="panel-soft rounded-2xl p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+    <div className="team-soft-surface rounded-[20px] p-4">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
         {title}
       </p>
-      <ul className="mt-3 space-y-2.5 text-sm leading-6 text-[#c9d1d9]">
+      <ul className="mt-3 space-y-2.5 text-sm leading-7 text-slate-700">
         {items.map((item) => (
           <li key={item} className="flex gap-2.5">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563eb]" />
@@ -113,22 +113,22 @@ export function RoleCard({ role }: { role: Role }) {
 
   return (
     <article
-      className={`glass glass-premium h-full rounded-[28px] p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12] sm:p-6 ${
-        isChief ? "border-[#e5ff00]/20 shadow-[0_0_40px_rgba(229,255,0,0.08)]" : ""
+      className={`team-card h-full rounded-[30px] p-5 transition-all hover:-translate-y-1 sm:p-6 ${
+        isChief ? "shadow-[0_28px_80px_rgba(234,179,8,0.12)]" : ""
       }`}
     >
       <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-24 opacity-80 ${
+        className={`pointer-events-none absolute inset-x-0 top-0 h-28 opacity-90 ${
           isChief
-            ? "bg-[radial-gradient(circle_at_top,rgba(229,255,0,0.14),transparent_68%)]"
-            : "bg-[radial-gradient(circle_at_top,rgba(59,130,246,0.12),transparent_68%)]"
+            ? "bg-[radial-gradient(circle_at_top,rgba(250,204,21,0.18),transparent_68%)]"
+            : "bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.16),transparent_68%)]"
         }`}
       />
 
       <div className="relative flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-[240px] flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-xl shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+            <span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl border border-slate-200 bg-white text-xl shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
               {role.emoji}
             </span>
             <span
@@ -136,55 +136,55 @@ export function RoleCard({ role }: { role: Role }) {
             >
               {role.code}
             </span>
-            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
               推荐顺序 {role.order}
             </span>
             {isChief && (
-              <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-2.5 py-1 text-[11px] font-semibold text-[#e5ff00]">
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
                 默认入口
               </span>
             )}
-            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#dbe4ee]">
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-600">
               {role.callName}
             </span>
           </div>
-          <h3 className="mt-3 text-2xl font-semibold text-[#f0f6fc]">{role.personaName}</h3>
-          <p className="mt-1 text-sm text-[#dbe4ee]">{role.chineseName}</p>
-          <p className="mt-1 text-sm text-[#94a3b8]">{role.shortLabel}</p>
+          <h3 className="mt-3 text-2xl font-semibold text-slate-950">{role.personaName}</h3>
+          <p className="mt-1 text-sm text-slate-800">{role.chineseName}</p>
+          <p className="mt-1 text-sm text-slate-500">{role.shortLabel}</p>
         </div>
         <div className="flex flex-col items-end gap-3 sm:gap-4">
-          <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+          <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
             {role.phase}
           </span>
-          <div className="rounded-[30px] border border-[#50f7ff]/20 bg-[linear-gradient(145deg,rgba(80,247,255,0.14),rgba(15,23,42,0.35))] p-1.5 shadow-[0_0_30px_rgba(80,247,255,0.14),inset_0_1px_0_rgba(255,255,255,0.08)]">
+          <div className="rounded-[32px] border border-slate-200 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(237,242,247,0.95))] p-1.5 shadow-[0_20px_48px_rgba(15,23,42,0.08)]">
             <img
               src={role.avatarSrc}
               alt={`${role.personaName} 头像`}
-              className="h-40 w-40 rounded-[28px] border border-white/10 object-cover sm:h-48 sm:w-48"
+              className="h-40 w-40 rounded-[28px] border border-white/70 object-cover sm:h-48 sm:w-48"
             />
           </div>
-          <p className="max-w-[190px] text-right text-xs leading-6 text-[#94a3b8]">
+          <p className="max-w-[190px] text-right text-xs leading-6 text-slate-500">
             {role.signatureLine}
           </p>
         </div>
       </div>
 
       <div className="relative mt-5 grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             职业身份 / 角色画像
           </p>
-          <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">{role.identity}</p>
-          <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{role.portrait}</p>
+          <p className="mt-3 text-sm font-semibold leading-7 text-slate-950">{role.identity}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{role.portrait}</p>
         </div>
 
-        <div className="panel-deep rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-deep-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             老板怎么叫他出场
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.usage}</p>
-          <div className="mt-4 border-t border-white/8 pt-4">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+          <p className="mt-3 text-sm leading-7 text-slate-700">{role.usage}</p>
+          <div className="mt-4 border-t border-slate-200 pt-4">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
               角色标签
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -202,46 +202,46 @@ export function RoleCard({ role }: { role: Role }) {
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-4">
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             人格化设定
           </p>
-          <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">
+          <p className="mt-3 text-sm font-semibold leading-7 text-slate-950">
             {role.personaName} · {role.callName}
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#94a3b8]">
+          <p className="mt-2 text-sm leading-7 text-slate-600">
             他的记忆册叫「{role.memoryName}」。
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">
+          <p className="mt-2 text-sm leading-7 text-slate-700">
             签名句：{role.signatureLine}
           </p>
         </div>
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             思考框架
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.thinkingFramework}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-700">{role.thinkingFramework}</p>
         </div>
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             工作脑回路
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.workingPattern}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-700">{role.workingPattern}</p>
         </div>
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             说话方式
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{role.voiceStyle}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-700">{role.voiceStyle}</p>
         </div>
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             常用提问
           </p>
-          <ul className="mt-3 space-y-2 text-sm leading-6 text-[#dbe4ee]">
+          <ul className="mt-3 space-y-2 text-sm leading-7 text-slate-700">
             {role.commonQuestions.map((q) => (
               <li key={q} className="flex gap-2">
-                <span className="text-[#64748b]">•</span>
+                <span className="text-slate-400">•</span>
                 <span>{q}</span>
               </li>
             ))}
@@ -259,13 +259,13 @@ export function RoleCard({ role }: { role: Role }) {
 
 export function DispatchCardView({ card }: { card: DispatchCard }) {
   return (
-    <article className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
-      <h3 className="text-lg font-semibold text-[#f0f6fc]">{card.title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{card.summary}</p>
-      <ul className="mt-4 space-y-2.5 text-sm leading-6 text-[#dbe4ee]">
+    <article className="team-card rounded-[24px] p-5 transition-all hover:-translate-y-1">
+      <h3 className="text-lg font-semibold text-slate-950">{card.title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-600">{card.summary}</p>
+      <ul className="mt-4 space-y-2.5 text-sm leading-7 text-slate-700">
         {card.combos.map((item) => (
-          <li key={item} className="panel-deep flex gap-2.5 rounded-xl p-3">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
+          <li key={item} className="team-deep-surface flex gap-2.5 rounded-[18px] p-3">
+            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-900" />
             <span>{item}</span>
           </li>
         ))}
@@ -276,14 +276,14 @@ export function DispatchCardView({ card }: { card: DispatchCard }) {
 
 export function WeeklyNodeCard({ node }: { node: WeeklyNode }) {
   return (
-    <div className="panel-soft rounded-2xl p-5">
+    <div className="team-soft-surface rounded-[22px] p-5">
       <span
         className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${node.accentClass}`}
       >
         {node.label}
       </span>
-      <h3 className="mt-3 text-xl font-semibold text-[#f0f6fc]">{node.title}</h3>
-      <p className="mt-3 text-sm leading-6 text-[#94a3b8]">{node.detail}</p>
+      <h3 className="mt-3 text-xl font-semibold text-slate-950">{node.title}</h3>
+      <p className="mt-3 text-sm leading-7 text-slate-600">{node.detail}</p>
     </div>
   );
 }
@@ -302,53 +302,53 @@ export function TimelineCard({ milestone }: { milestone: HistoryMilestone }) {
   };
 
   return (
-    <article className="glass glass-premium rounded-2xl p-5 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+    <article className="team-card rounded-[24px] p-5 transition-all hover:-translate-y-1">
       <div className="flex items-start justify-between gap-3">
         <span
           className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${categoryColors[milestone.category]}`}
         >
           {categoryLabels[milestone.category]}
         </span>
-        <span className="text-xs text-[#64748b]">{milestone.date}</span>
+        <span className="text-xs text-slate-500">{milestone.date}</span>
       </div>
-      <h3 className="mt-3 text-lg font-semibold text-[#f0f6fc]">{milestone.title}</h3>
-      <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{milestone.description}</p>
+      <h3 className="mt-3 text-lg font-semibold text-slate-950">{milestone.title}</h3>
+      <p className="mt-2 text-sm leading-7 text-slate-600">{milestone.description}</p>
     </article>
   );
 }
 
 export function DecisionCaseCard({ decisionCase }: { decisionCase: DecisionCase }) {
   return (
-    <article className="glass glass-premium rounded-2xl p-6 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
-      <h3 className="text-xl font-semibold text-[#f0f6fc]">{decisionCase.title}</h3>
+    <article className="team-card rounded-[26px] p-6 transition-all hover:-translate-y-1">
+      <h3 className="text-xl font-semibold text-slate-950">{decisionCase.title}</h3>
 
       <div className="mt-5 space-y-4">
-        <div className="panel-soft rounded-xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[18px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             背景
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">{decisionCase.context}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-700">{decisionCase.context}</p>
         </div>
 
-        <div className="panel-accent rounded-xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-accent-surface rounded-[18px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             决策
           </p>
-          <p className="mt-2 text-sm font-semibold leading-6 text-[#f0f6fc]">{decisionCase.decision}</p>
+          <p className="mt-2 text-sm font-semibold leading-7 text-slate-950">{decisionCase.decision}</p>
         </div>
 
-        <div className="panel-deep rounded-xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-deep-surface rounded-[18px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             理由
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#dbe4ee]">{decisionCase.rationale}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-700">{decisionCase.rationale}</p>
         </div>
 
-        <div className="panel-soft rounded-xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[18px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             结果
           </p>
-          <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{decisionCase.outcome}</p>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{decisionCase.outcome}</p>
         </div>
       </div>
     </article>
@@ -357,36 +357,36 @@ export function DecisionCaseCard({ decisionCase }: { decisionCase: DecisionCase 
 
 export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) {
   return (
-    <article className="glass glass-premium rounded-3xl p-6 transition-all hover:-translate-y-0.5 hover:border-black/[0.12]">
+    <article className="team-card rounded-[30px] p-6 transition-all hover:-translate-y-1">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/team/decisions/${entry.archiveNo}`}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8] transition hover:border-white/20 hover:text-[#f0f6fc]"
+              className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500 transition hover:border-slate-300 hover:text-slate-900"
             >
               {entry.archiveNo}
             </Link>
-            <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
               {entry.date}
             </span>
-            <span className="panel-accent rounded-full px-2.5 py-1 text-[11px] font-semibold text-[#f0f6fc]">
+            <span className="team-accent-surface rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-900">
               {ARCHIVE_STATUS_LABELS[entry.status]}
             </span>
           </div>
-          <h3 className="mt-4 text-xl font-semibold text-[#f0f6fc]">
-            <Link href={`/team/decisions/${entry.archiveNo}`} className="transition hover:text-[#e5ff00]">
+          <h3 className="mt-4 text-xl font-semibold text-slate-950">
+            <Link href={`/team/decisions/${entry.archiveNo}`} className="transition hover:text-slate-700">
               {entry.title}
             </Link>
           </h3>
-          <p className="mt-2 text-sm text-[#94a3b8]">提问时间：{entry.askedAt}</p>
+          <p className="mt-2 text-sm text-slate-500">提问时间：{entry.askedAt}</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           {entry.roles.map((roleId) => (
             <span
               key={roleId}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]"
+              className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500"
             >
               {ROLE_NAME_MAP[roleId]}
             </span>
@@ -395,30 +395,30 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
       </div>
 
       <div className="mt-5 grid gap-4 xl:grid-cols-[0.9fr_1.1fr]">
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             提问
           </p>
-          <p className="mt-3 text-sm font-semibold leading-6 text-[#f0f6fc]">{entry.question}</p>
+          <p className="mt-3 text-sm font-semibold leading-7 text-slate-950">{entry.question}</p>
         </div>
 
-        <div className="panel-accent rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-accent-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             团队回答
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#f0f6fc]">{entry.answer}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-900">{entry.answer}</p>
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="panel-deep rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-deep-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             公开决策过程
           </p>
-          <ul className="mt-3 space-y-3 text-sm leading-6 text-[#dbe4ee]">
+          <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
             {entry.publicProcess.map((step) => (
               <li key={step} className="flex gap-2.5">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#e5ff00]" />
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-900" />
                 <span>{step}</span>
               </li>
             ))}
@@ -427,71 +427,71 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-2">
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             任务分解
           </p>
           <div className="mt-3 space-y-3">
             {entry.decomposition.map((item) => (
-              <div key={item.title} className="panel-deep rounded-xl p-3">
+              <div key={item.title} className="team-deep-surface rounded-[18px] p-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-sm font-semibold leading-6 text-[#f0f6fc]">{item.title}</p>
-                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+                  <p className="text-sm font-semibold leading-7 text-slate-950">{item.title}</p>
+                  <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
                     {ROLE_NAME_MAP[item.owner]}
                   </span>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{item.detail}</p>
+                <p className="mt-2 text-sm leading-7 text-slate-600">{item.detail}</p>
               </div>
             ))}
           </div>
         </div>
 
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             角色执行
           </p>
           <div className="mt-3 space-y-3">
             {entry.execution.map((item) => (
-              <div key={`${item.role}-${item.task}`} className="panel-deep rounded-xl p-3">
+              <div key={`${item.role}-${item.task}`} className="team-deep-surface rounded-[18px] p-3">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#dbe4ee]">
+                  <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-600">
                     {ROLE_NAME_MAP[item.role]}
                   </span>
-                  <p className="text-sm font-semibold leading-6 text-[#f0f6fc]">{item.task}</p>
+                  <p className="text-sm font-semibold leading-7 text-slate-950">{item.task}</p>
                 </div>
-                <p className="mt-2 text-sm leading-6 text-[#94a3b8]">{item.output}</p>
+                <p className="mt-2 text-sm leading-7 text-slate-600">{item.output}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="mt-4 panel-deep rounded-2xl p-4">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+      <div className="mt-4 team-deep-surface rounded-[20px] p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
           最终汇总
         </p>
-        <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{entry.synthesis}</p>
+        <p className="mt-3 text-sm leading-7 text-slate-700">{entry.synthesis}</p>
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-        <div className="panel-accent rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-accent-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             结果 / 后续动作
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#f0f6fc]">{entry.result}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-900">{entry.result}</p>
         </div>
 
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             最终采用版本
           </p>
-          <p className="mt-3 text-sm leading-6 text-[#dbe4ee]">{entry.adoptedVersion}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-700">{entry.adoptedVersion}</p>
         </div>
       </div>
 
       <div className="mt-4 grid gap-4 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             关联页面
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -499,7 +499,7 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
               <Link
                 key={page.href}
                 href={page.href}
-                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#dbe4ee] transition hover:border-white/20 hover:text-[#f0f6fc]"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:text-slate-950"
               >
                 {page.label}
               </Link>
@@ -507,8 +507,8 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
           </div>
         </div>
 
-        <div className="panel-soft rounded-2xl p-4">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <div className="team-soft-surface rounded-[20px] p-4">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
             关联里程碑 / 标签
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
@@ -523,7 +523,7 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
             {entry.tags.map((tag) => (
               <span
                 key={tag}
-                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#dbe4ee]"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600"
               >
                 {tag}
               </span>
@@ -535,7 +535,7 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
       <div className="mt-5 flex justify-end">
         <Link
           href={`/team/decisions/${entry.archiveNo}`}
-          className="text-sm font-semibold text-[#e5ff00] transition hover:text-[#f5ff66]"
+          className="text-sm font-semibold text-slate-900 transition hover:text-slate-700"
         >
           查看详情 →
         </Link>

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function TeamHistoryPage() {
   return (
-    <div className="min-h-screen overflow-hidden" style={{ background: "var(--bg)" }}>
+    <div className="team-shell min-h-screen overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute left-[-10%] top-[-8rem] h-72 w-72 rounded-full blur-3xl"
