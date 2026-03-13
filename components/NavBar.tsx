@@ -10,8 +10,6 @@ const NAV_ITEMS = [
   { label: "MDR", href: "/mdr" },
 ];
 
-const AUXILIARY_ITEM = { label: "酱酱", href: "/jiangjiang" };
-
 const TONE_STYLES = {
   default: {
     headerBorder: "rgba(15, 23, 42, 0.08)",
@@ -25,18 +23,6 @@ const TONE_STYLES = {
       "text-slate-500 border-slate-200 bg-white/55 hover:text-slate-900 hover:border-slate-300 hover:bg-white/80",
     auxiliaryActive:
       "text-slate-950 border-slate-300 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.08)]",
-  },
-  warm: {
-    headerBorder: "rgba(120, 83, 50, 0.12)",
-    headerBackground: "rgba(255,248,240,0.86)",
-    brandText: "text-[#5b3f2a]",
-    activeItem:
-      "text-[#5b3f2a] bg-[#c8844a]/10 border border-[#c8844a]/16 shadow-[0_10px_24px_rgba(145,98,56,0.08)]",
-    inactiveItem: "text-[#8b6b54] hover:text-[#5b3f2a] hover:bg-[#c8844a]/8",
-    auxiliary:
-      "text-[#8b6b54] border-[#c9a07a]/25 bg-white/55 hover:text-[#5b3f2a] hover:border-[#c9a07a]/40 hover:bg-white/75",
-    auxiliaryActive:
-      "text-[#5b3f2a] border-[#c8844a]/22 bg-[#c8844a]/10 shadow-[0_10px_24px_rgba(145,98,56,0.08)]",
   },
 } as const;
 
@@ -74,8 +60,8 @@ export default function NavBar({
             网络安全日报
           </span>
         </Link>
-        <div className="flex items-center gap-2 rounded-full border border-white/70 bg-white/60 px-2 py-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
-          <nav className="flex items-center gap-1">
+        <nav className="flex items-center gap-2 rounded-full border border-white/70 bg-white/60 px-2 py-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+          <div className="flex items-center gap-1">
             {NAV_ITEMS.map(({ label, href }) => (
               <Link
                 key={label}
@@ -87,18 +73,8 @@ export default function NavBar({
                 {label}
               </Link>
             ))}
-          </nav>
-          <Link
-            href={AUXILIARY_ITEM.href}
-            className={`rounded-full border px-2.5 py-1 text-xs font-medium transition-all ${
-              active === AUXILIARY_ITEM.label
-                ? palette.auxiliaryActive
-                : palette.auxiliary
-            }`}
-          >
-            {AUXILIARY_ITEM.label}
-          </Link>
-        </div>
+          </div>
+        </nav>
       </div>
     </header>
   );
