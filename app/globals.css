@@ -149,3 +149,184 @@ body {
   pointer-events: none;
   z-index: 0;
 }
+
+/* Decision flow timeline */
+.decision-flow-track {
+  position: relative;
+}
+
+.decision-flow-line,
+.decision-flow-progress {
+  position: absolute;
+  left: 1rem;
+  top: 0.25rem;
+  width: 2px;
+  border-radius: 999px;
+}
+
+.decision-flow-line {
+  bottom: 0.25rem;
+  background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.18), rgba(255,255,255,0.08));
+}
+
+.decision-flow-progress {
+  height: 5.5rem;
+  background: linear-gradient(180deg, rgba(229,255,0,0), rgba(229,255,0,0.95), rgba(0,212,255,0.35), rgba(229,255,0,0));
+  box-shadow: 0 0 18px rgba(229,255,0,0.18);
+  animation: decision-flow-progress 18s linear infinite;
+}
+
+.decision-flow-step {
+  position: relative;
+  padding-left: 1.25rem;
+}
+
+.decision-flow-node {
+  position: absolute;
+  left: calc(-2.5rem + 1px);
+  top: 1.1rem;
+  z-index: 2;
+  height: 0.9rem;
+  width: 0.9rem;
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,0.16);
+  background: rgba(17, 24, 39, 0.95);
+  box-shadow: 0 0 0 0 rgba(229,255,0,0.18);
+  animation: decision-flow-node 18s infinite;
+  animation-delay: calc(var(--step-index, 0) * 1.55s);
+}
+
+.decision-flow-card {
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  opacity: 0.38;
+  transform: translateY(12px) scale(0.985);
+  animation: decision-flow-card 18s infinite;
+  animation-delay: calc(var(--step-index, 0) * 1.55s);
+}
+
+.decision-flow-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(255,255,255,0.06), transparent 42%);
+}
+
+.decision-flow-card--question,
+.decision-flow-node--question {
+  --decision-flow-color: #60a5fa;
+}
+
+.decision-flow-card--decompose,
+.decision-flow-node--decompose {
+  --decision-flow-color: #a78bfa;
+}
+
+.decision-flow-card--execute,
+.decision-flow-node--execute {
+  --decision-flow-color: #22c55e;
+}
+
+.decision-flow-card--answer,
+.decision-flow-node--answer {
+  --decision-flow-color: #06b6d4;
+}
+
+.decision-flow-card--synthesis,
+.decision-flow-node--synthesis {
+  --decision-flow-color: #e5ff00;
+}
+
+.decision-flow-card--result,
+.decision-flow-node--result {
+  --decision-flow-color: #f59e0b;
+}
+
+.decision-flow-node {
+  border-color: color-mix(in srgb, var(--decision-flow-color) 45%, rgba(255,255,255,0.2));
+}
+
+.decision-flow-card {
+  border-color: color-mix(in srgb, var(--decision-flow-color) 28%, rgba(255,255,255,0.08));
+}
+
+.decision-flow-card--question,
+.decision-flow-card--decompose,
+.decision-flow-card--execute,
+.decision-flow-card--answer,
+.decision-flow-card--synthesis,
+.decision-flow-card--result {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--decision-flow-color) 8%, rgba(255,255,255,0.03)), rgba(255,255,255,0.015));
+}
+
+@keyframes decision-flow-progress {
+  0% {
+    transform: translateY(-4%);
+    opacity: 0;
+  }
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100% + 32rem));
+    opacity: 0;
+  }
+}
+
+@keyframes decision-flow-card {
+  0%, 100% {
+    opacity: 0.38;
+    transform: translateY(12px) scale(0.985);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  8%, 18% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.06),
+      0 0 0 1px color-mix(in srgb, var(--decision-flow-color) 16%, transparent),
+      0 18px 36px color-mix(in srgb, var(--decision-flow-color) 14%, transparent);
+  }
+  24% {
+    opacity: 0.92;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes decision-flow-node {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(229,255,0,0);
+    transform: scale(0.95);
+    background: rgba(17, 24, 39, 0.95);
+  }
+  8%, 18% {
+    transform: scale(1.08);
+    background: var(--decision-flow-color);
+    box-shadow: 0 0 0 8px color-mix(in srgb, var(--decision-flow-color) 18%, transparent);
+  }
+  24% {
+    transform: scale(1);
+    background: color-mix(in srgb, var(--decision-flow-color) 72%, rgba(17,24,39,0.95));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .decision-flow-progress,
+  .decision-flow-node,
+  .decision-flow-card {
+    animation: none;
+  }
+
+  .decision-flow-card {
+    opacity: 1;
+    transform: none;
+  }
+}
