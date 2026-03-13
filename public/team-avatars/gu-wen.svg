@@ -1,60 +1,44 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 顾闻 - 竞争与战略情报官：冷静、分析、警觉 -->
   <defs>
-    <linearGradient id="gw-bg" x1="0" y1="0" x2="320" y2="320">
-      <stop stop-color="#0a1a2e"/>
-      <stop offset="1" stop-color="#16213e"/>
+    <linearGradient id="gw_bg" x1="20" y1="12" x2="302" y2="308" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7EDF2"/>
+      <stop offset="0.52" stop-color="#EAD8E2"/>
+      <stop offset="1" stop-color="#D6C2CE"/>
     </linearGradient>
-    <radialGradient id="gw-glow" cx="0.5" cy="0.3">
-      <stop stop-color="#06b6d4" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#06b6d4" stop-opacity="0"/>
+    <radialGradient id="gw_cloud" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(236 82) rotate(135) scale(120 112)">
+      <stop stop-color="#F8DDE8"/>
+      <stop offset="1" stop-color="#F8DDE8" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="gw_coat" x1="160" y1="182" x2="160" y2="296" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#655E78"/>
+      <stop offset="1" stop-color="#504A63"/>
+    </linearGradient>
   </defs>
-
-  <!-- 背景 -->
-  <rect width="320" height="320" rx="48" fill="url(#gw-bg)"/>
-  <circle cx="160" cy="110" r="150" fill="url(#gw-glow)"/>
-
-  <!-- 服装 - 高领 -->
-  <path d="M75 280 L115 200 L160 175 L205 200 L245 280 Z" fill="#0d1520"/>
-  <rect x="145" y="195" width="30" height="125" fill="#1a2535"/>
-
-  <!-- 头部 - 亚洲人肤色 -->
-  <ellipse cx="160" cy="128" rx="80" ry="92" fill="#f4d4a8"/>
-
-  <!-- 发型 - 短发、利落、黑色 -->
-  <path d="M80 98 Q78 42 160 35 Q242 42 240 98 Q236 88 225 76 Q200 58 160 56 Q120 58 95 76 Q84 88 80 98 Z" fill="#1a1a1a"/>
-  <path d="M160 56 Q185 62 210 75" stroke="#0a0a0a" stroke-width="2.5" fill="none"/>
-  <path d="M90 85 L102 98" stroke="#0a0a0a" stroke-width="2.5" stroke-linecap="round"/>
-
-  <!-- 眉毛 - 平直、黑色 -->
-  <path d="M112 111 Q128 109 148 111" stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="round"/>
-  <path d="M172 111 Q192 109 208 111" stroke="#1a1a1a" stroke-width="4.5" stroke-linecap="round"/>
-
-  <!-- 眼镜 - 细框、专业 -->
-  <circle cx="127" cy="137" r="20" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.6"/>
-  <circle cx="193" cy="137" r="20" stroke="#06b6d4" stroke-width="3" fill="none" opacity="0.6"/>
-  <path d="M147 137 L173 137" stroke="#06b6d4" stroke-width="3" opacity="0.6"/>
-
-  <!-- 眼睛 - 细长、专注 -->
-  <path d="M120 137 Q127 135 134 137" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M186 137 Q193 135 200 137" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <ellipse cx="127" cy="137" rx="4" ry="5" fill="#1a1a1a"/>
-  <ellipse cx="193" cy="137" rx="4" ry="5" fill="#1a1a1a"/>
-  <circle cx="128" cy="136" r="1.5" fill="#06b6d4" opacity="0.9"/>
-  <circle cx="194" cy="136" r="1.5" fill="#06b6d4" opacity="0.9"/>
-
-  <!-- 鼻子 - 扁平 -->
-  <path d="M160 144 L160 163" stroke="#e4c498" stroke-width="2.5" stroke-linecap="round"/>
-  <ellipse cx="156" cy="163" rx="3" ry="2" fill="#e4c498"/>
-  <ellipse cx="164" cy="163" rx="3" ry="2" fill="#e4c498"/>
-
-  <!-- 嘴 - 紧闭、思考 -->
-  <path d="M142 182 L178 182" stroke="#c49a7a" stroke-width="3.5" stroke-linecap="round"/>
-
-  <!-- 标志性元素 - 雷达扫描线 -->
-  <circle cx="265" cy="110" r="28" stroke="#06b6d4" stroke-width="2.5" fill="none" opacity="0.3"/>
-  <circle cx="265" cy="110" r="20" stroke="#06b6d4" stroke-width="2.5" fill="none" opacity="0.5"/>
-  <path d="M265 110 L282 93" stroke="#06b6d4" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-  <circle cx="282" cy="93" r="4" fill="#06b6d4" opacity="0.8"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#gw_bg)"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#C5AFBD" stroke-width="2"/>
+  <circle cx="236" cy="82" r="86" fill="url(#gw_cloud)"/>
+  <path d="M30 246C76 214 118 200 160 200C202 200 242 214 290 246" fill="#E4D2DC" fill-opacity="0.68"/>
+  <path d="M86 296L101 222C114 196 136 181 160 181C184 181 206 196 219 222L234 296H86Z" fill="url(#gw_coat)"/>
+  <path d="M130 193L160 223L190 193L197 296H123L130 193Z" fill="#F6EDF1"/>
+  <rect x="147" y="160" width="26" height="28" rx="13" fill="#E7C4AE"/>
+  <ellipse cx="160" cy="122" rx="46" ry="53" fill="#E7C4AE"/>
+  <path d="M114 112C118 84 138 65 169 66C193 67 207 83 208 112C199 100 186 92 169 90C146 87 127 96 114 112Z" fill="#54464B"/>
+  <path d="M119 106C126 79 143 67 160 67C176 67 192 77 200 96C190 91 179 90 168 90C148 90 132 95 119 106Z" fill="#63545A"/>
+  <path d="M134 118C138 115 143 113 149 113C154 113 160 115 163 118" stroke="#664E4B" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M157 118C161 115 166 113 172 113C177 113 183 115 186 118" stroke="#664E4B" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="146" cy="125" rx="5.2" ry="6.8" fill="#2E2526"/>
+  <ellipse cx="174" cy="125" rx="5.2" ry="6.8" fill="#2E2526"/>
+  <circle cx="148" cy="123" r="1.2" fill="#FFFDF7"/>
+  <circle cx="176" cy="123" r="1.2" fill="#FFFDF7"/>
+  <path d="M160 128V139" stroke="#CA9783" stroke-width="3" stroke-linecap="round"/>
+  <path d="M147 151C154 157 166 157 173 151" stroke="#996A61" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="130" cy="138" rx="9" ry="6" fill="#D89C8B" fill-opacity="0.28"/>
+  <ellipse cx="190" cy="138" rx="9" ry="6" fill="#D89C8B" fill-opacity="0.28"/>
+  <circle cx="146" cy="124" r="16" stroke="#7B6871" stroke-width="3"/>
+  <circle cx="174" cy="124" r="16" stroke="#7B6871" stroke-width="3"/>
+  <path d="M162 124H158" stroke="#7B6871" stroke-width="3" stroke-linecap="round"/>
+  <path d="M190 124H205" stroke="#7B6871" stroke-width="3" stroke-linecap="round"/>
+  <path d="M115 202C128 193 143 188 160 188C177 188 192 193 205 202" stroke="#C69AB0" stroke-width="3" stroke-linecap="round"/>
+  <path d="M223 80C232 80 240 85 245 92" stroke="#B99CB1" stroke-width="4" stroke-linecap="round"/>
+  <path d="M231 94C238 96 244 101 247 107" stroke="#D9B7C9" stroke-width="3" stroke-linecap="round"/>
 </svg>

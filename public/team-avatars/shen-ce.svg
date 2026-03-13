@@ -1,56 +1,43 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 沈策 - 总参谋：沉稳、锐利、决断力强 - 插画风格 -->
   <defs>
-    <linearGradient id="sc-bg" x1="0" y1="0" x2="320" y2="320">
-      <stop stop-color="#0a0e1a"/>
-      <stop offset="1" stop-color="#1a1f35"/>
+    <linearGradient id="sc_bg" x1="28" y1="18" x2="292" y2="302" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7F1D8"/>
+      <stop offset="0.48" stop-color="#E9DFC4"/>
+      <stop offset="1" stop-color="#D9C8A8"/>
     </linearGradient>
-    <radialGradient id="sc-glow" cx="0.5" cy="0.3">
-      <stop stop-color="#e5ff00" stop-opacity="0.15"/>
-      <stop offset="1" stop-color="#e5ff00" stop-opacity="0"/>
+    <radialGradient id="sc_glow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(110 86) rotate(53) scale(160 132)">
+      <stop stop-color="#FFF7D6"/>
+      <stop offset="1" stop-color="#FFF7D6" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="sc_coat" x1="160" y1="180" x2="160" y2="298" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6E7F74"/>
+      <stop offset="1" stop-color="#53645D"/>
+    </linearGradient>
   </defs>
-
-  <!-- 背景 -->
-  <rect width="320" height="320" rx="48" fill="url(#sc-bg)"/>
-  <circle cx="160" cy="120" r="140" fill="url(#sc-glow)"/>
-
-  <!-- 西装领 -->
-  <path d="M80 280 L120 200 L160 180 L200 200 L240 280 Z" fill="#0d1420"/>
-  <path d="M140 200 L160 220 L180 200 L160 320 Z" fill="#1a2030"/>
-
-  <!-- 头部 - 亚洲人肤色 -->
-  <ellipse cx="160" cy="140" rx="75" ry="85" fill="#f4d4a8"/>
-
-  <!-- 发型 - 短发、整齐、黑色 -->
-  <path d="M85 110 Q85 50 160 45 Q235 50 235 110 Q230 95 220 85 Q200 70 160 68 Q120 70 100 85 Q90 95 85 110 Z" fill="#1a1a1a"/>
-  <path d="M95 100 Q100 80 160 75 Q220 80 225 100" stroke="#0a0a0a" stroke-width="2" fill="none"/>
-
-  <!-- 眉毛 - 浓黑、平直 -->
-  <path d="M115 125 Q130 123 145 125" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
-  <path d="M175 125 Q190 123 205 125" stroke="#1a1a1a" stroke-width="5" stroke-linecap="round"/>
-
-  <!-- 眼睛 - 细长、深邃 -->
-  <path d="M118 145 Q130 143 142 145" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <path d="M178 145 Q190 143 202 145" stroke="#1a1a1a" stroke-width="3" fill="none" stroke-linecap="round"/>
-  <ellipse cx="130" cy="145" rx="4" ry="5" fill="#1a1a1a"/>
-  <ellipse cx="190" cy="145" rx="4" ry="5" fill="#1a1a1a"/>
-  <circle cx="131" cy="144" r="1.5" fill="#e5ff00" opacity="0.8"/>
-  <circle cx="191" cy="144" r="1.5" fill="#e5ff00" opacity="0.8"/>
-
-  <!-- 鼻子 - 扁平 -->
-  <path d="M160 150 L160 168" stroke="#e4c498" stroke-width="2.5" stroke-linecap="round"/>
-  <ellipse cx="156" cy="168" rx="3" ry="2" fill="#e4c498"/>
-  <ellipse cx="164" cy="168" rx="3" ry="2" fill="#e4c498"/>
-
-  <!-- 嘴 - 紧抿、坚定 -->
-  <path d="M142 188 Q160 186 178 188" stroke="#c49a7a" stroke-width="3.5" stroke-linecap="round"/>
-
-  <!-- 战术耳机 -->
-  <path d="M75 140 Q70 140 70 145 L70 155 Q70 160 75 160" stroke="#e5ff00" stroke-width="3" fill="none" opacity="0.6"/>
-  <circle cx="75" cy="152" r="6" fill="#e5ff00" opacity="0.4"/>
-
-  <!-- 光效 -->
-  <path d="M240 100 L260 80" stroke="#e5ff00" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
-  <path d="M245 120 L270 115" stroke="#e5ff00" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#sc_bg)"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#C7B38A" stroke-width="2"/>
+  <circle cx="110" cy="86" r="88" fill="url(#sc_glow)"/>
+  <path d="M32 236C77 208 117 198 160 198C203 198 244 210 288 238" fill="#D9C59E" fill-opacity="0.55"/>
+  <path d="M82 294L98 220C109 194 131 180 160 180C189 180 211 194 222 220L238 294H82Z" fill="url(#sc_coat)"/>
+  <path d="M131 192L160 219L189 192L197 294H123L131 192Z" fill="#F3E8CF"/>
+  <rect x="146" y="161" width="28" height="28" rx="13" fill="#E8C2A6"/>
+  <ellipse cx="160" cy="122" rx="49" ry="55" fill="#E8C2A6"/>
+  <path d="M114 115C116 84 135 63 167 63C192 63 208 79 210 111C201 96 185 87 166 87C144 87 126 97 114 115Z" fill="#4D4139"/>
+  <path d="M121 92C132 71 152 63 171 64C186 65 199 73 206 92C196 84 181 79 162 79C147 79 133 84 121 92Z" fill="#5C4E43"/>
+  <path d="M132 118C136 114 142 112 148 112C154 112 159 114 163 118" stroke="#5F4A40" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M157 118C161 114 167 112 173 112C179 112 184 114 188 118" stroke="#5F4A40" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="146" cy="124" rx="5.5" ry="7" fill="#2F2824"/>
+  <ellipse cx="174" cy="124" rx="5.5" ry="7" fill="#2F2824"/>
+  <circle cx="148" cy="122" r="1.2" fill="#FFFDF7"/>
+  <circle cx="176" cy="122" r="1.2" fill="#FFFDF7"/>
+  <path d="M160 127V138" stroke="#C79677" stroke-width="3" stroke-linecap="round"/>
+  <path d="M147 149C154 155 166 155 173 149" stroke="#9F6A59" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="130" cy="136" rx="9" ry="6" fill="#D99D88" fill-opacity="0.35"/>
+  <ellipse cx="190" cy="136" rx="9" ry="6" fill="#D99D88" fill-opacity="0.35"/>
+  <path d="M118 196C133 188 146 184 160 184C174 184 187 188 202 196" stroke="#C7B38A" stroke-width="3" stroke-linecap="round"/>
+  <path d="M214 92C222 90 229 93 234 100" stroke="#9C8364" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M226 101C235 112 241 126 244 141" stroke="#9C8364" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="244" cy="144" r="5" fill="#B89A73"/>
+  <path d="M62 68C70 60 82 58 93 61" stroke="#CBB58E" stroke-width="4" stroke-linecap="round"/>
+  <path d="M74 78C82 72 93 71 102 75" stroke="#D8C7A6" stroke-width="3" stroke-linecap="round"/>
 </svg>

@@ -1,56 +1,41 @@
 <svg width="320" height="320" viewBox="0 0 320 320" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- 苏墨 - 表达与材料官：精致、克制、文雅 -->
   <defs>
-    <linearGradient id="sm-bg" x1="0" y1="0" x2="320" y2="320">
-      <stop stop-color="#1a0f1e"/>
-      <stop offset="1" stop-color="#2d1a3e"/>
+    <linearGradient id="sm_bg" x1="22" y1="16" x2="300" y2="304" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7EEF7"/>
+      <stop offset="0.54" stop-color="#E6D8E9"/>
+      <stop offset="1" stop-color="#D3C4D8"/>
     </linearGradient>
-    <radialGradient id="sm-glow" cx="0.5" cy="0.3">
-      <stop stop-color="#d946ef" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#d946ef" stop-opacity="0"/>
+    <radialGradient id="sm_wash" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(238 84) rotate(136) scale(124 116)">
+      <stop stop-color="#F9E0F6"/>
+      <stop offset="1" stop-color="#F9E0F6" stop-opacity="0"/>
     </radialGradient>
+    <linearGradient id="sm_coat" x1="160" y1="182" x2="160" y2="296" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#746484"/>
+      <stop offset="1" stop-color="#5D4F69"/>
+    </linearGradient>
   </defs>
-
-  <!-- 背景 -->
-  <rect width="320" height="320" rx="48" fill="url(#sm-bg)"/>
-  <circle cx="160" cy="110" r="150" fill="url(#sm-glow)"/>
-
-  <!-- 服装 - 优雅套装 -->
-  <path d="M72 280 L112 198 L160 173 L208 198 L248 280 Z" fill="#1a1028"/>
-  <path d="M136 195 L160 213 L184 195 L160 320 Z" fill="#d946ef" opacity="0.25"/>
-
-  <!-- 头部 - 亚洲人肤色 -->
-  <ellipse cx="160" cy="126" rx="78" ry="90" fill="#f4d4a8"/>
-
-  <!-- 发型 - 长发、柔顺、黑色 -->
-  <path d="M82 96 Q80 42 160 35 Q240 42 238 96 Q234 128 226 150 L218 168 Q212 182 205 195 L192 210 Q178 218 160 218 Q142 218 128 210 L115 195 Q108 182 102 168 L94 150 Q86 128 82 96 Z" fill="#1a1a1a"/>
-  <path d="M94 108 Q100 78 160 70 Q220 78 226 108" stroke="#0a0a0a" stroke-width="2.5" fill="none"/>
-  <path d="M88 130 Q94 150 105 168" stroke="#0a0a0a" stroke-width="2" fill="none" opacity="0.5"/>
-  <path d="M232 130 Q226 150 215 168" stroke="#0a0a0a" stroke-width="2" fill="none" opacity="0.5"/>
-
-  <!-- 眉毛 - 细长、黑色 -->
-  <path d="M116 109 Q129 107 148 109" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
-  <path d="M172 109 Q191 107 204 109" stroke="#1a1a1a" stroke-width="3" stroke-linecap="round"/>
-
-  <!-- 眼睛 - 温和、细长 -->
-  <path d="M123 133 Q130 131 137 133" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <path d="M183 133 Q190 131 197 133" stroke="#1a1a1a" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-  <ellipse cx="130" cy="133" rx="4" ry="5" fill="#1a1a1a"/>
-  <ellipse cx="190" cy="133" rx="4" ry="5" fill="#1a1a1a"/>
-  <circle cx="131" cy="132" r="1.5" fill="#d946ef" opacity="0.9"/>
-  <circle cx="191" cy="132" r="1.5" fill="#d946ef" opacity="0.9"/>
-
-  <!-- 鼻子 - 扁平 -->
-  <path d="M160 140 L160 157" stroke="#e4c498" stroke-width="2.5" stroke-linecap="round"/>
-  <ellipse cx="156" cy="157" rx="3" ry="2" fill="#e4c498"/>
-  <ellipse cx="164" cy="157" rx="3" ry="2" fill="#e4c498"/>
-
-  <!-- 嘴 - 温和微笑 -->
-  <path d="M144 178 Q160 182 176 178" stroke="#c49a7a" stroke-width="3.5" stroke-linecap="round"/>
-
-  <!-- 标志性元素 - 钢笔/书写工具 -->
-  <path d="M245 95 L265 75" stroke="#d946ef" stroke-width="3.5" stroke-linecap="round" opacity="0.6"/>
-  <circle cx="265" cy="75" r="4" fill="#d946ef" opacity="0.7"/>
-  <path d="M250 105 L270 105" stroke="#d946ef" stroke-width="2.5" stroke-linecap="round" opacity="0.4"/>
-  <path d="M252 115 L268 115" stroke="#d946ef" stroke-width="2" stroke-linecap="round" opacity="0.3"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" fill="url(#sm_bg)"/>
+  <rect x="10" y="10" width="300" height="300" rx="40" stroke="#C8B4CB" stroke-width="2"/>
+  <circle cx="238" cy="84" r="88" fill="url(#sm_wash)"/>
+  <path d="M32 246C78 214 118 200 160 200C202 200 244 214 288 246" fill="#E6D8E5" fill-opacity="0.7"/>
+  <path d="M88 296L102 222C115 197 137 182 160 182C183 182 205 197 218 222L232 296H88Z" fill="url(#sm_coat)"/>
+  <path d="M128 193L160 223L192 193L198 296H122L128 193Z" fill="#F8F2F9"/>
+  <path d="M118 209C131 197 145 191 160 191C175 191 189 197 202 209" stroke="#C6A4C8" stroke-width="3" stroke-linecap="round"/>
+  <rect x="146" y="162" width="28" height="26" rx="13" fill="#E8C5AE"/>
+  <ellipse cx="160" cy="122" rx="47" ry="54" fill="#E8C5AE"/>
+  <path d="M113 112C118 82 137 64 169 66C192 67 207 82 208 110C198 98 185 91 168 90C146 88 127 97 113 112Z" fill="#54464F"/>
+  <path d="M118 110C124 79 141 68 161 68C176 68 191 77 199 93C192 121 181 137 166 144C152 149 136 142 124 124C119 118 117 114 118 110Z" fill="#67586A"/>
+  <path d="M133 119C137 115 142 113 148 113C154 113 159 115 163 119" stroke="#634D5A" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M157 119C161 115 166 113 172 113C178 113 183 115 187 119" stroke="#634D5A" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="146" cy="125" rx="5.2" ry="6.8" fill="#2A2427"/>
+  <ellipse cx="174" cy="125" rx="5.2" ry="6.8" fill="#2A2427"/>
+  <circle cx="148" cy="123" r="1.2" fill="#FFFDF7"/>
+  <circle cx="176" cy="123" r="1.2" fill="#FFFDF7"/>
+  <path d="M160 129V139" stroke="#C99B83" stroke-width="3" stroke-linecap="round"/>
+  <path d="M147 151C154 157 166 157 173 151" stroke="#986960" stroke-width="3.5" stroke-linecap="round"/>
+  <ellipse cx="130" cy="138" rx="9" ry="6" fill="#DA9F94" fill-opacity="0.24"/>
+  <ellipse cx="190" cy="138" rx="9" ry="6" fill="#DA9F94" fill-opacity="0.24"/>
+  <path d="M214 90L238 84" stroke="#B98EC1" stroke-width="4" stroke-linecap="round"/>
+  <path d="M220 103H248" stroke="#D4B7D9" stroke-width="3" stroke-linecap="round"/>
+  <path d="M224 116H252" stroke="#E6D2EA" stroke-width="3" stroke-linecap="round"/>
 </svg>
