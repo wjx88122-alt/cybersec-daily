@@ -11,9 +11,9 @@ import {
 import {
   SectionTitle,
   TeamTabs,
-  DecisionArchiveCard,
   StatCard,
 } from "../components";
+import DecisionArchiveDeck from "../DecisionArchiveDeck";
 
 export const metadata: Metadata = {
   title: "决策档案 | 总裁辅助团队",
@@ -262,11 +262,7 @@ export default async function TeamDecisionsPage({ searchParams }: DecisionArchiv
             />
 
             {filtered.length > 0 ? (
-              <div className="grid gap-6">
-                {filtered.map((entry) => (
-                  <DecisionArchiveCard key={entry.id} entry={entry} />
-                ))}
-              </div>
+              <DecisionArchiveDeck entries={filtered} />
             ) : (
               <div className="glass glass-premium rounded-3xl p-8">
                 <div className="top-shine" />
