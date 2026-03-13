@@ -160,7 +160,7 @@ export function RoleCard({ role }: { role: Role }) {
             <img
               src={role.avatarSrc}
               alt={`${role.personaName} 头像`}
-              className="h-32 w-32 rounded-[26px] border border-white/10 object-cover sm:h-36 sm:w-36"
+              className="h-40 w-40 rounded-[28px] border border-white/10 object-cover sm:h-48 sm:w-48"
             />
           </div>
           <p className="max-w-[190px] text-right text-xs leading-6 text-[#94a3b8]">

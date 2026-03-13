@@ -181,7 +181,7 @@ export default function TeamPage() {
                           <img
                             src={role.avatarSrc}
                             alt={`${role.personaName} 头像`}
-                            className="h-14 w-14 rounded-[20px] border border-[#50f7ff]/20 bg-[linear-gradient(145deg,rgba(80,247,255,0.1),rgba(15,23,42,0.35))] object-cover shadow-[0_0_20px_rgba(80,247,255,0.14)] sm:h-16 sm:w-16"
+                            className="h-[4.5rem] w-[4.5rem] rounded-[22px] border border-[#50f7ff]/20 bg-[linear-gradient(145deg,rgba(80,247,255,0.1),rgba(15,23,42,0.35))] object-cover shadow-[0_0_24px_rgba(80,247,255,0.16)] sm:h-[5rem] sm:w-[5rem]"
                           />
                           <span
                             className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}

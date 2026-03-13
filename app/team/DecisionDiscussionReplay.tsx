@@ -240,7 +240,7 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
         />
       </div>
 
-      <div className="mt-6 grid gap-5 xl:grid-cols-[280px_1fr]">
+      <div className="mt-6 grid gap-5 xl:grid-cols-[320px_1fr]">
         <aside className="panel-deep rounded-3xl p-4 sm:p-5">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
             参会角色
@@ -261,12 +261,12 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
                       <Image
                         src={speaker.avatarSrc}
                         alt={speaker.name}
-                        width={44}
-                        height={44}
-                        className="h-11 w-11 rounded-2xl border border-white/10 object-cover"
+                        width={56}
+                        height={56}
+                        className="h-14 w-14 rounded-[18px] border border-white/10 object-cover"
                       />
                     ) : (
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05] text-sm font-semibold text-[#f0f6fc]">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/10 bg-white/[0.05] text-sm font-semibold text-[#f0f6fc]">
                         你
                       </div>
                     )}
@@ -323,9 +323,9 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
                       <Image
                         src={speaker.avatarSrc}
                         alt={speaker.name}
-                        width={48}
-                        height={48}
-                        className="mt-1 h-12 w-12 shrink-0 rounded-2xl border border-white/10 object-cover"
+                        width={60}
+                        height={60}
+                        className="mt-1 h-[3.75rem] w-[3.75rem] shrink-0 rounded-[20px] border border-white/10 object-cover"
                       />
                     ) : null
                   )}
