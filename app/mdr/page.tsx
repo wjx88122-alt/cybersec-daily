@@ -369,13 +369,6 @@ export default function MDRPage() {
           <a href="/mdr/dashboard" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-all">
             📺 运营大屏
           </a>
-          <a href="/mdr/huawei" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-red-600/10 text-red-600 border border-red-600/20 hover:bg-red-600/20 transition-all">
-            <span className="w-4 h-4 rounded bg-gradient-to-br from-red-600 to-red-500 flex items-center justify-center text-white text-[7px] font-bold">HW</span>
-            华为防火墙处置
-          </a>
-          <a href="/mdr/huawei/isdb" className="inline-flex items-center gap-1.5 mt-2 ml-2 px-3 py-1.5 text-xs font-medium rounded-lg bg-orange-500/10 text-orange-600 border border-orange-500/20 hover:bg-orange-500/20 transition-all">
-            📦 华为 SD-WAN ISDB
-          </a>
         </div>
 
         {/* Sub-tabs */}
