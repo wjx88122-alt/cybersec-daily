@@ -1,5 +1,6 @@
 import { FeedItem } from "./feeds";
 import { DailyDigest } from "./digest";
+import { getShanghaiDateStamp } from "./date-stamp";
 
 export type DailySnapshot = {
   date: string; // "2026-02-23"
@@ -17,7 +18,7 @@ export function generateSnapshot(
   items: FeedItem[],
   digest: DailyDigest | null,
 ): DailySnapshot {
-  const date = new Date().toISOString().slice(0, 10);
+  const date = getShanghaiDateStamp();
 
   const byCategory: Record<string, number> = {};
   const bySource: Record<string, number> = {};

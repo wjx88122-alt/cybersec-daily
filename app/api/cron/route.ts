@@ -4,6 +4,7 @@ import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
 import { resolveAppBaseUrl } from "@/lib/app-url";
+import { resolveFeedRefresh } from "@/lib/feed-refresh";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
@@ -33,7 +34,7 @@ export async function GET(req: NextRequest) {
   }
 
   const t0 = Date.now();
-  const [feedA, feedB, feedAI, prevA, prevB, prevAI] = await Promise.all([
+  const [feedAResult, feedBResult, feedAIResult, prevA, prevB, prevAI] = await Promise.all([
     fetchFeedsA(),
     fetchFeedsB(),
     fetchFeedsAI(),
@@ -42,12 +43,41 @@ export async function GET(req: NextRequest) {
     kv.get<FeedItem[]>("feed-ai"),
   ]);
   console.log(
-    `fetch: ${Date.now() - t0}ms feedA=${feedA.length} feedB=${feedB.length} feedAI=${feedAI.length}`,
+    `fetch: ${Date.now() - t0}ms feedA=${feedAResult.items.length} feedB=${feedBResult.items.length} feedAI=${feedAIResult.items.length}`,
   );
 
-  const mergedA = mergeWithExisting(feedA, prevA ?? []);
-  const mergedB = mergeWithExisting(feedB, prevB ?? []);
-  const mergedAI = mergeWithExisting(feedAI, prevAI ?? []);
+  const previousA = prevA ?? [];
+  const previousB = prevB ?? [];
+  const previousAI = prevAI ?? [];
+
+  let refreshedA;
+  let refreshedB;
+  let refreshedAI;
+  try {
+    refreshedA = resolveFeedRefresh(feedAResult, previousA);
+    refreshedB = resolveFeedRefresh(feedBResult, previousB);
+    refreshedAI = resolveFeedRefresh(feedAIResult, previousAI);
+  } catch (error) {
+    console.error("feed refresh failed:", error);
+    return NextResponse.json(
+      { error: "Feed refresh failed before cache update" },
+      { status: 502 },
+    );
+  }
+
+  if (refreshedA.stale) console.warn("feed-a refresh failed, keeping previous cache");
+  if (refreshedB.stale) console.warn("feed-b refresh failed, keeping previous cache");
+  if (refreshedAI.stale) console.warn("feed-ai refresh failed, keeping previous cache");
+
+  const mergedA = refreshedA.stale
+    ? refreshedA.items
+    : mergeWithExisting(refreshedA.items, previousA);
+  const mergedB = refreshedB.stale
+    ? refreshedB.items
+    : mergeWithExisting(refreshedB.items, previousB);
+  const mergedAI = refreshedAI.stale
+    ? refreshedAI.items
+    : mergeWithExisting(refreshedAI.items, previousAI);
 
   await Promise.all([
     kv.set("feed-a", mergedA),
@@ -97,5 +127,10 @@ export async function GET(req: NextRequest) {
     feedA: mergedA.length,
     feedB: mergedB.length,
     feedAI: mergedAI.length,
+    staleFeeds: [
+      refreshedA.stale ? "feed-a" : null,
+      refreshedB.stale ? "feed-b" : null,
+      refreshedAI.stale ? "feed-ai" : null,
+    ].filter(Boolean),
   });
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
+import { loadFeedCollection } from "@/lib/feed-client";
 import NewsCard from "@/components/NewsCard";
 import CategoryFilter, { AI_CATEGORIES } from "@/components/CategoryFilter";
 import NavBar from "@/components/NavBar";
@@ -15,15 +16,8 @@ export default function AIPage() {
   const [cutoff] = useState(() => Date.now() - CUTOFF_MS);
 
   useEffect(() => {
-    fetch("/api/feed-ai")
-      .then((r) => r.json())
-      .then((data) => {
-        const all = data.items || [];
-        all.sort((a: FeedItem, b: FeedItem) => {
-          const ta = new Date(a.pubDate).getTime();
-          const tb = new Date(b.pubDate).getTime();
-          return (isNaN(tb) ? 0 : tb) - (isNaN(ta) ? 0 : ta);
-        });
+    loadFeedCollection<FeedItem>(fetch, ["/api/feed-ai"])
+      .then((all) => {
         setItems(all);
       })
       .catch(() => setError("加载失败，请稍后刷新重试"))

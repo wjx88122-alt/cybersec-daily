@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
+import { loadFeedCollection } from "@/lib/feed-client";
 import NewsCard from "@/components/NewsCard";
 import CategoryFilter from "@/components/CategoryFilter";
 import NavBar from "@/components/NavBar";
@@ -15,17 +16,8 @@ export default function Home() {
   const [cutoff] = useState(() => Date.now() - CUTOFF_MS);
 
   useEffect(() => {
-    Promise.all([
-      fetch("/api/feed-a").then((r) => r.json()),
-      fetch("/api/feed-b").then((r) => r.json()),
-    ])
-      .then(([dataA, dataB]) => {
-        const all = [...(dataA.items || []), ...(dataB.items || [])];
-        all.sort((a, b) => {
-          const ta = new Date(a.pubDate).getTime();
-          const tb = new Date(b.pubDate).getTime();
-          return (isNaN(tb) ? 0 : tb) - (isNaN(ta) ? 0 : ta);
-        });
+    loadFeedCollection<FeedItem>(fetch, ["/api/feed-a", "/api/feed-b"])
+      .then((all) => {
         setItems(all);
       })
       .catch(() => setError("加载失败，请稍后刷新重试"))

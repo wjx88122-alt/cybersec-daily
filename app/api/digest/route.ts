@@ -1,5 +1,6 @@
 import { kv } from "@/lib/kv";
 import { generateDigest, DailyDigest } from "@/lib/digest";
+import { buildDigestInputItems } from "@/lib/digest-inputs";
 import { FeedItem } from "@/lib/feeds";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -15,15 +16,17 @@ export async function GET(req: NextRequest) {
       kv.get<FeedItem[]>("feed-b"),
       kv.get<FeedItem[]>("feed-ai"),
     ]);
-    if (!feedA)
+
+    let allItems: FeedItem[];
+    try {
+      allItems = buildDigestInputItems(feedA, feedB, feedAI);
+    } catch {
       return NextResponse.json(
-        { error: "No feed data, run cron first" },
+        { error: "Missing required feed data, run cron first" },
         { status: 400 },
       );
-    const allItems = [...(feedA ?? []), ...(feedB ?? []), ...(feedAI ?? [])];
-    allItems.sort(
-      (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime(),
-    );
+    }
+
     const digest = await generateDigest(allItems);
     await kv.set("digest", digest);
     return NextResponse.json({ ok: true, items: digest.items.length });
