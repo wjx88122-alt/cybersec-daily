@@ -12,6 +12,29 @@ function normalizeBaseUrl(value?: string | null): string | null {
   return `https://${trimmed.replace(/\/+$/, "")}`;
 }
 
+export function resolveAppBaseUrlFromSources({
+  appBaseUrl,
+  vercelUrl,
+  linkedVercelBaseUrl,
+  nextPublicAppUrl,
+  requestOrigin,
+}: {
+  appBaseUrl?: string | null;
+  vercelUrl?: string | null;
+  linkedVercelBaseUrl?: string | null;
+  nextPublicAppUrl?: string | null;
+  requestOrigin?: string | null;
+}): string {
+  return (
+    normalizeBaseUrl(appBaseUrl) ??
+    normalizeBaseUrl(vercelUrl) ??
+    normalizeBaseUrl(nextPublicAppUrl) ??
+    normalizeBaseUrl(requestOrigin) ??
+    normalizeBaseUrl(linkedVercelBaseUrl) ??
+    "http://localhost:3000"
+  );
+}
+
 function getLinkedVercelBaseUrl(): string | null {
   try {
     const file = readFileSync(join(process.cwd(), ".vercel", "project.json"), "utf8");
@@ -25,12 +48,11 @@ function getLinkedVercelBaseUrl(): string | null {
 }
 
 export function resolveAppBaseUrl(requestOrigin?: string): string {
-  return (
-    normalizeBaseUrl(process.env.APP_BASE_URL) ??
-    normalizeBaseUrl(process.env.VERCEL_URL) ??
-    getLinkedVercelBaseUrl() ??
-    normalizeBaseUrl(process.env.NEXT_PUBLIC_APP_URL) ??
-    normalizeBaseUrl(requestOrigin) ??
-    "http://localhost:3000"
-  );
+  return resolveAppBaseUrlFromSources({
+    appBaseUrl: process.env.APP_BASE_URL,
+    vercelUrl: process.env.VERCEL_URL,
+    nextPublicAppUrl: process.env.NEXT_PUBLIC_APP_URL,
+    requestOrigin,
+    linkedVercelBaseUrl: getLinkedVercelBaseUrl(),
+  });
 }

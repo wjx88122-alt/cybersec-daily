@@ -1,4 +1,5 @@
 import { DigestItem } from "@/lib/digest";
+import { resolveSafeExternalHref } from "@/lib/remote-url";
 
 const IMPORTANCE_CONFIG = {
   critical: {
@@ -35,11 +36,7 @@ export default function DigestCard({
   featured?: boolean;
 }) {
   const cfg = IMPORTANCE_CONFIG[item.importance] || IMPORTANCE_CONFIG.medium;
-  const safeHref =
-    item.sourceLink?.startsWith("http://") ||
-    item.sourceLink?.startsWith("https://")
-      ? item.sourceLink
-      : "#";
+  const safeHref = resolveSafeExternalHref(item.sourceLink);
 
   return (
     <a

@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { normalizeFeedPubDate, resolveFeedRefresh } = await import(
+const { normalizeFeedPubDate, resolveFeedRefresh, mergeFeedItems } = await import(
   "../lib/feed-refresh.ts"
 );
 
@@ -45,4 +45,51 @@ test("resolveFeedRefresh accepts empty fresh results when at least one source su
   );
 
   assert.deepEqual(resolved, { items: [], stale: false });
+});
+
+test("mergeFeedItems preserves cached timestamps when fresh items lose pubDate", () => {
+  const merged = mergeFeedItems(
+    [
+      {
+        id: "same",
+        title: "Fresh title",
+        link: "https://example.com/post",
+        summary: "Fresh summary",
+        source: "Example",
+        category: "综合资讯",
+        pubDate: "",
+      },
+    ],
+    [
+      {
+        id: "same",
+        title: "Old title",
+        link: "https://example.com/post",
+        summary: "Old summary",
+        source: "Example",
+        category: "综合资讯",
+        pubDate: "2026-03-24T00:00:00.000Z",
+        image: "https://cdn.example.com/old.png",
+        titleZh: "旧标题",
+        summaryZh: "旧摘要",
+        summaryAi: "旧AI摘要",
+      },
+    ],
+  );
+
+  assert.deepEqual(merged, [
+    {
+      id: "same",
+      title: "Fresh title",
+      link: "https://example.com/post",
+      summary: "Fresh summary",
+      source: "Example",
+      category: "综合资讯",
+      pubDate: "2026-03-24T00:00:00.000Z",
+      image: "https://cdn.example.com/old.png",
+      titleZh: "旧标题",
+      summaryZh: "旧摘要",
+      summaryAi: "旧AI摘要",
+    },
+  ]);
 });

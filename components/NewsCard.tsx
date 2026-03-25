@@ -1,6 +1,7 @@
 "use client";
 
 import { FeedItem } from "@/lib/feeds";
+import { resolveSafeExternalHref, resolveSafeImageUrl } from "@/lib/remote-url";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
 import { useState } from "react";
@@ -197,7 +198,11 @@ export default function NewsCard({
 
   const title = item.titleZh || item.title;
   const summary = item.summaryZh || item.summaryAi || item.summary;
-  const imgSrc = !imgError && item.image ? item.image : null;
+  const safeHref = resolveSafeExternalHref(item.link);
+  const imgSrc =
+    !imgError && item.image
+      ? resolveSafeImageUrl(item.image, item.link || "https://example.com")
+      : null;
   const catAccent =
     CATEGORY_ACCENT[item.category] ??
     "bg-slate-100 text-slate-700 border-slate-200";
@@ -206,7 +211,7 @@ export default function NewsCard({
 
   return (
     <a
-      href={item.link}
+      href={safeHref}
       target="_blank"
       rel="noopener noreferrer"
       className={`group block overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/82 shadow-[0_20px_60px_rgba(15,23,42,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] reveal-rise ${

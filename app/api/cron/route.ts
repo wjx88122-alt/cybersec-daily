@@ -4,28 +4,10 @@ import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
 import { resolveAppBaseUrl } from "@/lib/app-url";
-import { resolveFeedRefresh } from "@/lib/feed-refresh";
+import { mergeFeedItems, resolveFeedRefresh } from "@/lib/feed-refresh";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
-
-function mergeWithExisting(
-  fresh: FeedItem[],
-  existing: FeedItem[],
-): FeedItem[] {
-  const map = new Map(existing.map((i) => [i.id, i]));
-  return fresh.map((item) => {
-    const prev = map.get(item.id);
-    if (!prev) return item;
-    return {
-      ...item,
-      image: prev.image || item.image,
-      titleZh: prev.titleZh || item.titleZh,
-      summaryZh: prev.summaryZh || item.summaryZh,
-      summaryAi: prev.summaryAi || item.summaryAi,
-    };
-  });
-}
 
 export async function GET(req: NextRequest) {
   const auth = req.headers.get("authorization");
@@ -71,13 +53,13 @@ export async function GET(req: NextRequest) {
 
   const mergedA = refreshedA.stale
     ? refreshedA.items
-    : mergeWithExisting(refreshedA.items, previousA);
+    : mergeFeedItems(refreshedA.items, previousA);
   const mergedB = refreshedB.stale
     ? refreshedB.items
-    : mergeWithExisting(refreshedB.items, previousB);
+    : mergeFeedItems(refreshedB.items, previousB);
   const mergedAI = refreshedAI.stale
     ? refreshedAI.items
-    : mergeWithExisting(refreshedAI.items, previousAI);
+    : mergeFeedItems(refreshedAI.items, previousAI);
 
   await Promise.all([
     kv.set("feed-a", mergedA),
