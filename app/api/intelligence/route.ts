@@ -14,7 +14,14 @@ export async function GET() {
   ]);
 
   return NextResponse.json({
-    ...snapshot,
+    updatedAt: snapshot.updatedAt,
+    sourceStatus: snapshot.sourceStatus,
+    summary: snapshot.summary,
+    featuredTopics: snapshot.featuredTopics,
+    actors: snapshot.actors,
+    vulnerabilities: snapshot.vulnerabilities,
+    iocs: snapshot.iocs,
+    advisories: snapshot.advisories,
     subscriptions: subscriptions.value,
     subscriptionStorage: subscriptions.storage,
   });

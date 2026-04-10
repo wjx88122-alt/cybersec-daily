@@ -3,11 +3,14 @@ import {
   MOCK_INTEL_ACTORS,
   MOCK_INTEL_IOCS,
   MOCK_INTEL_REPORTS,
+  type IntelActor,
   type IntelFeaturedTopic,
   type IntelIndustryAlert,
+  type IntelIoc,
   type IntelSummary,
   type IntelVulnerability,
 } from "./intelligence-mock";
+import { buildLiveMappingLayer } from "./intelligence-mapping-sources";
 
 const KEV_URL =
   "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
@@ -73,7 +76,9 @@ export type LiveIntelligencePayload = {
   sourceStatus: LiveSourceStatus[];
   summary: IntelSummary;
   featuredTopics: IntelFeaturedTopic[];
+  actors: IntelActor[];
   vulnerabilities: IntelVulnerability[];
+  iocs: IntelIoc[];
   advisories: IntelIndustryAlert[];
   subscriptions: string[];
   subscriptionStorage?: "kv" | "memory";
@@ -202,7 +207,9 @@ function buildFeaturedTopics(
 }
 
 function summarizeLiveData(
+  actors: IntelActor[],
   vulnerabilities: IntelVulnerability[],
+  iocs: IntelIoc[],
   advisories: IntelIndustryAlert[],
 ): IntelSummary {
   const addedWithin24h = vulnerabilities.filter((item) =>
@@ -211,11 +218,11 @@ function summarizeLiveData(
 
   return {
     newItemsToday: addedWithin24h + advisories.length,
-    activeActors: MOCK_INTEL_ACTORS.length,
+    activeActors: actors.length || MOCK_INTEL_ACTORS.length,
     criticalVulnerabilities: vulnerabilities.filter(
       (item) => item.severity === "critical",
     ).length,
-    newIocs: MOCK_INTEL_IOCS.length,
+    newIocs: iocs.length || MOCK_INTEL_IOCS.length,
     industryAlerts: advisories.length,
     weeklyReports: MOCK_INTEL_REPORTS.length,
   };
@@ -225,7 +232,9 @@ export async function buildLiveIntelligenceSnapshot(): Promise<
   Omit<LiveIntelligencePayload, "subscriptions" | "subscriptionStorage">
 > {
   const sourceStatus: LiveSourceStatus[] = [];
+  let actors: IntelActor[] = [];
   let vulnerabilities: IntelVulnerability[] = [];
+  let iocs: IntelIoc[] = [];
   let advisories: IntelIndustryAlert[] = [];
 
   try {
@@ -328,12 +337,19 @@ export async function buildLiveIntelligenceSnapshot(): Promise<
     });
   }
 
+  const mappingLayer = await buildLiveMappingLayer();
+  actors = mappingLayer.actors;
+  iocs = mappingLayer.iocs;
+  sourceStatus.push(...mappingLayer.status);
+
   return {
     updatedAt: new Date().toISOString(),
     sourceStatus,
-    summary: summarizeLiveData(vulnerabilities, advisories),
+    summary: summarizeLiveData(actors, vulnerabilities, iocs, advisories),
     featuredTopics: buildFeaturedTopics(vulnerabilities),
+    actors,
     vulnerabilities,
+    iocs,
     advisories,
   };
 }

@@ -133,17 +133,24 @@ export default function IntelligencePage() {
   const displayedFeaturedTopics = liveData?.featuredTopics?.length
     ? liveData.featuredTopics
     : MOCK_INTEL_FEATURED_TOPICS;
+  const displayedActors = liveData?.actors?.length
+    ? liveData.actors
+    : MOCK_INTEL_ACTORS;
   const displayedVulnerabilities = liveData?.vulnerabilities?.length
     ? liveData.vulnerabilities
     : MOCK_INTEL_VULNERABILITIES;
+  const displayedIocs = liveData?.iocs?.length
+    ? liveData.iocs
+    : MOCK_INTEL_IOCS;
   const displayedAlerts = liveData?.advisories?.length
     ? liveData.advisories
     : MOCK_INTEL_INDUSTRY_ALERTS;
   const sourceStatus: LiveSourceStatus[] = liveData?.sourceStatus ?? [];
+  const threatFoxStatus = sourceStatus.find((item) => item.source === "ThreatFox");
 
   const actorMap = useMemo(
-    () => new Map(MOCK_INTEL_ACTORS.map((item) => [item.id, item])),
-    [],
+    () => new Map(displayedActors.map((item) => [item.id, item])),
+    [displayedActors],
   );
   const vulnerabilityLookupItems = useMemo(
     () => [...MOCK_INTEL_VULNERABILITIES, ...displayedVulnerabilities],
@@ -160,7 +167,7 @@ export default function IntelligencePage() {
 
   const filteredActors = useMemo(
     () =>
-      MOCK_INTEL_ACTORS.filter((actor) =>
+      displayedActors.filter((actor) =>
         includesQuery(deferredQuery, [
           actor.name,
           actor.origin,
@@ -170,7 +177,7 @@ export default function IntelligencePage() {
           ...actor.ttp,
         ]),
       ),
-    [deferredQuery],
+    [deferredQuery, displayedActors],
   );
 
   const filteredVulnerabilities = useMemo(
@@ -188,7 +195,7 @@ export default function IntelligencePage() {
 
   const filteredIocs = useMemo(
     () =>
-      MOCK_INTEL_IOCS.filter((item) =>
+      displayedIocs.filter((item) =>
         includesQuery(deferredQuery, [
           item.value,
           item.type,
@@ -197,7 +204,7 @@ export default function IntelligencePage() {
           ...item.tags,
         ]),
       ),
-    [deferredQuery],
+    [deferredQuery, displayedIocs],
   );
 
   const filteredAlerts = useMemo(
@@ -228,7 +235,7 @@ export default function IntelligencePage() {
   const activeActor =
     filteredActors.find((item) => item.id === selectedActorId) ??
     filteredActors[0] ??
-    MOCK_INTEL_ACTORS[0];
+    displayedActors[0];
 
   const activeVulnerability =
     filteredVulnerabilities.find((item) => item.id === selectedVulnerabilityId) ??
@@ -238,7 +245,7 @@ export default function IntelligencePage() {
   const activeIoc =
     filteredIocs.find((item) => item.id === selectedIocId) ??
     filteredIocs[0] ??
-    MOCK_INTEL_IOCS[0];
+    displayedIocs[0];
 
   const searchResults = useMemo(() => {
     const actorHits =
@@ -478,12 +485,15 @@ export default function IntelligencePage() {
                 真实情报源
               </div>
               <div className="mt-2 text-sm text-[#64748b]">
-                CISA KEV / NVD / FIRST EPSS / CISA Advisories
+                CISA KEV / NVD / FIRST EPSS / CISA Advisories / MITRE ATT&CK / ThreatFox
                 {liveData ? ` · 最近同步 ${formatTime(liveData.updatedAt)}` : ""}
               </div>
               {liveError ? (
                 <div className="mt-2 text-xs text-orange-500">{liveError}</div>
               ) : null}
+              <div className="mt-2 text-xs text-[#94a3b8]">
+                未配置 <code>THREATFOX_AUTH_KEY</code> 时，ThreatFox 将回退到知识库 IOC。
+              </div>
             </div>
             <div className="text-xs text-[#64748b]">
               {isLoadingLive ? "正在同步实时漏洞与官方预警..." : "已进入混合情报模式"}
@@ -779,6 +789,9 @@ export default function IntelligencePage() {
               Library
             </div>
             <h2 className="mt-1 text-lg font-semibold text-[#1a1a2e]">威胁组织库</h2>
+            <div className="mt-1 text-xs text-[#64748b]">
+              优先展示 MITRE ATT&CK 组织档案，回退到本地知识库画像。
+            </div>
           </div>
           <div className="grid gap-4 lg:grid-cols-[0.95fr_1.45fr]">
             <div className="glass rounded-2xl p-4">
@@ -807,7 +820,7 @@ export default function IntelligencePage() {
                       </span>
                     </div>
                     <div className="mt-1 text-xs text-[#64748b]">
-                      {actor.targetIndustries.join(" / ")}
+                      {actor.targetIndustries.join(" / ")} · {actor.origin}
                     </div>
                   </button>
                 ))}
@@ -829,6 +842,9 @@ export default function IntelligencePage() {
                     <div className="mt-2 text-xs text-[#64748b]">
                       别名：{activeActor.aliases.join(" / ")} · 起源：{activeActor.origin} · 最近活动：
                       {timeAgo(activeActor.lastActivity)}
+                    </div>
+                    <div className="mt-1 text-[11px] text-[#94a3b8]">
+                      MITRE ATT&CK 组织档案
                     </div>
                   </div>
                   <div className="flex gap-2">
@@ -1079,6 +1095,9 @@ export default function IntelligencePage() {
               Intelligence
             </div>
             <h2 className="mt-1 text-lg font-semibold text-[#1a1a2e]">IOC 情报库</h2>
+            <div className="mt-1 text-xs text-[#64748b]">
+              优先展示 ThreatFox 实时 IOC，并尝试映射到 ATT&CK 组织。
+            </div>
           </div>
           <div className="grid gap-4 lg:grid-cols-[1.05fr_1.15fr]">
             <div className="glass rounded-2xl p-4">
@@ -1087,9 +1106,14 @@ export default function IntelligencePage() {
                   {filteredIocs.length} 个 IOC 命中当前检索
                 </span>
                 <span className="text-[10px] uppercase tracking-[0.2em] text-[#94a3b8]">
-                  IOC Feed
+                  ThreatFox
                 </span>
               </div>
+              {threatFoxStatus && !threatFoxStatus.ok ? (
+                <div className="mb-3 rounded-xl border border-dashed border-black/[0.08] px-3 py-2 text-xs text-[#64748b]">
+                  {threatFoxStatus.detail}
+                </div>
+              ) : null}
               <div className="space-y-2">
                 {filteredIocs.map((item) => (
                   <button
@@ -1175,11 +1199,17 @@ export default function IntelligencePage() {
                   <div className="rounded-2xl border border-black/[0.06] bg-white/70 p-4">
                     <div className="text-[11px] font-medium text-[#64748b]">关联组织</div>
                     <div className="mt-2 space-y-1.5">
-                      {activeIoc.linkedActorIds.map((id) => (
-                        <div key={id} className="text-xs text-[#475569]">
-                          {actorMap.get(id)?.name}
+                      {activeIoc.linkedActorIds.length > 0 ? (
+                        activeIoc.linkedActorIds.map((id) => (
+                          <div key={id} className="text-xs text-[#475569]">
+                            {actorMap.get(id)?.name}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-xs text-[#94a3b8]">
+                          当前 IOC 未映射到 ATT&CK 组织。
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                   <div className="rounded-2xl border border-black/[0.06] bg-white/70 p-4">
