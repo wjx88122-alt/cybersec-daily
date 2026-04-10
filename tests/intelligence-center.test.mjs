@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { join } from "node:path";
 import test from "node:test";
 
-const root =
-  "/Users/kissbye/.config/superpowers/worktrees/cybersec-daily/intelligence-center";
+const root = fileURLToPath(new URL("..", import.meta.url));
 
 test("Intelligence MDR route exists", () => {
   assert.equal(

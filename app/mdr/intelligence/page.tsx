@@ -1,6 +1,12 @@
 "use client";
 
-import { startTransition, useDeferredValue, useMemo, useState } from "react";
+import {
+  startTransition,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import NavBar from "@/components/NavBar";
 import {
   MOCK_INTEL_ACTORS,
@@ -13,11 +19,10 @@ import {
   MOCK_INTEL_SUMMARY,
   MOCK_INTEL_VULNERABILITIES,
   MOCK_INTEL_WATCHLIST,
-  type IntelActor,
-  type IntelIoc,
   type IntelSeverity,
   type IntelVulnerability,
 } from "@/lib/intelligence-mock";
+import type { LiveIntelligencePayload, LiveSourceStatus } from "@/lib/intelligence-sources";
 
 const severityBadge: Record<IntelSeverity, string> = {
   critical: "bg-red-500/12 text-red-500 border-red-500/20",
@@ -108,6 +113,9 @@ function DomainCard({
 export default function IntelligencePage() {
   const [query, setQuery] = useState("");
   const [scope, setScope] = useState<SearchScope>("all");
+  const [liveData, setLiveData] = useState<LiveIntelligencePayload | null>(null);
+  const [isLoadingLive, setIsLoadingLive] = useState(true);
+  const [liveError, setLiveError] = useState("");
   const [selectedActorId, setSelectedActorId] = useState(
     MOCK_INTEL_ACTORS[0]?.id ?? "",
   );
@@ -121,14 +129,29 @@ export default function IntelligencePage() {
   const [subscriptions, setSubscriptions] = useState(MOCK_INTEL_SUBSCRIPTIONS);
   const [feedback, setFeedback] = useState("");
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
+  const displayedSummary = liveData?.summary ?? MOCK_INTEL_SUMMARY;
+  const displayedFeaturedTopics = liveData?.featuredTopics?.length
+    ? liveData.featuredTopics
+    : MOCK_INTEL_FEATURED_TOPICS;
+  const displayedVulnerabilities = liveData?.vulnerabilities?.length
+    ? liveData.vulnerabilities
+    : MOCK_INTEL_VULNERABILITIES;
+  const displayedAlerts = liveData?.advisories?.length
+    ? liveData.advisories
+    : MOCK_INTEL_INDUSTRY_ALERTS;
+  const sourceStatus: LiveSourceStatus[] = liveData?.sourceStatus ?? [];
 
   const actorMap = useMemo(
     () => new Map(MOCK_INTEL_ACTORS.map((item) => [item.id, item])),
     [],
   );
+  const vulnerabilityLookupItems = useMemo(
+    () => [...MOCK_INTEL_VULNERABILITIES, ...displayedVulnerabilities],
+    [displayedVulnerabilities],
+  );
   const vulnerabilityMap = useMemo(
-    () => new Map(MOCK_INTEL_VULNERABILITIES.map((item) => [item.id, item])),
-    [],
+    () => new Map(vulnerabilityLookupItems.map((item) => [item.id, item])),
+    [vulnerabilityLookupItems],
   );
   const reportMap = useMemo(
     () => new Map(MOCK_INTEL_REPORTS.map((item) => [item.id, item])),
@@ -152,7 +175,7 @@ export default function IntelligencePage() {
 
   const filteredVulnerabilities = useMemo(
     () =>
-      MOCK_INTEL_VULNERABILITIES.filter((item) =>
+      displayedVulnerabilities.filter((item) =>
         includesQuery(deferredQuery, [
           item.cve,
           item.title,
@@ -160,7 +183,7 @@ export default function IntelligencePage() {
           ...item.affectedProducts,
         ]),
       ),
-    [deferredQuery],
+    [deferredQuery, displayedVulnerabilities],
   );
 
   const filteredIocs = useMemo(
@@ -179,14 +202,14 @@ export default function IntelligencePage() {
 
   const filteredAlerts = useMemo(
     () =>
-      MOCK_INTEL_INDUSTRY_ALERTS.filter((item) =>
+      displayedAlerts.filter((item) =>
         includesQuery(deferredQuery, [
           item.title,
           item.summary,
           ...item.industries,
         ]),
       ),
-    [deferredQuery],
+    [deferredQuery, displayedAlerts],
   );
 
   const filteredReports = useMemo(
@@ -210,7 +233,7 @@ export default function IntelligencePage() {
   const activeVulnerability =
     filteredVulnerabilities.find((item) => item.id === selectedVulnerabilityId) ??
     filteredVulnerabilities[0] ??
-    MOCK_INTEL_VULNERABILITIES[0];
+    displayedVulnerabilities[0];
 
   const activeIoc =
     filteredIocs.find((item) => item.id === selectedIocId) ??
@@ -286,26 +309,97 @@ export default function IntelligencePage() {
     });
   };
 
-  const addSubscription = (label: string) => {
-    startTransition(() => {
-      setSubscriptions((prev) =>
-        prev.includes(label) ? prev : [label, ...prev].slice(0, 6),
-      );
-      setFeedback(`已订阅 ${label} 的后续更新。`);
-    });
-  };
+  useEffect(() => {
+    const controller = new AbortController();
 
-  const copyIoc = (value: string) => {
-    startTransition(() => {
-      setFeedback(`已复制 IOC：${value}`);
-    });
-  };
+    async function loadLiveData() {
+      try {
+        const response = await fetch("/api/intelligence", {
+          signal: controller.signal,
+        });
+        if (!response.ok) {
+          throw new Error(`live intelligence load failed: ${response.status}`);
+        }
 
-  const exportSnapshot = (label: string) => {
-    startTransition(() => {
-      setFeedback(`已生成 ${label} 的专题摘要，可继续接入导出流程。`);
-    });
-  };
+        const payload = (await response.json()) as LiveIntelligencePayload;
+        startTransition(() => {
+          setLiveData(payload);
+          if (Array.isArray(payload.subscriptions) && payload.subscriptions.length > 0) {
+            setSubscriptions(payload.subscriptions);
+          }
+          setLiveError("");
+          setIsLoadingLive(false);
+        });
+      } catch (error) {
+        if (controller.signal.aborted) return;
+        startTransition(() => {
+          setIsLoadingLive(false);
+          setLiveError(
+            error instanceof Error
+              ? error.message
+              : "真实情报源加载失败，当前展示知识库回退内容。",
+          );
+        });
+      }
+    }
+
+    loadLiveData();
+
+    return () => controller.abort();
+  }, []);
+
+  async function addSubscription(label: string) {
+    try {
+      const response = await fetch("/api/intelligence/subscriptions", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ topic: label }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`subscribe failed: ${response.status}`);
+      }
+
+      const payload = (await response.json()) as {
+        items?: string[];
+        storage?: "kv" | "memory";
+      };
+
+      startTransition(() => {
+        if (Array.isArray(payload.items)) {
+          setSubscriptions(payload.items);
+        }
+        setFeedback(
+          `已订阅 ${label} 的后续更新。${
+            payload.storage === "memory" ? "当前使用本地临时存储。" : "已写入持久化存储。"
+          }`,
+        );
+      });
+    } catch (error) {
+      startTransition(() => {
+        setFeedback(
+          error instanceof Error
+            ? `订阅失败：${error.message}`
+            : "订阅失败，请稍后再试。",
+        );
+      });
+    }
+  }
+
+  async function copyIoc(value: string) {
+    try {
+      await navigator.clipboard.writeText(value);
+      startTransition(() => {
+        setFeedback(`已复制 IOC：${value}`);
+      });
+    } catch {
+      startTransition(() => {
+        setFeedback(`已选定 IOC：${value}，当前环境未授予剪贴板写入权限。`);
+      });
+    }
+  }
 
   const selectedActorName = activeActor?.name ?? "";
   const selectedVulnerabilityName = activeVulnerability?.cve ?? "";
@@ -336,12 +430,22 @@ export default function IntelligencePage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => exportSnapshot("本周重点情报")}
+              <a
+                href="/api/intelligence/export?format=markdown"
+                target="_blank"
+                rel="noreferrer"
                 className="rounded-lg border border-[#2563eb]/20 bg-[#2563eb]/10 px-3 py-1.5 text-xs font-medium text-[#2563eb] transition-all hover:bg-[#2563eb]/15"
               >
-                导出本周摘要
-              </button>
+                导出 Markdown
+              </a>
+              <a
+                href="/api/intelligence/export?format=json"
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-lg border border-black/[0.08] bg-white/80 px-3 py-1.5 text-xs font-medium text-[#475569] transition-all hover:bg-white"
+              >
+                导出 JSON
+              </a>
               <a
                 href="/mdr"
                 className="rounded-lg border border-black/[0.08] bg-white/70 px-3 py-1.5 text-xs font-medium text-[#475569] transition-all hover:bg-white"
@@ -364,41 +468,95 @@ export default function IntelligencePage() {
           </div>
         ) : null}
 
+        <div className="glass mb-6 rounded-2xl p-5">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94a3b8]">
+                Live Sources
+              </div>
+              <div className="mt-1 text-lg font-semibold text-[#1a1a2e]">
+                真实情报源
+              </div>
+              <div className="mt-2 text-sm text-[#64748b]">
+                CISA KEV / NVD / FIRST EPSS / CISA Advisories
+                {liveData ? ` · 最近同步 ${formatTime(liveData.updatedAt)}` : ""}
+              </div>
+              {liveError ? (
+                <div className="mt-2 text-xs text-orange-500">{liveError}</div>
+              ) : null}
+            </div>
+            <div className="text-xs text-[#64748b]">
+              {isLoadingLive ? "正在同步实时漏洞与官方预警..." : "已进入混合情报模式"}
+            </div>
+          </div>
+          <div className="mt-4 grid gap-3 md:grid-cols-2">
+            {sourceStatus.length > 0 ? (
+              sourceStatus.map((item) => (
+                <div
+                  key={item.source}
+                  className="rounded-xl border border-black/[0.06] bg-white/70 px-4 py-3"
+                >
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-sm font-medium text-[#1a1a2e]">
+                      {item.source}
+                    </span>
+                    <span
+                      className={`rounded-full px-2 py-0.5 text-[10px] ${
+                        item.ok ? "bg-emerald-500/10 text-emerald-600" : "bg-orange-500/10 text-orange-500"
+                      }`}
+                    >
+                      {item.ok ? "在线" : "回退中"}
+                    </span>
+                  </div>
+                  <div className="mt-1 text-xs text-[#64748b]">{item.detail}</div>
+                  <div className="mt-2 text-[10px] uppercase tracking-[0.24em] text-[#94a3b8]">
+                    count {item.count}
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="rounded-xl border border-dashed border-black/[0.08] px-4 py-4 text-sm text-[#94a3b8]">
+                正在准备实时源状态。
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
           {[
             {
               label: "今日新增情报",
-              value: MOCK_INTEL_SUMMARY.newItemsToday,
+              value: displayedSummary.newItemsToday,
               icon: "🛰️",
               accent: "text-[#2563eb]",
             },
             {
               label: "活跃组织",
-              value: MOCK_INTEL_SUMMARY.activeActors,
+              value: displayedSummary.activeActors,
               icon: "🎯",
               accent: "text-red-500",
             },
             {
               label: "高危漏洞专题",
-              value: MOCK_INTEL_SUMMARY.criticalVulnerabilities,
+              value: displayedSummary.criticalVulnerabilities,
               icon: "🧨",
               accent: "text-orange-500",
             },
             {
               label: "新增 IOC",
-              value: MOCK_INTEL_SUMMARY.newIocs,
+              value: displayedSummary.newIocs,
               icon: "🔍",
               accent: "text-cyan-500",
             },
             {
               label: "行业预警",
-              value: MOCK_INTEL_SUMMARY.industryAlerts,
+              value: displayedSummary.industryAlerts,
               icon: "🏭",
               accent: "text-amber-500",
             },
             {
               label: "本周报告",
-              value: MOCK_INTEL_SUMMARY.weeklyReports,
+              value: displayedSummary.weeklyReports,
               icon: "📚",
               accent: "text-violet-500",
             },
@@ -573,7 +731,7 @@ export default function IntelligencePage() {
             </span>
           </div>
           <div className="grid gap-4 lg:grid-cols-3">
-            {MOCK_INTEL_FEATURED_TOPICS.map((topic) => (
+            {displayedFeaturedTopics.map((topic) => (
               <article key={topic.id} className="glass rounded-2xl p-5">
                 <div className="flex items-center justify-between gap-3">
                   <span
@@ -680,12 +838,14 @@ export default function IntelligencePage() {
                     >
                       重点关注
                     </button>
-                    <button
-                      onClick={() => exportSnapshot(activeActor.name)}
+                    <a
+                      href="/api/intelligence/export?format=markdown"
+                      target="_blank"
+                      rel="noreferrer"
                       className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-xs font-medium text-[#475569]"
                     >
                       导出专题
-                    </button>
+                    </a>
                   </div>
                 </div>
 
@@ -840,12 +1000,16 @@ export default function IntelligencePage() {
                     >
                       关注漏洞
                     </button>
-                    <button
-                      onClick={() => addSubscription(activeVulnerability.cve)}
+                    <a
+                      href={`/api/intelligence/export?format=markdown&cve=${encodeURIComponent(
+                        activeVulnerability.cve,
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
                       className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-xs font-medium text-[#475569]"
                     >
-                      订阅更新
-                    </button>
+                      导出专题
+                    </a>
                   </div>
                 </div>
 
@@ -1104,12 +1268,14 @@ export default function IntelligencePage() {
                       >
                         订阅
                       </button>
-                      <button
-                        onClick={() => exportSnapshot(item.title)}
+                      <a
+                        href="/api/intelligence/export?format=markdown"
+                        target="_blank"
+                        rel="noreferrer"
                         className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-xs font-medium text-[#475569]"
                       >
                         导出
-                      </button>
+                      </a>
                     </div>
                   </div>
                   <div className="mt-4 grid gap-3 md:grid-cols-2">
@@ -1150,9 +1316,9 @@ export default function IntelligencePage() {
               <div className="mt-5 rounded-2xl border border-black/[0.06] bg-white/70 p-4">
                 <div className="text-[11px] font-medium text-[#64748b]">知识库页首版边界</div>
                 <div className="mt-2 space-y-1.5 text-xs text-[#475569]">
-                  <div>▸ 外部情报主导，不直接承接工单闭环</div>
-                  <div>▸ 支持轻交互：关注、订阅、复制、导出</div>
-                  <div>▸ 后续可接真实情报源和规则下发流程</div>
+                  <div>▸ 真实漏洞源与官方预警已接入页面主视图</div>
+                  <div>▸ 订阅能力走 /api/intelligence/subscriptions</div>
+                  <div>▸ 导出能力走 /api/intelligence/export</div>
                 </div>
               </div>
             </div>
