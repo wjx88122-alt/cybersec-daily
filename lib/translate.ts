@@ -2,9 +2,11 @@ import { jsonrepair } from "jsonrepair";
 import { getDeepSeekClient, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
 
+type TranslationResult = { titleZh: string; summaryZh: string };
+
 async function translateBatch(
   items: { title: string; summary: string }[],
-): Promise<{ titleZh: string; summaryZh: string }[]> {
+): Promise<TranslationResult[]> {
   const client = getDeepSeekClient();
   const model = getLLMModel();
   const response = await client.chat.completions.create({
@@ -45,9 +47,16 @@ ${JSON.stringify(items)}
   }
 }
 
+function normalizeTranslation(result?: Partial<TranslationResult>): TranslationResult {
+  return {
+    titleZh: result?.titleZh?.trim() ?? "",
+    summaryZh: result?.summaryZh?.trim() ?? "",
+  };
+}
+
 export async function translateItems(
   items: FeedItem[],
-): Promise<{ titleZh: string; summaryZh: string }[]> {
+): Promise<TranslationResult[]> {
   const input = items.map((item) => ({
     title: item.title,
     summary: item.summary,
@@ -58,9 +67,23 @@ export async function translateItems(
   const results = await translateBatch(input);
 
   // Validate result length matches input; pad with empty if LLM returned fewer
-  const validated: { titleZh: string; summaryZh: string }[] = [];
+  const validated: TranslationResult[] = [];
   for (let i = 0; i < input.length; i++) {
-    validated.push(results[i] ?? { titleZh: "", summaryZh: "" });
+    let result = normalizeTranslation(results[i]);
+
+    if (!result.titleZh || !result.summaryZh) {
+      try {
+        const retried = normalizeTranslation((await translateBatch([input[i]]))[0]);
+        result = {
+          titleZh: result.titleZh || retried.titleZh,
+          summaryZh: result.summaryZh || retried.summaryZh,
+        };
+      } catch {
+        // Keep the best-effort batch result if single retry also fails.
+      }
+    }
+
+    validated.push(result);
   }
   return validated;
 }

@@ -3,7 +3,7 @@ import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
 import { extractArticleText } from "@/lib/extractArticle";
 import { resolveAppBaseUrl } from "@/lib/app-url";
 import { summarizeItems } from "@/lib/summarize";
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
 
@@ -16,9 +16,12 @@ export async function GET(req: NextRequest) {
   const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
   const triggerDigestRebuild = () => {
     const digestUrl = `${appBaseUrl}/api/digest`;
-    fetch(digestUrl, {
-      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-    }).catch((e) => console.error("summarize: trigger digest failed:", e));
+    after(() => {
+      void fetch(digestUrl, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        cache: "no-store",
+      }).catch((e) => console.error("summarize: trigger digest failed:", e));
+    });
   };
 
   const [feedA, feedB, feedAI] = await Promise.all([

@@ -35,6 +35,16 @@ That cron refreshes feeds first, then the downstream cloud routes chain automati
 - `/api/summarize`
 - `/api/digest`
 
+## Translation self-healing
+
+To reduce recurring cases where recent English items appear without Chinese translations, the translation pipeline now has multiple safeguards:
+
+- `/api/cron` refreshes feeds and immediately schedules a recent-only translation repair
+- `/api/translate?scope=recent` always prioritizes the latest 24 hours before backlog items
+- partial batch results are retried item-by-item inside `lib/translate.ts`
+- public feed reads (`/api/feed`, `/api/feed-a`, `/api/feed-b`, `/api/feed-ai`) can trigger a throttled self-heal repair if recent items are still missing Chinese fields
+- `/api/translation-health` exposes the latest translation health snapshot, including recent missing counts and sampled missing items
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

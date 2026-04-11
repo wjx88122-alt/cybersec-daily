@@ -1,8 +1,12 @@
 import { kv } from "@/lib/kv";
 import { translateItems } from "@/lib/translate";
-import { FeedItem } from "@/lib/feeds";
+import { CUTOFF_MS, FeedItem } from "@/lib/feeds";
 import { resolveAppBaseUrl } from "@/lib/app-url";
-import { NextRequest, NextResponse } from "next/server";
+import {
+  isLikelyUntranslated,
+  recordTranslationHealthFromItems,
+} from "@/lib/translation-health";
+import { after, NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
 
@@ -13,26 +17,13 @@ const BATCH_SIZE = 10;
 /** Helper: detect Chinese content (skip translation for Chinese sources) */
 const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
 const normalize = (text?: string) => (text ?? "").trim();
+const getTimestamp = (item: FeedItem) => {
+  const time = new Date(item.pubDate).getTime();
+  return Number.isNaN(time) ? 0 : time;
+};
 
-function isLikelyUntranslated(item: FeedItem) {
-  const title = normalize(item.title);
-  const summary = normalize(item.summary);
-  const titleZh = normalize(item.titleZh);
-  const summaryZh = normalize(item.summaryZh);
-
-  const titleLooksChinese = isChinese(title);
-  const summaryLooksChinese = isChinese(summary);
-
-  // For non-Chinese source text, zh field equal to source text usually means untranslated copy.
-  const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
-  const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
-
-  return (
-    !titleZh ||
-    !summaryZh ||
-    titleCopiedFromSource ||
-    summaryCopiedFromSource
-  );
+function sortByNewest(items: FeedItem[]) {
+  return [...items].sort((a, b) => getTimestamp(b) - getTimestamp(a));
 }
 
 function autoFillChineseFields(items: FeedItem[]) {
@@ -80,11 +71,16 @@ export async function GET(req: NextRequest) {
 
   const startTime = Date.now();
   const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const recentCutoff = Date.now() - CUTOFF_MS;
+  const scope = req.nextUrl.searchParams.get("scope") === "recent" ? "recent" : "all";
   const triggerSummarize = () => {
     const summarizeUrl = `${appBaseUrl}/api/summarize`;
-    fetch(summarizeUrl, {
-      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-    }).catch((e) => console.error("translate: trigger summarize failed:", e));
+    after(() => {
+      void fetch(summarizeUrl, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        cache: "no-store",
+      }).catch((e) => console.error("translate: trigger summarize failed:", e));
+    });
   };
 
   const [feedA, feedB, feedAI] = await Promise.all([
@@ -107,20 +103,46 @@ export async function GET(req: NextRequest) {
   autoFillChineseFields(allItems);
   autoFillChineseFields(aiItems);
 
-  // Collect ALL untranslated/incomplete items — no time filter here
-  // (time filtering is only for frontend display, not translation eligibility)
   const toTranslate = allItems.filter(isLikelyUntranslated);
   const toTranslateAI = aiItems.filter(isLikelyUntranslated);
-  const allToTranslate = [...toTranslate, ...toTranslateAI];
+  const recentToTranslate = sortByNewest(
+    toTranslate.filter((item) => getTimestamp(item) >= recentCutoff),
+  );
+  const backlogToTranslate = sortByNewest(
+    toTranslate.filter((item) => getTimestamp(item) < recentCutoff),
+  );
+  const recentToTranslateAI = sortByNewest(
+    toTranslateAI.filter((item) => getTimestamp(item) >= recentCutoff),
+  );
+  const backlogToTranslateAI = sortByNewest(
+    toTranslateAI.filter((item) => getTimestamp(item) < recentCutoff),
+  );
+  const allToTranslate =
+    scope === "recent"
+      ? [...recentToTranslate, ...recentToTranslateAI]
+      : [
+          ...recentToTranslate,
+          ...backlogToTranslate,
+          ...recentToTranslateAI,
+          ...backlogToTranslateAI,
+        ];
 
   if (allToTranslate.length === 0) {
     const totalWithZh = allItems.filter((i) => i.titleZh).length + aiItems.filter((i) => i.titleZh).length;
     if (feedAI) await kv.set("feed-ai", aiItems);
     triggerSummarize();
-    return NextResponse.json({ ok: true, withZh: totalWithZh, skipped: true });
+    return NextResponse.json({
+      ok: true,
+      scope,
+      withZh: totalWithZh,
+      recentPending: 0,
+      skipped: true,
+    });
   }
 
-  console.log(`translate: ${allToTranslate.length} items pending (${toTranslate.length} sec + ${toTranslateAI.length} ai)`);
+  console.log(
+    `translate[${scope}]: ${allToTranslate.length} items queued (${recentToTranslate.length} recent sec + ${recentToTranslateAI.length} recent ai + ${backlogToTranslate.length} backlog sec + ${backlogToTranslateAI.length} backlog ai)`,
+  );
 
   const translationMap = new Map<string, { titleZh: string; summaryZh: string }>();
   let batchesDone = 0;
@@ -174,30 +196,66 @@ export async function GET(req: NextRequest) {
   const withZh = allItems.filter((i) => i.titleZh).length;
   const withZhAI = aiItems.filter((i) => i.titleZh).length;
   const pending = allToTranslate.length - translationMap.size;
+  const recentPending = [...allItems, ...aiItems].filter(
+    (item) => getTimestamp(item) >= recentCutoff && isLikelyUntranslated(item),
+  ).length;
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
-  // Self-chain: if there are still pending items, fire another translate run
-  // Uses fire-and-forget fetch so this response returns immediately
-  // Limit chain depth to prevent infinite loops
+  await recordTranslationHealthFromItems({
+    items: [...allItems, ...aiItems],
+    source: `translate:${scope}`,
+    extra: {
+      pass: {
+        scope,
+        translated: translationMap.size,
+        pending,
+        recentPending,
+        batchesDone,
+        batchesFailed,
+        elapsedSec: elapsed,
+        reason: req.nextUrl.searchParams.get("reason") ?? null,
+      },
+    },
+  });
+
   const chainCount = parseInt(req.nextUrl.searchParams.get("chain") ?? "0");
-  const MAX_CHAINS = 3;
-  if (pending > 0 && chainCount < MAX_CHAINS) {
-    const selfUrl = `${appBaseUrl}/api/translate?chain=${chainCount + 1}`;
-    fetch(selfUrl, {
-      headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
-    }).catch(() => {});
-    console.log(`translate: ${pending} items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`);
+  const MAX_CHAINS = scope === "recent" ? 4 : 3;
+  if (scope === "recent" && recentPending > 0 && chainCount < MAX_CHAINS) {
+    const selfUrl = `${appBaseUrl}/api/translate?scope=recent&chain=${chainCount + 1}`;
+    after(() => {
+      void fetch(selfUrl, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        cache: "no-store",
+      }).catch((e) => console.error("translate: recent chained run failed:", e));
+    });
+    console.log(
+      `translate[recent]: ${recentPending} recent items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`,
+    );
   }
-  if (pending === 0) {
+  if (scope === "all" && pending > 0 && chainCount < MAX_CHAINS) {
+    const selfUrl = `${appBaseUrl}/api/translate?chain=${chainCount + 1}`;
+    after(() => {
+      void fetch(selfUrl, {
+        headers: { authorization: `Bearer ${process.env.CRON_SECRET}` },
+        cache: "no-store",
+      }).catch((e) => console.error("translate: chained run failed:", e));
+    });
+    console.log(
+      `translate[all]: ${pending} items still pending, chained run ${chainCount + 1}/${MAX_CHAINS}`,
+    );
+  }
+  if (recentPending === 0) {
     triggerSummarize();
   }
 
   return NextResponse.json({
     ok: true,
+    scope,
     withZh,
     withZhAI,
     translated: translationMap.size,
     pending,
+    recentPending,
     batchesDone,
     batchesFailed,
     elapsedSec: elapsed,
