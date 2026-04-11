@@ -34,7 +34,7 @@ test("intelligence snapshot route is wired for live actors and iocs", () => {
 });
 
 test("intelligence page references MITRE ATT&CK and ThreatFox sections", () => {
-  const page = readFileSync(join(root, "app/mdr/intelligence/page.tsx"), "utf8");
+  const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
 
   assert.equal(page.includes("MITRE ATT&CK"), true);
   assert.equal(page.includes("ThreatFox"), true);

@@ -34,7 +34,7 @@ test("live intelligence source client exists and references the official upstrea
 });
 
 test("intelligence center page references live snapshot, export, and subscriptions APIs", () => {
-  const page = readFileSync(join(root, "app/mdr/intelligence/page.tsx"), "utf8");
+  const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
 
   assert.equal(page.includes("/api/intelligence"), true);
   assert.equal(page.includes("/api/intelligence/export"), true);

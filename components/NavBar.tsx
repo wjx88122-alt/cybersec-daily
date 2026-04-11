@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { label: "安全", href: "/" },
   { label: "AI", href: "/ai" },
   { label: "团队", href: "/team" },
+  { label: "情报中心", href: "/intelligence" },
   { label: "MDR", href: "/mdr" },
 ];
 

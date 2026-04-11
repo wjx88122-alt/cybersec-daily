@@ -414,16 +414,10 @@ export default function IntelligencePage() {
 
   return (
     <div className="min-h-screen mdr-shell">
-      <NavBar active="MDR" />
+      <NavBar active="情报中心" />
       <main className="mx-auto max-w-7xl px-4 py-6">
         <div className="mb-6">
-          <a
-            href="/mdr"
-            className="text-xs text-[#94a3b8] transition-colors hover:text-[#64748b]"
-          >
-            ← 返回 MDR 工单系统
-          </a>
-          <div className="mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.28em] text-[#64748b]">
                 Intelligence Center
@@ -435,6 +429,9 @@ export default function IntelligencePage() {
                 外部威胁情报主导的知识库工作台，覆盖威胁组织库、漏洞专题、IOC
                 情报库、行业预警、报告与订阅，帮助分析师从检索走到研判和下发。
               </p>
+              <div className="mt-2 text-xs text-[#94a3b8]">
+                顶级情报工作台 · 可联动 MDR 处置，但不再从属于 MDR 模块
+              </div>
             </div>
             <div className="flex flex-wrap gap-2">
               <a

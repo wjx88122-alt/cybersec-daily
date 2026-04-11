@@ -6,11 +6,11 @@ import test from "node:test";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
-test("Intelligence MDR route exists", () => {
+test("top-level intelligence route exists", () => {
   assert.equal(
-    existsSync(join(root, "app/mdr/intelligence/page.tsx")),
+    existsSync(join(root, "app/intelligence/page.tsx")),
     true,
-    "app/mdr/intelligence/page.tsx should exist",
+    "app/intelligence/page.tsx should exist",
   );
 });
 
@@ -25,12 +25,19 @@ test("Intelligence mock data file exists", () => {
 test("MDR landing page links to the Intelligence Center", () => {
   const page = readFileSync(join(root, "app/mdr/page.tsx"), "utf8");
 
-  assert.equal(page.includes("/mdr/intelligence"), true);
+  assert.equal(page.includes("/intelligence"), true);
   assert.equal(page.includes("情报中心"), true);
 });
 
-test("Intelligence Center page exposes the main knowledge domains", () => {
-  const page = readFileSync(join(root, "app/mdr/intelligence/page.tsx"), "utf8");
+test("top nav contains a first-class intelligence entry", () => {
+  const nav = readFileSync(join(root, "components/NavBar.tsx"), "utf8");
+
+  assert.equal(nav.includes('label: "情报中心"'), true);
+  assert.equal(nav.includes('href: "/intelligence"'), true);
+});
+
+test("Intelligence Center top-level page exposes the main knowledge domains", () => {
+  const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
 
   assert.equal(page.includes("威胁组织库"), true);
   assert.equal(page.includes("漏洞专题"), true);
