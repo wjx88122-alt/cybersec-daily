@@ -126,6 +126,12 @@ export default function IntelligencePage() {
     MOCK_INTEL_IOCS[0]?.id ?? "",
   );
   const [watchlist, setWatchlist] = useState(MOCK_INTEL_WATCHLIST);
+  const [threatList, setThreatList] = useState<
+    NonNullable<LiveIntelligencePayload["threatList"]>
+  >([]);
+  const [safelist, setSafelist] = useState<
+    NonNullable<LiveIntelligencePayload["safelist"]>
+  >([]);
   const [subscriptions, setSubscriptions] = useState(MOCK_INTEL_SUBSCRIPTIONS);
   const [feedback, setFeedback] = useState("");
   const deferredQuery = useDeferredValue(query.trim().toLowerCase());
@@ -147,6 +153,8 @@ export default function IntelligencePage() {
     : MOCK_INTEL_INDUSTRY_ALERTS;
   const sourceStatus: LiveSourceStatus[] = liveData?.sourceStatus ?? [];
   const threatFoxStatus = sourceStatus.find((item) => item.source === "ThreatFox");
+  const relevance = liveData?.relevance ?? null;
+  const graph = liveData?.graph ?? null;
 
   const actorMap = useMemo(
     () => new Map(displayedActors.map((item) => [item.id, item])),
@@ -334,6 +342,8 @@ export default function IntelligencePage() {
           if (Array.isArray(payload.subscriptions) && payload.subscriptions.length > 0) {
             setSubscriptions(payload.subscriptions);
           }
+          setThreatList(payload.threatList ?? []);
+          setSafelist(payload.safelist ?? []);
           setLiveError("");
           setIsLoadingLive(false);
         });
@@ -390,6 +400,55 @@ export default function IntelligencePage() {
           error instanceof Error
             ? `订阅失败：${error.message}`
             : "订阅失败，请稍后再试。",
+        );
+      });
+    }
+  }
+
+  async function addToOperationalList(
+    list: "threat" | "safelist",
+    entry: {
+      id: string;
+      label: string;
+      kind: "actor" | "vulnerability" | "ioc";
+      severity: IntelSeverity;
+      source: string;
+    },
+  ) {
+    try {
+      const response = await fetch("/api/intelligence/lists", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ list, entry }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`list update failed: ${response.status}`);
+      }
+
+      const payload = (await response.json()) as {
+        threatList?: typeof threatList;
+        safelist?: typeof safelist;
+        storage?: "kv" | "memory";
+      };
+
+      startTransition(() => {
+        setThreatList(payload.threatList ?? []);
+        setSafelist(payload.safelist ?? []);
+        setFeedback(
+          `已加入 ${list === "threat" ? "Threat List" : "Safelist"}：${
+            entry.label
+          }。${payload.storage === "memory" ? "当前使用本地临时存储。" : "已写入持久化存储。"}`,
+        );
+      });
+    } catch (error) {
+      startTransition(() => {
+        setFeedback(
+          error instanceof Error
+            ? `列表更新失败：${error.message}`
+            : "列表更新失败，请稍后再试。",
         );
       });
     }
@@ -527,6 +586,191 @@ export default function IntelligencePage() {
               </div>
             )}
           </div>
+        </div>
+
+        <div className="mb-6 grid gap-4 xl:grid-cols-[1.35fr_0.85fr]">
+          <div className="space-y-4">
+            <section className="glass rounded-2xl p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94a3b8]">
+                    Relevance
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-[#1a1a2e]">
+                    客户相关性
+                  </div>
+                </div>
+                <div className="text-xs text-[#64748b]">
+                  托管行业：{relevance?.managedIndustries.join(" / ") ?? "金融 / 医疗 / 制造 / 教育 / 互联网"}
+                </div>
+              </div>
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {[
+                  {
+                    label: "重点漏洞",
+                    item: relevance?.topVulnerability,
+                    accent: "text-red-500",
+                  },
+                  {
+                    label: "重点组织",
+                    item: relevance?.topActor,
+                    accent: "text-cyan-500",
+                  },
+                  {
+                    label: "重点 IOC",
+                    item: relevance?.topIoc,
+                    accent: "text-violet-500",
+                  },
+                ].map(({ label, item, accent }) => (
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-black/[0.06] bg-white/70 p-4"
+                  >
+                    <div className="text-[11px] font-medium text-[#64748b]">{label}</div>
+                    <div className={`mt-2 text-2xl font-bold ${accent}`}>
+                      {item?.score ?? "--"}
+                    </div>
+                    <div className="mt-1 text-sm font-medium text-[#1a1a2e]">
+                      {item?.label ?? "等待数据"}
+                    </div>
+                    <div className="mt-2 space-y-1">
+                      {(item?.reasons ?? ["暂无命中原因"]).slice(0, 3).map((reason) => (
+                        <div key={reason} className="text-xs text-[#64748b]">
+                          ▸ {reason}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="glass rounded-2xl p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94a3b8]">
+                    Graph
+                  </div>
+                  <div className="mt-1 text-lg font-semibold text-[#1a1a2e]">
+                    实体关系图谱
+                  </div>
+                </div>
+                <div className="text-xs text-[#64748b]">
+                  当前围绕高优先级焦点对象构建
+                </div>
+              </div>
+              {graph?.focus ? (
+                <div className="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+                  <div className="rounded-2xl border border-[#2563eb]/14 bg-[#2563eb]/6 p-5">
+                    <div className="text-[11px] font-medium uppercase tracking-[0.24em] text-[#64748b]">
+                      Focus
+                    </div>
+                    <div className="mt-2 text-xl font-semibold text-[#1a1a2e]">
+                      {graph.focus.label}
+                    </div>
+                    <div className="mt-1 text-xs text-[#64748b]">
+                      {graph.title}
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      {graph.edges.slice(0, 6).map((edge) => (
+                        <div key={`${edge.from}-${edge.to}`} className="text-xs text-[#64748b]">
+                          ▸ {edge.label}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="grid gap-3 md:grid-cols-3">
+                    {[
+                      { label: "关联组织", kind: "actor" },
+                      { label: "关联 IOC", kind: "ioc" },
+                      { label: "关联行业", kind: "industry" },
+                    ].map((group) => (
+                      <div
+                        key={group.kind}
+                        className="rounded-2xl border border-black/[0.06] bg-white/70 p-4"
+                      >
+                        <div className="text-[11px] font-medium text-[#64748b]">
+                          {group.label}
+                        </div>
+                        <div className="mt-2 space-y-2">
+                          {graph.nodes
+                            .filter((node) => node.kind === group.kind)
+                            .slice(0, 4)
+                            .map((node) => (
+                              <div key={node.id} className="rounded-xl bg-black/[0.03] px-3 py-2 text-xs text-[#475569]">
+                                {node.label}
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 rounded-xl border border-dashed border-black/[0.08] px-4 py-6 text-sm text-[#94a3b8]">
+                  暂无可展示的图谱焦点。
+                </div>
+              )}
+            </section>
+          </div>
+
+          <section className="glass rounded-2xl p-5">
+            <div className="text-xs font-semibold uppercase tracking-[0.24em] text-[#94a3b8]">
+              Operational Lists
+            </div>
+            <div className="mt-1 text-lg font-semibold text-[#1a1a2e]">
+              Threat List / Safelist
+            </div>
+            <div className="mt-2 text-xs text-[#64748b]">
+              用于将情报中心对象纳入重点跟踪或排除清单。
+            </div>
+
+            <div className="mt-5">
+              <div className="text-[11px] font-medium text-[#64748b]">Threat List</div>
+              <div className="mt-2 space-y-2">
+                {threatList.length > 0 ? (
+                  threatList.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl border border-red-500/14 bg-red-500/6 px-3 py-3"
+                    >
+                      <div className="text-sm font-medium text-[#1a1a2e]">{item.label}</div>
+                      <div className="mt-1 text-xs text-[#64748b]">
+                        {item.kind} · {item.source}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-xl border border-dashed border-black/[0.08] px-3 py-4 text-xs text-[#94a3b8]">
+                    暂无重点跟踪条目。
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="mt-5">
+              <div className="text-[11px] font-medium text-[#64748b]">Safelist</div>
+              <div className="mt-2 space-y-2">
+                {safelist.length > 0 ? (
+                  safelist.map((item) => (
+                    <div
+                      key={item.id}
+                      className="rounded-xl border border-emerald-500/14 bg-emerald-500/6 px-3 py-3"
+                    >
+                      <div className="text-sm font-medium text-[#1a1a2e]">{item.label}</div>
+                      <div className="mt-1 text-xs text-[#64748b]">
+                        {item.kind} · {item.source}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-xl border border-dashed border-black/[0.08] px-3 py-4 text-xs text-[#94a3b8]">
+                    暂无抑制或排除条目。
+                  </div>
+                )}
+              </div>
+            </div>
+          </section>
         </div>
 
         <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-6">
@@ -851,6 +1095,20 @@ export default function IntelligencePage() {
                     >
                       重点关注
                     </button>
+                    <button
+                      onClick={() =>
+                        addToOperationalList("threat", {
+                          id: activeActor.id,
+                          label: activeActor.name,
+                          kind: "actor",
+                          severity: activeActor.riskRating,
+                          source: activeActor.origin,
+                        })
+                      }
+                      className="rounded-lg border border-red-500/20 bg-red-500/8 px-3 py-1.5 text-xs font-medium text-red-500"
+                    >
+                      加入 Threat List
+                    </button>
                     <a
                       href="/api/intelligence/export?format=markdown"
                       target="_blank"
@@ -1013,6 +1271,20 @@ export default function IntelligencePage() {
                     >
                       关注漏洞
                     </button>
+                    <button
+                      onClick={() =>
+                        addToOperationalList("threat", {
+                          id: activeVulnerability.id,
+                          label: activeVulnerability.cve,
+                          kind: "vulnerability",
+                          severity: activeVulnerability.severity,
+                          source: "Live Vulnerability Topic",
+                        })
+                      }
+                      className="rounded-lg border border-red-500/20 bg-red-500/8 px-3 py-1.5 text-xs font-medium text-red-500"
+                    >
+                      加入 Threat List
+                    </button>
                     <a
                       href={`/api/intelligence/export?format=markdown&cve=${encodeURIComponent(
                         activeVulnerability.cve,
@@ -1022,6 +1294,16 @@ export default function IntelligencePage() {
                       className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-xs font-medium text-[#475569]"
                     >
                       导出专题
+                    </a>
+                    <a
+                      href={`/api/intelligence/export-rule?format=sigma&kind=vulnerability&value=${encodeURIComponent(
+                        activeVulnerability.cve,
+                      )}&title=${encodeURIComponent(activeVulnerability.title)}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-xs font-medium text-[#475569]"
+                    >
+                      导出规则
                     </a>
                   </div>
                 </div>
@@ -1174,6 +1456,44 @@ export default function IntelligencePage() {
                     >
                       加入观察
                     </button>
+                    <button
+                      onClick={() =>
+                        addToOperationalList("threat", {
+                          id: activeIoc.id,
+                          label: activeIoc.value,
+                          kind: "ioc",
+                          severity: activeIoc.severity,
+                          source: activeIoc.source,
+                        })
+                      }
+                      className="rounded-lg border border-red-500/20 bg-red-500/8 px-3 py-1.5 text-xs font-medium text-red-500"
+                    >
+                      加入 Threat List
+                    </button>
+                    <button
+                      onClick={() =>
+                        addToOperationalList("safelist", {
+                          id: activeIoc.id,
+                          label: activeIoc.value,
+                          kind: "ioc",
+                          severity: activeIoc.severity,
+                          source: activeIoc.source,
+                        })
+                      }
+                      className="rounded-lg border border-emerald-500/20 bg-emerald-500/8 px-3 py-1.5 text-xs font-medium text-emerald-600"
+                    >
+                      加入 Safelist
+                    </button>
+                    <a
+                      href={`/api/intelligence/export-rule?format=sigma&kind=ioc&value=${encodeURIComponent(
+                        activeIoc.value,
+                      )}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-lg border border-black/[0.08] bg-white px-3 py-1.5 text-xs font-medium text-[#475569]"
+                    >
+                      导出规则
+                    </a>
                   </div>
                 </div>
 

@@ -11,6 +11,11 @@ import {
   type IntelVulnerability,
 } from "./intelligence-mock";
 import { buildLiveMappingLayer } from "./intelligence-mapping-sources";
+import type {
+  GraphSnapshot,
+  IntelligenceListEntry,
+  RelevanceSnapshot,
+} from "./intelligence-ops";
 
 const KEV_URL =
   "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json";
@@ -80,9 +85,18 @@ export type LiveIntelligencePayload = {
   vulnerabilities: IntelVulnerability[];
   iocs: IntelIoc[];
   advisories: IntelIndustryAlert[];
+  relevance: RelevanceSnapshot;
+  graph: GraphSnapshot;
+  threatList: IntelligenceListEntry[];
+  safelist: IntelligenceListEntry[];
   subscriptions: string[];
   subscriptionStorage?: "kv" | "memory";
 };
+
+export type LiveIntelligenceBaseSnapshot = Omit<
+  LiveIntelligencePayload,
+  "subscriptions" | "subscriptionStorage" | "relevance" | "graph" | "threatList" | "safelist"
+>;
 
 function parseScore(item?: NvdMetric[]): number | null {
   const score = item?.[0]?.cvssData?.baseScore;
@@ -228,9 +242,7 @@ function summarizeLiveData(
   };
 }
 
-export async function buildLiveIntelligenceSnapshot(): Promise<
-  Omit<LiveIntelligencePayload, "subscriptions" | "subscriptionStorage">
-> {
+export async function buildLiveIntelligenceSnapshot(): Promise<LiveIntelligenceBaseSnapshot> {
   const sourceStatus: LiveSourceStatus[] = [];
   let actors: IntelActor[] = [];
   let vulnerabilities: IntelVulnerability[] = [];
