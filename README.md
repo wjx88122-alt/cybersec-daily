@@ -1,61 +1,264 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# cybersec-daily
 
-## Getting Started
+一个面向中文读者的网络安全与 AI 日报站点，内置资讯聚合、自动翻译、摘要生成、情报中心和 MDR 演示模块。
 
-First, run the development server:
+- 线上地址: [cybersec-daily.vercel.app](https://cybersec-daily.vercel.app)
+- 仓库: [wjx88122-alt/cybersec-daily](https://github.com/wjx88122-alt/cybersec-daily)
+- 技术栈: Next.js 16, React 19, TypeScript, Tailwind CSS 4, Vercel Cron, Upstash Redis, OpenAI-compatible LLM providers
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 项目概览
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+这个项目不是单纯的资讯列表页，而是一个围绕“安全资讯聚合 -> 翻译与修复 -> 摘要生成 -> 情报与运营展示”串起来的站点。
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+当前包含 5 个顶层入口：
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `/` 安全资讯首页，聚合近 24 小时网络安全资讯
+- `/ai` AI 资讯页，聚合 AI 产品、研究、政策与工程动态
+- `/team` 总裁辅助团队页面，展示多角色 AI 幕僚编制
+- `/intelligence` 情报中心，采用 briefing-first 的 Threat Intelligence Command Center 布局
+- `/mdr` MDR 演示页，包含工单派发、SOC 仪表板和关联子页
 
-## Cloud-first triggering
+## 主要能力
 
-Server-to-server follow-up calls now prefer a cloud base URL instead of the incoming local origin. Set `APP_BASE_URL` to your deployed domain (recommended), or rely on `VERCEL_URL` as a fallback.
+### 1. 多源资讯聚合
 
-The scheduled refresh pipeline stays in the cloud through a single `vercel.json` cron:
+站点通过多个 API 路由拉取安全与 AI 内容：
+
+- `/api/feed-a`
+- `/api/feed-b`
+- `/api/feed-ai`
+- `/api/feed`
+
+前端页面使用统一的 feed client 读取这些结果，并在客户端完成排序、筛选和搜索。
+
+### 2. 自动翻译与自愈
+
+项目会把英文资讯翻译成中文，并在最近内容缺少中文字段时自动触发修复。
+
+相关能力包括：
+
+- `/api/translate`
+- `/api/translation-health`
+- `lib/translate.ts`
+- `lib/translation-health.ts`
+
+支持的 LLM 优先级是：
+
+1. `DEEPSEEK_API_KEY`
+2. `KIMI_API_KEY`
+3. `OPENAI_API_KEY`
+
+### 3. 每日摘要与快照
+
+站点会基于近期内容生成摘要和每日快照，供首页和后续展示消费。
+
+相关能力包括：
+
+- `/api/digest`
+- `lib/digest.ts`
+- `lib/snapshot.ts`
+
+### 4. 云端定时刷新
+
+Vercel 上只保留了一个 cron 入口：
 
 - `/api/cron`
 
-That cron refreshes feeds first, then the downstream cloud routes chain automatically:
+这个入口会负责：
 
-- `/api/images`
-- `/api/translate`
-- `/api/summarize`
+- 刷新 feed 缓存
+- 触发图片抓取
+- 触发翻译修复
+- 更新每日快照
+
+相关配置见 [`vercel.json`](./vercel.json)。
+
+### 5. 情报中心与运营演示模块
+
+除了资讯站点本身，这个仓库还内置两个偏产品演示 / 工作台性质的模块：
+
+- `/intelligence`
+  现在是新的 Threat Intelligence Command Center，强调态势、重点活动、暴露面和 analyst drilldown
+- `/mdr`
+  展示 MDR 工单派发、运营中心、网络侧视图与 Splunk 映射页面
+
+## 路由结构
+
+### 页面路由
+
+- `/`
+- `/ai`
+- `/team`
+- `/team/decisions`
+- `/team/decisions/[slug]`
+- `/intelligence`
+- `/mdr`
+- `/mdr/dashboard`
+- `/mdr/network`
+- `/mdr/splunk`
+
+### API 路由
+
+- `/api/cron`
 - `/api/digest`
+- `/api/feed`
+- `/api/feed-a`
+- `/api/feed-ai`
+- `/api/feed-b`
+- `/api/images`
+- `/api/summarize`
+- `/api/translate`
+- `/api/translation-health`
 
-## Translation self-healing
+## 本地开发
 
-To reduce recurring cases where recent English items appear without Chinese translations, the translation pipeline now has multiple safeguards:
+### 依赖安装
 
-- `/api/cron` refreshes feeds and immediately schedules a recent-only translation repair
-- `/api/translate?scope=recent` always prioritizes the latest 24 hours before backlog items
-- partial batch results are retried item-by-item inside `lib/translate.ts`
-- public feed reads (`/api/feed`, `/api/feed-a`, `/api/feed-b`, `/api/feed-ai`) can trigger a throttled self-heal repair if recent items are still missing Chinese fields
-- `/api/translation-health` exposes the latest translation health snapshot, including recent missing counts and sampled missing items
+```bash
+npm install
+```
 
-## Learn More
+### 启动开发环境
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+默认访问：
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- [http://localhost:3000](http://localhost:3000)
 
-## Deploy on Vercel
+### 运行测试
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm test
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 生产构建
+
+```bash
+npm run build
+```
+
+## 环境变量
+
+### 必需
+
+这些变量至少应该在部署环境中配置：
+
+- `CRON_SECRET`
+  用于保护 `/api/cron`、`/api/translate`、`/api/images`、`/api/summarize` 等内部触发接口
+
+- `KV_REST_API_URL`
+- `KV_REST_API_TOKEN`
+  用于 Upstash Redis / KV 缓存
+
+### LLM 提供方
+
+至少配置一个：
+
+- `DEEPSEEK_API_KEY`，推荐
+- `KIMI_API_KEY`
+- `OPENAI_API_KEY`
+
+可选模型变量：
+
+- `DEEPSEEK_MODEL`
+- `KIMI_MODEL`
+- `OPENAI_MODEL`
+
+### 站点地址
+
+- `APP_BASE_URL`
+- `NEXT_PUBLIC_APP_URL`
+- `VERCEL_URL`
+
+项目会通过 `lib/app-url.ts` 优先解析云端可达地址，保证 cron 和后续链路尽量走云端而不是本地回环地址。
+
+## 目录说明
+
+```text
+app/
+  page.tsx                  安全资讯首页
+  ai/page.tsx               AI 资讯页
+  intelligence/             新情报中心
+  mdr/                      MDR 演示模块
+  team/                     多角色团队页
+  api/                      Feed / cron / translate / digest 等接口
+
+components/
+  NavBar.tsx
+  NewsCard.tsx
+  CategoryFilter.tsx
+  ThreatMap.tsx
+  NetworkTopology.tsx
+
+lib/
+  feed-client.ts
+  feed-refresh.ts
+  translate.ts
+  digest.ts
+  snapshot.ts
+  app-url.ts
+  kv.ts
+  deepseek.ts
+
+tests/
+  *.test.mjs                关键回归测试
+```
+
+## 设计与内容定位
+
+这个项目目前同时承担两类职责：
+
+- 一个真实可部署的安全 / AI 内容站点
+- 一个可持续演进的安全产品界面实验场
+
+因此仓库里既有：
+
+- 面向资讯消费的首页与 AI 页
+- 面向情报和安全运营演示的 `/intelligence` 与 `/mdr`
+- 面向角色化协同展示的 `/team`
+
+如果你只关心资讯聚合能力，从首页、AI 页和 `/api/*` 路由看即可；如果你关心安全产品 UI，重点看 `/intelligence`、`/mdr` 和 `app/globals.css`。
+
+## 测试与质量
+
+当前测试覆盖重点放在以下几类回归：
+
+- feed client 合并与排序
+- cron 配置与刷新策略
+- 时间与摘要输入逻辑
+- URL 安全性与应用基地址解析
+- intelligence 路由结构契约
+- 历史功能移除回归（如 Huawei 相关页面）
+
+测试命令：
+
+```bash
+npm test
+```
+
+## 部署
+
+项目设计为优先部署到 Vercel。
+
+当前 `vercel.json` 中配置了：
+
+- 单一 cron 入口
+- 不同 API 路由的 `maxDuration`
+
+推荐部署方式：
+
+1. 在 Vercel 导入仓库
+2. 配置上面的环境变量
+3. 确认 cron 已启用
+4. 用生产域名配置 `APP_BASE_URL`
+
+## 后续可扩展方向
+
+- 增加更多安全 / AI 内容源
+- 为 digest 增加更稳定的人工校验或审阅机制
+- 将 `/intelligence` 从演示数据逐步切回真实情报源
+- 将 `/mdr` 接入更真实的工单和告警模型
+- 增加更完整的观测、缓存和失败重试面板
