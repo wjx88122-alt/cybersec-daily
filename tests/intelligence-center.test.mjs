@@ -39,11 +39,51 @@ test("top nav contains a first-class intelligence entry", () => {
 test("Intelligence Center top-level page exposes the main knowledge domains", () => {
   const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
 
-  assert.equal(page.includes("威胁组织库"), true);
-  assert.equal(page.includes("漏洞专题"), true);
-  assert.equal(page.includes("IOC 情报库"), true);
-  assert.equal(page.includes("行业预警"), true);
-  assert.equal(page.includes("报告与订阅"), true);
+  assert.equal(page.includes("IntelligenceCommandCenter"), true);
+  assert.equal(page.includes("Command Bridge"), true);
+  assert.equal(page.includes("Graph Theater"), true);
+  assert.equal(page.includes("Execution Deck"), true);
+});
+
+test("new intelligence command-center module and styles exist", () => {
+  assert.equal(
+    existsSync(join(root, "app/intelligence/IntelligenceCommandCenter.tsx")),
+    true,
+    "IntelligenceCommandCenter.tsx should exist",
+  );
+  assert.equal(
+    existsSync(join(root, "app/intelligence/intelligence-center.module.css")),
+    true,
+    "intelligence-center.module.css should exist",
+  );
+});
+
+test("command-center component exposes bridge, graph theater, and execution deck", () => {
+  const source = readFileSync(
+    join(root, "app/intelligence/IntelligenceCommandCenter.tsx"),
+    "utf8",
+  );
+
+  assert.equal(source.includes("Command Bridge"), true);
+  assert.equal(source.includes("Graph Theater"), true);
+  assert.equal(source.includes("Execution Deck"), true);
+  assert.equal(source.includes("重点攻击活动"), true);
+  assert.equal(source.includes("资产暴露与漏洞优先级"), true);
+  assert.equal(source.includes("实体关联图谱"), true);
+  assert.equal(source.includes("狩猎与研判工作台"), true);
+  assert.equal(source.includes("自动化响应剧本"), true);
+});
+
+test("command-center css module defines the new layout rails", () => {
+  const css = readFileSync(
+    join(root, "app/intelligence/intelligence-center.module.css"),
+    "utf8",
+  );
+
+  assert.equal(css.includes(".commandShell"), true);
+  assert.equal(css.includes(".commandBridge"), true);
+  assert.equal(css.includes(".graphTheater"), true);
+  assert.equal(css.includes(".executionDeck"), true);
 });
 
 test("Intelligence mock data exports the knowledge graph anchors", () => {
