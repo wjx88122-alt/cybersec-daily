@@ -5,6 +5,42 @@ import { join } from "node:path";
 import test from "node:test";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+const HOMEPAGE_REQUIRED_CLASSES = [
+  "homepage-shell",
+  "executive-brief",
+  "brief-hero",
+  "decision-rail",
+  "posture-snapshot",
+  "what-changed",
+  "exposure-priorities",
+  "analyst-drilldown",
+];
+
+const HOMEPAGE_PHRASES = [
+  "组织威胁态势",
+  "今日需要决策",
+  "重点攻击活动",
+  "资产暴露与漏洞优先级",
+  "实体关联图谱",
+  "狩猎与研判工作台",
+  "自动化响应剧本",
+];
+
+const RETIRED_PHRASES = [
+  "威胁组织库",
+  "漏洞专题",
+  "IOC 情报库",
+  "行业预警",
+  "报告与订阅",
+];
+
+const HOMEPAGE_ORDERED_CLASSES = [
+  "homepage-shell",
+  "executive-brief",
+  "what-changed",
+  "exposure-priorities",
+  "analyst-drilldown",
+];
 
 test("top-level intelligence route exists", () => {
   assert.equal(
@@ -14,11 +50,11 @@ test("top-level intelligence route exists", () => {
   );
 });
 
-test("Intelligence mock data file exists", () => {
+test("route-local intelligence command center data file exists", () => {
   assert.equal(
-    existsSync(join(root, "lib/intelligence-mock.ts")),
+    existsSync(join(root, "app/intelligence/data.ts")),
     true,
-    "lib/intelligence-mock.ts should exist",
+    "app/intelligence/data.ts should exist",
   );
 });
 
@@ -36,24 +72,30 @@ test("top nav contains a first-class intelligence entry", () => {
   assert.equal(nav.includes('href: "/intelligence"'), true);
 });
 
-test("Intelligence Center top-level page exposes the main knowledge domains", () => {
+test("Intelligence Center route exposes the command-center homepage contract", () => {
   const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
 
-  assert.equal(page.includes("威胁组织库"), true);
-  assert.equal(page.includes("漏洞专题"), true);
-  assert.equal(page.includes("IOC 情报库"), true);
-  assert.equal(page.includes("行业预警"), true);
-  assert.equal(page.includes("报告与订阅"), true);
-});
+  for (const className of HOMEPAGE_REQUIRED_CLASSES) {
+    assert.equal(page.includes(className), true, `expected ${className} in app/intelligence/page.tsx`);
+  }
 
-test("Intelligence mock data exports the knowledge graph anchors", () => {
-  const source = readFileSync(join(root, "lib/intelligence-mock.ts"), "utf8");
+  for (const phrase of HOMEPAGE_PHRASES) {
+    assert.equal(page.includes(phrase), true, `expected phrase ${phrase} in app/intelligence/page.tsx`);
+  }
 
-  assert.equal(source.includes("MOCK_INTEL_SUMMARY"), true);
-  assert.equal(source.includes("MOCK_INTEL_FEATURED_TOPICS"), true);
-  assert.equal(source.includes("MOCK_INTEL_ACTORS"), true);
-  assert.equal(source.includes("MOCK_INTEL_VULNERABILITIES"), true);
-  assert.equal(source.includes("MOCK_INTEL_IOCS"), true);
-  assert.equal(source.includes("MOCK_INTEL_INDUSTRY_ALERTS"), true);
-  assert.equal(source.includes("MOCK_INTEL_REPORTS"), true);
+  for (const phrase of RETIRED_PHRASES) {
+    assert.equal(page.includes(phrase), false, `did not expect retired phrase ${phrase}`);
+  }
+
+  const orderedPositions = HOMEPAGE_ORDERED_CLASSES.map((className) => page.indexOf(className));
+  orderedPositions.forEach((position, index) => {
+    assert.equal(position >= 0, true, `expected ${HOMEPAGE_ORDERED_CLASSES[index]} to exist`);
+  });
+  for (let index = 1; index < orderedPositions.length; index += 1) {
+    assert.equal(
+      orderedPositions[index - 1] < orderedPositions[index],
+      true,
+      `${HOMEPAGE_ORDERED_CLASSES[index - 1]} should appear before ${HOMEPAGE_ORDERED_CLASSES[index]}`,
+    );
+  }
 });
