@@ -5,6 +5,29 @@ import { join } from "node:path";
 import test from "node:test";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
+const INTELLIGENCE_COMPONENT_FILES = [
+  "app/intelligence/components/Topbar.tsx",
+  "app/intelligence/components/ExecutiveBrief.tsx",
+  "app/intelligence/components/WhatChanged.tsx",
+  "app/intelligence/components/ExposurePriorities.tsx",
+  "app/intelligence/components/AnalystDrilldown.tsx",
+];
+
+const ROUTE_COMPONENT_ORDER = [
+  "Topbar",
+  "ExecutiveBrief",
+  "WhatChanged",
+  "ExposurePriorities",
+  "AnalystDrilldown",
+];
+
+const RETIRED_PHRASES = [
+  "威胁组织库",
+  "漏洞专题",
+  "IOC 情报库",
+  "行业预警",
+  "报告与订阅",
+];
 
 test("top-level intelligence route exists", () => {
   assert.equal(
@@ -14,12 +37,22 @@ test("top-level intelligence route exists", () => {
   );
 });
 
-test("Intelligence mock data file exists", () => {
+test("route-local intelligence command center data file exists", () => {
   assert.equal(
-    existsSync(join(root, "lib/intelligence-mock.ts")),
+    existsSync(join(root, "app/intelligence/data.ts")),
     true,
-    "lib/intelligence-mock.ts should exist",
+    "app/intelligence/data.ts should exist",
   );
+});
+
+test("route-local intelligence command center components exist", () => {
+  for (const relativePath of INTELLIGENCE_COMPONENT_FILES) {
+    assert.equal(
+      existsSync(join(root, relativePath)),
+      true,
+      `${relativePath} should exist`,
+    );
+  }
 });
 
 test("MDR landing page links to the Intelligence Center", () => {
@@ -36,64 +69,58 @@ test("top nav contains a first-class intelligence entry", () => {
   assert.equal(nav.includes('href: "/intelligence"'), true);
 });
 
-test("Intelligence Center top-level page exposes the main knowledge domains", () => {
+test("Intelligence route composes the command-center page in the approved order", () => {
   const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
+  const expectedImports = [
+    'from "@/app/intelligence/data"',
+    'from "@/app/intelligence/components/Topbar"',
+    'from "@/app/intelligence/components/ExecutiveBrief"',
+    'from "@/app/intelligence/components/WhatChanged"',
+    'from "@/app/intelligence/components/ExposurePriorities"',
+    'from "@/app/intelligence/components/AnalystDrilldown"',
+  ];
 
-  assert.equal(page.includes("IntelligenceCommandCenter"), true);
-  assert.equal(page.includes("Command Bridge"), true);
-  assert.equal(page.includes("Graph Theater"), true);
-  assert.equal(page.includes("Execution Deck"), true);
+  for (const importText of expectedImports) {
+    assert.equal(page.includes(importText), true, `expected ${importText} in app/intelligence/page.tsx`);
+  }
+
+  const orderedPositions = ROUTE_COMPONENT_ORDER.map((componentName) =>
+    page.indexOf(`<${componentName}`),
+  );
+  orderedPositions.forEach((position, index) => {
+    assert.equal(position >= 0, true, `expected ${ROUTE_COMPONENT_ORDER[index]} to exist`);
+  });
+  for (let index = 1; index < orderedPositions.length; index += 1) {
+    assert.equal(
+      orderedPositions[index - 1] < orderedPositions[index],
+      true,
+      `${ROUTE_COMPONENT_ORDER[index - 1]} should appear before ${ROUTE_COMPONENT_ORDER[index]}`,
+    );
+  }
+
+  assert.equal(page.includes("intelligence-command-center"), true);
+  assert.equal(page.includes("homepage-shell"), true);
 });
 
-test("new intelligence command-center module and styles exist", () => {
-  assert.equal(
-    existsSync(join(root, "app/intelligence/IntelligenceCommandCenter.tsx")),
-    true,
-    "IntelligenceCommandCenter.tsx should exist",
-  );
-  assert.equal(
-    existsSync(join(root, "app/intelligence/intelligence-center.module.css")),
-    true,
-    "intelligence-center.module.css should exist",
-  );
-});
+test("command-center component files expose the new homepage domains and retire the old portal taxonomy", () => {
+  const componentSource = INTELLIGENCE_COMPONENT_FILES
+    .filter((relativePath) => existsSync(join(root, relativePath)))
+    .map((relativePath) => readFileSync(join(root, relativePath), "utf8"))
+    .join("\n");
 
-test("command-center component exposes bridge, graph theater, and execution deck", () => {
-  const source = readFileSync(
-    join(root, "app/intelligence/IntelligenceCommandCenter.tsx"),
-    "utf8",
-  );
+  for (const phrase of [
+    "组织威胁态势",
+    "今日需要决策",
+    "重点攻击活动",
+    "资产暴露与漏洞优先级",
+    "实体关联图谱",
+    "狩猎与研判工作台",
+    "自动化响应剧本",
+  ]) {
+    assert.equal(componentSource.includes(phrase), true, `expected phrase ${phrase} in intelligence components`);
+  }
 
-  assert.equal(source.includes("Command Bridge"), true);
-  assert.equal(source.includes("Graph Theater"), true);
-  assert.equal(source.includes("Execution Deck"), true);
-  assert.equal(source.includes("重点攻击活动"), true);
-  assert.equal(source.includes("资产暴露与漏洞优先级"), true);
-  assert.equal(source.includes("实体关联图谱"), true);
-  assert.equal(source.includes("狩猎与研判工作台"), true);
-  assert.equal(source.includes("自动化响应剧本"), true);
-});
-
-test("command-center css module defines the new layout rails", () => {
-  const css = readFileSync(
-    join(root, "app/intelligence/intelligence-center.module.css"),
-    "utf8",
-  );
-
-  assert.equal(css.includes(".commandShell"), true);
-  assert.equal(css.includes(".commandBridge"), true);
-  assert.equal(css.includes(".graphTheater"), true);
-  assert.equal(css.includes(".executionDeck"), true);
-});
-
-test("Intelligence mock data exports the knowledge graph anchors", () => {
-  const source = readFileSync(join(root, "lib/intelligence-mock.ts"), "utf8");
-
-  assert.equal(source.includes("MOCK_INTEL_SUMMARY"), true);
-  assert.equal(source.includes("MOCK_INTEL_FEATURED_TOPICS"), true);
-  assert.equal(source.includes("MOCK_INTEL_ACTORS"), true);
-  assert.equal(source.includes("MOCK_INTEL_VULNERABILITIES"), true);
-  assert.equal(source.includes("MOCK_INTEL_IOCS"), true);
-  assert.equal(source.includes("MOCK_INTEL_INDUSTRY_ALERTS"), true);
-  assert.equal(source.includes("MOCK_INTEL_REPORTS"), true);
+  for (const phrase of RETIRED_PHRASES) {
+    assert.equal(componentSource.includes(phrase), false, `did not expect retired phrase ${phrase}`);
+  }
 });

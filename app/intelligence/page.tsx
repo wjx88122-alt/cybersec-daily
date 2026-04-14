@@ -1,28 +1,32 @@
-import IntelligenceCommandCenter from "./IntelligenceCommandCenter";
-
-const INTELLIGENCE_PAGE_CONFIG = {
-  liveSnapshotEndpoint: "/api/intelligence",
-  exportJsonHref: "/api/intelligence/export?format=json",
-  exportMarkdownHref: "/api/intelligence/export?format=markdown",
-  subscriptionsEndpoint: "/api/intelligence/subscriptions",
-  exportRuleEndpoint: "/api/intelligence/export-rule",
-  listsEndpoint: "/api/intelligence/lists",
-  liveSourcesTitle: "真实情报源",
-  mitreLabel: "MITRE ATT&CK",
-  threatFoxLabel: "ThreatFox",
-  threatFoxKeyLabel: "THREATFOX_AUTH_KEY",
-  relevanceLabel: "客户相关性",
-  graphTitle: "实体关系图谱",
-  threatListLabel: "Threat List",
-  safeListLabel: "Safelist",
-  commandBridgeLabel: "Command Bridge",
-  graphTheaterLabel: "Graph Theater",
-  executionDeckLabel: "Execution Deck",
-  huntDeckTitle: "狩猎与研判工作台",
-  playbookDeckTitle: "自动化响应剧本",
-  exportJsonLabel: "导出 JSON",
-} as const;
+import NavBar from "@/components/NavBar";
+import { intelligenceCommandCenterData } from "@/app/intelligence/data";
+import Topbar from "@/app/intelligence/components/Topbar";
+import ExecutiveBrief from "@/app/intelligence/components/ExecutiveBrief";
+import WhatChanged from "@/app/intelligence/components/WhatChanged";
+import ExposurePriorities from "@/app/intelligence/components/ExposurePriorities";
+import AnalystDrilldown from "@/app/intelligence/components/AnalystDrilldown";
 
 export default function IntelligencePage() {
-  return <IntelligenceCommandCenter config={INTELLIGENCE_PAGE_CONFIG} />;
+  return (
+    <div className="min-h-screen intelligence-command-center">
+      <NavBar active="情报中心" />
+      <div className="homepage-shell">
+        <Topbar topbar={intelligenceCommandCenterData.topbar} />
+        <main className="dashboard">
+          <ExecutiveBrief
+            hero={intelligenceCommandCenterData.hero}
+            kpis={intelligenceCommandCenterData.kpis}
+          />
+          <WhatChanged campaigns={intelligenceCommandCenterData.campaigns} />
+          <ExposurePriorities exposures={intelligenceCommandCenterData.exposures} />
+          <AnalystDrilldown
+            graph={intelligenceCommandCenterData.graph}
+            hunts={intelligenceCommandCenterData.hunts}
+            playbooks={intelligenceCommandCenterData.playbooks}
+            exposures={intelligenceCommandCenterData.exposures}
+          />
+        </main>
+      </div>
+    </div>
+  );
 }
