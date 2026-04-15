@@ -4,7 +4,17 @@ function Chip({ label, tone }: { label: string; tone?: string }) {
   return <div className={`chip${tone ? ` ${tone}` : ""}`}>{label}</div>;
 }
 
-export default function Topbar({ topbar }: { topbar: TopbarData }) {
+export default function Topbar({
+  topbar,
+  filterStats = {},
+  activeFilters = [],
+}: {
+  topbar: TopbarData;
+  filterStats?: Record<string, number>;
+  activeFilters?: string[];
+}) {
+  const summaryText = activeFilters.length > 0 ? `已启用 ${activeFilters.length} 个筛选` : "筛选：全部";
+
   return (
     <header className="topbar">
       <div className="topbar-inner intel-ribbon">
@@ -34,11 +44,18 @@ export default function Topbar({ topbar }: { topbar: TopbarData }) {
         </nav>
         <div className="filter-strip" aria-label="全局过滤">
           {topbar.filters.map((filter) => (
-            <span key={filter} className="filter-pill">
-              {filter}
-            </span>
+            <button
+              key={filter}
+              type="button"
+              className={`filter-pill${activeFilters.includes(filter) ? " is-active" : ""}`}
+              aria-pressed={activeFilters.includes(filter)}
+            >
+              <span>{filter}</span>
+              <em>{filterStats[filter] ?? 0}</em>
+            </button>
           ))}
         </div>
+        <div className="filter-summary">{summaryText}</div>
       </div>
     </header>
   );

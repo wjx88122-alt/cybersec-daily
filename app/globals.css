@@ -1564,3 +1564,279 @@ body {
 .reveal-rise {
   animation: reveal-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/* Intelligence center extensions merged from threat-intelligence-command-center */
+.intelligence-command-center .filter-pill {
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font: inherit;
+}
+
+.intelligence-command-center .filter-pill span {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.intelligence-command-center .filter-pill em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.intelligence-command-center .filter-pill.is-active {
+  border-color: rgba(88, 225, 255, 0.34);
+  color: #d8fbff;
+  background: rgba(88, 225, 255, 0.12);
+}
+
+.intelligence-command-center .filter-summary {
+  color: var(--text-3);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intelligence-command-center .bridge-right {
+  display: grid;
+  gap: 10px;
+  justify-items: end;
+}
+
+.intelligence-command-center .verdict-panel {
+  padding: 18px;
+  border-color: rgba(88, 225, 255, 0.24);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(88, 225, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(14, 27, 44, 0.96), rgba(8, 16, 29, 0.98));
+}
+
+.intelligence-command-center .verdict-meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.intelligence-command-center .verdict-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 167, 220, 0.14);
+  color: var(--text-2);
+  font-size: 11px;
+}
+
+.intelligence-command-center .verdict-factors {
+  margin-top: 12px;
+  display: grid;
+  gap: 8px;
+}
+
+.intelligence-command-center .verdict-factor {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(124, 167, 220, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.intelligence-command-center .verdict-factor span {
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.intelligence-command-center .verdict-factor strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 16px;
+  color: var(--cyan);
+}
+
+.intelligence-command-center .decision-meta {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.intelligence-command-center .decision-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 167, 220, 0.14);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-3);
+  font-size: 11px;
+}
+
+.intelligence-command-center .surface-toggle-row {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.intelligence-command-center .surface-toggle {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(124, 167, 220, 0.18);
+  background: rgba(8, 16, 28, 0.74);
+  color: var(--text-2);
+  cursor: pointer;
+}
+
+.intelligence-command-center .surface-toggle span {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intelligence-command-center .surface-toggle em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--text-3);
+}
+
+.intelligence-command-center .surface-toggle.is-active {
+  border-color: rgba(88, 225, 255, 0.34);
+  color: #dcfbff;
+  background: rgba(88, 225, 255, 0.12);
+}
+
+.intelligence-command-center .action {
+  appearance: none;
+  cursor: pointer;
+}
+
+.intelligence-command-center .collaboration-workspace,
+.intelligence-command-center .intake-layer,
+.intelligence-command-center .detection-pipeline,
+.intelligence-command-center .evidence-assistant {
+  margin-top: 34px;
+}
+
+.intelligence-command-center .collab-grid,
+.intelligence-command-center .assistant-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.intelligence-command-center .table-wrap {
+  overflow-x: auto;
+}
+
+.intelligence-command-center .intel-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+.intelligence-command-center .intel-table th,
+.intelligence-command-center .intel-table td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid rgba(124, 167, 220, 0.12);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.intelligence-command-center .intel-table th {
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.intelligence-command-center .pipeline-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.intelligence-command-center .stage-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(88, 225, 255, 0.2);
+  color: var(--cyan);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intelligence-command-center .coverage-grid {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.intelligence-command-center .coverage-row {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 10px;
+  align-items: center;
+}
+
+.intelligence-command-center .coverage-row span {
+  color: var(--text-2);
+  font-size: 12px;
+}
+
+.intelligence-command-center .coverage-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.intelligence-command-center .coverage-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(88, 225, 255, 0.74), rgba(61, 220, 151, 0.74));
+}
+
+.intelligence-command-center .coverage-row strong {
+  color: var(--text);
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12px;
+}
+
+.intelligence-command-center .evidence-item {
+  text-decoration: none;
+  color: inherit;
+}
+
+.intelligence-command-center .evidence-item:hover {
+  border-color: rgba(88, 225, 255, 0.28);
+}
+
+@media (max-width: 1320px) {
+  .intelligence-command-center .collab-grid,
+  .intelligence-command-center .assistant-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1040px) {
+  .intelligence-command-center .coverage-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}

@@ -23,7 +23,13 @@ export interface HeroData {
   decisions: {
     title: string;
     badge: string;
-    items: Array<{ title: string; description: string }>;
+    items: Array<{
+      title: string;
+      description: string;
+      owner?: string;
+      sla?: string;
+      recommendedAction?: string;
+    }>;
   };
   actionMatrix: {
     title: string;
@@ -68,12 +74,16 @@ export interface ExposureData {
   badge: string;
   rows: Array<{
     asset: string;
+    surface?: "EASM" | "IASM";
     scope: string;
     finding: string;
     findingNote: string;
+    scorePercent?: number;
     score: string;
     owner: string;
     ownerNote: string;
+    ticketId?: string;
+    ticketStatus?: string;
     actionTone: Tone;
     action: string;
   }>;
@@ -147,6 +157,94 @@ export interface IntelligenceCommandCenterData {
   graph: GraphData;
   hunts: HuntData;
   playbooks: PlaybookData;
+  collaboration: CollaborationData;
+  intake: IntakeData;
+  detectionPipeline: DetectionPipelineData;
+  assistant: AssistantData;
+}
+
+export interface CollaborationData {
+  sectionId: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  badge: string;
+  projects: Array<{
+    name: string;
+    owner: string;
+    sla: string;
+    status: string;
+    iocCount: number;
+  }>;
+  collections: Array<{
+    name: string;
+    type: string;
+    sharing: string;
+    freshness: string;
+  }>;
+  cases: Array<{
+    id: string;
+    severity: string;
+    summary: string;
+    owner: string;
+  }>;
+}
+
+export interface IntakeData {
+  sectionId: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  connectors: Array<{
+    name: string;
+    format: string;
+    freshness: string;
+    confidence: number;
+    records: number;
+    status: string;
+  }>;
+  samplePayloads: {
+    csv: string;
+    json: string;
+    stix: string;
+  };
+}
+
+export interface DetectionPipelineData {
+  sectionId: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  stages: string[];
+  mappings: Array<{
+    threat: string;
+    mitre: string;
+    sigma: string;
+    yara: string;
+    kql: string;
+    owner: string;
+  }>;
+  coverage: {
+    sigma: number;
+    yara: number;
+    kql: number;
+  };
+}
+
+export interface AssistantData {
+  sectionId: string;
+  eyebrow: string;
+  title: string;
+  confidence: number;
+  summary: string;
+  findings: string[];
+  evidence: Array<{
+    title: string;
+    source: string;
+    url: string;
+    note: string;
+    timestamp: string;
+  }>;
 }
 
 export const intelligenceCommandCenterData: IntelligenceCommandCenterData = {
@@ -166,6 +264,10 @@ export const intelligenceCommandCenterData: IntelligenceCommandCenterData = {
       { id: "graph", label: "图谱" },
       { id: "hunting", label: "狩猎" },
       { id: "playbooks", label: "剧本" },
+      { id: "collab", label: "协作" },
+      { id: "intake", label: "接入" },
+      { id: "pipeline", label: "检测" },
+      { id: "assistant", label: "证据 AI" },
     ],
     filters: ["高相关", "互联网暴露", "需决策", "自动化就绪"],
   },
@@ -198,14 +300,23 @@ export const intelligenceCommandCenterData: IntelligenceCommandCenterData = {
         {
           title: "优先封堵公网暴露的 VPN 资产",
           description: "与正在活跃利用的 CVE-2025-4171 重叠，且已关联到当前金融行业 Campaign。",
+          owner: "NetOps-A",
+          sla: "2h",
+          recommendedAction: "Patch now + EDR Sweep",
         },
         {
           title: "启动凭据泄露专项狩猎",
           description: "过去 24 小时新增 31 条凭据暴露提及，其中 9 个账号与高价值资产管理域相关。",
+          owner: "IAM-Core",
+          sla: "4h",
+          recommendedAction: "Force reset + impossible travel hunt",
         },
         {
           title: "将两个 IOC 集合下发 EDR Sweep",
           description: "现有规则已具备落地条件，建议从观察升级为自动化搜集与封禁。",
+          owner: "SOC-L2",
+          sla: "1h",
+          recommendedAction: "Auto sweep + blocklist submission",
         },
       ],
     },
@@ -323,45 +434,61 @@ export const intelligenceCommandCenterData: IntelligenceCommandCenterData = {
     rows: [
       {
         asset: "gw-prod-vpn-03",
+        surface: "EASM",
         scope: "公网边界 / 华东",
         finding: "CVE-2025-4171 · SSL VPN RCE",
         findingNote: "关联 Campaign: Silver Meridian / 已见公开利用 / 当前端口可达",
+        scorePercent: 92,
         score: "97",
         owner: "NetOps-A",
         ownerNote: "Owner confirmed",
+        ticketId: "INC-7421",
+        ticketStatus: "In progress",
         actionTone: "critical",
         action: "Patch now",
       },
       {
         asset: "sso-admin-apac",
+        surface: "IASM",
         scope: "身份入口 / 全球",
         finding: "Leaked credential overlap",
         findingNote: "暗网提及 + 品牌仿冒 + 9 个高价值账号命中",
+        scorePercent: 84,
         score: "91",
         owner: "IAM-Core",
         ownerNote: "Escalation pending",
+        ticketId: "IAM-315",
+        ticketStatus: "Pending approval",
         actionTone: "warning",
         action: "Reset + hunt",
       },
       {
         asset: "k8s-observe-east",
+        surface: "EASM",
         scope: "观察集群 / 云原生",
         finding: "Unmanaged exposed dashboard",
         findingNote: "未知资产 + 第三方集成遗留 + 缺少 WAF 保护",
+        scorePercent: 76,
         score: "83",
         owner: "Unknown",
         ownerNote: "Needs ownership",
+        ticketId: "ASM-998",
+        ticketStatus: "Owner discovery",
         actionTone: "warning",
         action: "Assign owner",
       },
       {
         asset: "legacy-pay-api",
+        surface: "IASM",
         scope: "支付接口 / 历史系统",
         finding: "CVE-2024-9932 · Deserialization",
         findingNote: "暂无本地命中，但已被相邻行业 Campaign 采用",
+        scorePercent: 61,
         score: "69",
         owner: "Payments-B",
         ownerNote: "Owner confirmed",
+        ticketId: "PAY-412",
+        ticketStatus: "Scheduled",
         actionTone: "info",
         action: "Validate",
       },
@@ -492,6 +619,149 @@ export const intelligenceCommandCenterData: IntelligenceCommandCenterData = {
         code:
           "Summary:\n- 当前高优先级威胁与 VPN 暴露和凭据泄露同时重叠\n- 建议先执行边界 sweep、账号重置、Owner 确认\n- 若 4 小时内新增命中，自动升级事件等级",
         actions: [{ label: "Share" }, { label: "Attach to Incident" }, { label: "Convert to Project", tone: "warning" }],
+      },
+    ],
+  },
+  collaboration: {
+    sectionId: "collab",
+    eyebrow: "Collaboration Objects",
+    title: "协作对象与复用上下文",
+    description: "把调查沉淀为可复用对象，不再靠临时备注和聊天记录。每个对象都附带 owner、SLA、证据和当前状态。",
+    badge: "3 active projects · 2 collections · 1 major case",
+    projects: [
+      {
+        name: "APAC VPN Burst Investigation",
+        owner: "SOC-L2",
+        sla: "Today 18:00",
+        status: "In progress",
+        iocCount: 18,
+      },
+      {
+        name: "Credential Leak Containment",
+        owner: "IAM-Core",
+        sla: "Today 20:00",
+        status: "Escalated",
+        iocCount: 31,
+      },
+      {
+        name: "Unknown Asset Ownership Cleanup",
+        owner: "ASM Team",
+        sla: "Tomorrow 12:00",
+        status: "Needs approval",
+        iocCount: 7,
+      },
+    ],
+    collections: [
+      {
+        name: "Silver Meridian IOC Set",
+        type: "IOC bundle",
+        sharing: "SOC + IR + NetOps",
+        freshness: "Synced 8m ago",
+      },
+      {
+        name: "Finance Credential Brokers",
+        type: "Threat profile",
+        sharing: "SOC + IAM + Brand",
+        freshness: "Synced 16m ago",
+      },
+    ],
+    cases: [
+      {
+        id: "CASE-2026-0415-17",
+        severity: "High",
+        summary: "凭据泄露与品牌仿冒链路叠加，已触发跨团队事件协作。",
+        owner: "IR Commander",
+      },
+    ],
+  },
+  intake: {
+    sectionId: "intake",
+    eyebrow: "Intake Layer",
+    title: "标准化情报接入层",
+    description: "支持 JSON/CSV/STIX/TAXII 的统一接入模型，并为每条记录补齐 source、freshness、confidence 元数据。",
+    connectors: [
+      { name: "MISP Feed", format: "CSV", freshness: "15m", confidence: 0.82, records: 124, status: "Healthy" },
+      { name: "ISAC Package", format: "JSON", freshness: "1h", confidence: 0.76, records: 42, status: "Healthy" },
+      { name: "TAXII Collection", format: "STIX 2.1", freshness: "30m", confidence: 0.88, records: 219, status: "Healthy" },
+    ],
+    samplePayloads: {
+      csv: "indicator,type\n198.51.100.47,ip\nmalicious.example,domain",
+      json: '[{"indicator":"203.0.113.11","type":"ip"},{"indicator":"a1b2c3d4e5f6","type":"sha256"}]',
+      stix:
+        '{"type":"bundle","objects":[{"type":"indicator","name":"vpn-c2-ip","pattern":"[ipv4-addr:value = \\'198.51.100.47\\']"}]}',
+    },
+  },
+  detectionPipeline: {
+    sectionId: "pipeline",
+    eyebrow: "Threat-to-Detection Pipeline",
+    title: "威胁到检测内容流水线",
+    description: "新威胁进入后自动映射 MITRE 技术并生成检测建议，跟踪 Sigma/YARA/KQL 覆盖率与状态。",
+    stages: ["Ingest", "Correlate", "Map MITRE", "Generate Rules", "Deploy", "Verify"],
+    mappings: [
+      {
+        threat: "Silver Meridian VPN chain",
+        mitre: "T1190 / T1078 / T1021",
+        sigma: "Ready",
+        yara: "Draft",
+        kql: "Deployed",
+        owner: "Detection Eng",
+      },
+      {
+        threat: "Credential broker cluster",
+        mitre: "T1589 / T1110 / T1556",
+        sigma: "Draft",
+        yara: "N/A",
+        kql: "Ready",
+        owner: "SOC-L2",
+      },
+      {
+        threat: "Aster Loader infra expansion",
+        mitre: "T1105 / T1573 / T1071",
+        sigma: "Backlog",
+        yara: "Ready",
+        kql: "Draft",
+        owner: "Threat Hunting",
+      },
+    ],
+    coverage: {
+      sigma: 64,
+      yara: 58,
+      kql: 79,
+    },
+  },
+  assistant: {
+    sectionId: "assistant",
+    eyebrow: "Evidence-backed AI",
+    title: "证据可追溯 AI 总结",
+    confidence: 0.83,
+    summary:
+      "当前最高风险来自 VPN 暴露与凭据泄露叠加，优先执行边界补丁与身份重置，4 小时内复核 sweep 结果并决定是否升级事件等级。",
+    findings: [
+      "高相关 Campaign 与暴露资产重叠度上升到 0.78",
+      "新增 31 条凭据泄露提及，9 条命中高价值账号域",
+      "两条 IOC 在 24 小时内出现重复命中且命中资产包含公网边界节点",
+    ],
+    evidence: [
+      {
+        title: "Campaign evidence cluster",
+        source: "Google Threat Intelligence",
+        url: "https://cloud.google.com/security/products/threat-intelligence",
+        note: "Unified verdict 与行业定向线索一致",
+        timestamp: "09:06 CST",
+      },
+      {
+        title: "Vulnerability context",
+        source: "Microsoft Defender TI",
+        url: "https://learn.microsoft.com/en-us/defender/threat-intelligence/what-is-microsoft-defender-threat-intelligence-defender-ti",
+        note: "CVE 优先级和利用上下文支持当前修复顺序",
+        timestamp: "09:12 CST",
+      },
+      {
+        title: "Asset exposure view",
+        source: "Palo Alto Cortex Xpanse",
+        url: "https://www.paloaltonetworks.com/cortex/cortex-xpanse/attack-surface-management",
+        note: "外部攻击面持续发现与责任人映射作为处置依据",
+        timestamp: "09:19 CST",
       },
     ],
   },

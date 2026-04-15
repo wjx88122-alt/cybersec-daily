@@ -6,8 +6,12 @@ function StatusPill({ label, tone }: { label: string; tone?: string }) {
 
 export default function ExposurePriorities({
   exposures,
+  surfaceScope = "all",
+  scopeStats = {},
 }: {
   exposures: ExposureData;
+  surfaceScope?: "all" | "easm" | "iasm";
+  scopeStats?: Record<string, number>;
 }) {
   const homepageExposureRows = exposures.rows.slice(0, 3);
 
@@ -23,7 +27,26 @@ export default function ExposurePriorities({
           <h2>{exposures.title}</h2>
           <p>{exposures.description}</p>
         </div>
-        <StatusPill label={exposures.badge} tone="critical" />
+        <div className="bridge-right">
+          <StatusPill label={exposures.badge} tone="critical" />
+          <div className="surface-toggle-row" role="group" aria-label="Attack surface scope">
+            {[
+              { key: "all", label: "All surfaces" },
+              { key: "easm", label: "EASM" },
+              { key: "iasm", label: "IASM" },
+            ].map((scope) => (
+              <button
+                key={scope.key}
+                type="button"
+                className={`surface-toggle${surfaceScope === scope.key ? " is-active" : ""}`}
+                aria-pressed={surfaceScope === scope.key}
+              >
+                <span>{scope.label}</span>
+                <em>{scopeStats[scope.key] ?? 0}</em>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="exposure-priority-list">
@@ -40,7 +63,10 @@ export default function ExposurePriorities({
             <p>{row.findingNote}</p>
             <div className="detail-list">
               <span>{`Risk score: ${row.score}`}</span>
+              <span>{`Surface: ${row.surface ?? "N/A"}`}</span>
               <span>{`Owner: ${row.owner}`}</span>
+              <span>{`Ticket: ${row.ticketId ?? "Untracked"}`}</span>
+              <span>{`Status: ${row.ticketStatus ?? "Unknown"}`}</span>
               <span>{row.ownerNote}</span>
             </div>
           </article>

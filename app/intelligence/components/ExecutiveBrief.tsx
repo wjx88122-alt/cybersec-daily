@@ -11,10 +11,28 @@ function StatusPill({ label, tone }: { label: string; tone?: string }) {
 export default function ExecutiveBrief({
   hero,
   kpis,
+  verdict,
 }: {
   hero: HeroData;
   kpis: KpiData[];
+  verdict?: {
+    total: number;
+    factors: Array<{ label: string; score: number }>;
+    metadata: { scope: string; activeFilters: string[] };
+  };
 }) {
+  const effectiveVerdict = verdict ?? {
+    total: 72,
+    factors: [
+      { label: "威胁相关性", score: 74 },
+      { label: "利用活跃度", score: 68 },
+      { label: "暴露可达性", score: 71 },
+      { label: "处置可执行度", score: 76 },
+      { label: "证据置信度", score: 72 },
+    ],
+    metadata: { scope: "ALL", activeFilters: [] },
+  };
+
   return (
     <section className="executive-brief section" id={hero.sectionId} aria-label="组织威胁态势">
       <div className="briefing-row">
@@ -30,6 +48,37 @@ export default function ExecutiveBrief({
         </article>
 
         <aside className="decision-rail" aria-label="今日需要决策">
+          <section className="panel verdict-panel">
+            <div className="panel-header">
+              <div>
+                <div className="meta-label">Unified verdict</div>
+                <h3>统一结论分</h3>
+              </div>
+              <StatusPill
+                label={`${effectiveVerdict.total} / 100`}
+                tone={
+                  effectiveVerdict.total >= 80
+                    ? "critical"
+                    : effectiveVerdict.total >= 65
+                      ? "warning"
+                      : "info"
+                }
+              />
+            </div>
+            <div className="verdict-meta">
+              <span>{`Scope: ${effectiveVerdict.metadata.scope}`}</span>
+              <span>{`Filters: ${effectiveVerdict.metadata.activeFilters.join(" / ") || "none"}`}</span>
+            </div>
+            <div className="verdict-factors">
+              {effectiveVerdict.factors.map((factor) => (
+                <div key={factor.label} className="verdict-factor">
+                  <span>{factor.label}</span>
+                  <strong>{factor.score}</strong>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <section className="panel decision-panel">
             <div className="panel-header">
               <div>
@@ -43,6 +92,11 @@ export default function ExecutiveBrief({
                 <article key={item.title} className="decision-item">
                   <strong>{item.title}</strong>
                   <p>{item.description}</p>
+                  <div className="decision-meta">
+                    <span>{`Owner: ${item.owner ?? "N/A"}`}</span>
+                    <span>{`SLA: ${item.sla ?? "N/A"}`}</span>
+                    <span>{`Action: ${item.recommendedAction ?? "N/A"}`}</span>
+                  </div>
                 </article>
               ))}
             </div>

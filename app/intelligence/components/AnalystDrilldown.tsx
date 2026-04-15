@@ -12,9 +12,13 @@ function ActionRow({
   return (
     <div className="action-row">
       {actions.map((action) => (
-        <div key={`${action.label}-${action.tone ?? "default"}`} className={`action${action.tone ? ` ${action.tone}` : ""}`}>
+        <button
+          key={`${action.label}-${action.tone ?? "default"}`}
+          type="button"
+          className={`action${action.tone ? ` ${action.tone}` : ""}`}
+        >
           {action.label}
-        </div>
+        </button>
       ))}
     </div>
   );

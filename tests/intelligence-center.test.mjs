@@ -11,6 +11,7 @@ const INTELLIGENCE_COMPONENT_FILES = [
   "app/intelligence/components/WhatChanged.tsx",
   "app/intelligence/components/ExposurePriorities.tsx",
   "app/intelligence/components/AnalystDrilldown.tsx",
+  "app/intelligence/components/OpsExtensions.tsx",
 ];
 
 const ROUTE_COMPONENT_ORDER = [
@@ -19,6 +20,7 @@ const ROUTE_COMPONENT_ORDER = [
   "WhatChanged",
   "ExposurePriorities",
   "AnalystDrilldown",
+  "OpsExtensions",
 ];
 
 const RETIRED_PHRASES = [
@@ -78,6 +80,7 @@ test("Intelligence route composes the command-center page in the approved order"
     'from "@/app/intelligence/components/WhatChanged"',
     'from "@/app/intelligence/components/ExposurePriorities"',
     'from "@/app/intelligence/components/AnalystDrilldown"',
+    'from "@/app/intelligence/components/OpsExtensions"',
   ];
 
   for (const importText of expectedImports) {
@@ -107,6 +110,8 @@ test("command-center component files expose the new homepage domains and retire 
     .filter((relativePath) => existsSync(join(root, relativePath)))
     .map((relativePath) => readFileSync(join(root, relativePath), "utf8"))
     .join("\n");
+  const dataSource = readFileSync(join(root, "app/intelligence/data.ts"), "utf8");
+  const combinedSource = `${componentSource}\n${dataSource}`;
 
   for (const phrase of [
     "组织威胁态势",
@@ -116,11 +121,16 @@ test("command-center component files expose the new homepage domains and retire 
     "实体关联图谱",
     "狩猎与研判工作台",
     "自动化响应剧本",
+    "统一结论分",
+    "协作对象与复用上下文",
+    "标准化情报接入层",
+    "威胁到检测内容流水线",
+    "证据可追溯 AI 总结",
   ]) {
-    assert.equal(componentSource.includes(phrase), true, `expected phrase ${phrase} in intelligence components`);
+    assert.equal(combinedSource.includes(phrase), true, `expected phrase ${phrase} in intelligence route assets`);
   }
 
   for (const phrase of RETIRED_PHRASES) {
-    assert.equal(componentSource.includes(phrase), false, `did not expect retired phrase ${phrase}`);
+    assert.equal(combinedSource.includes(phrase), false, `did not expect retired phrase ${phrase}`);
   }
 });
