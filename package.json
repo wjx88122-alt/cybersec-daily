@@ -8,7 +8,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "repair:translations": "node scripts/repair-translations.mjs",
+    "repair:translations:all": "node scripts/repair-translations.mjs --scope=all"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.78.0",

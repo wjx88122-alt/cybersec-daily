@@ -53,13 +53,18 @@ export function mergeFeedItems<T extends MergeableFeedItem>(
     const prev = map.get(item.id);
     if (!prev) return item;
 
+    const titleChanged = item.title !== prev.title;
+    const summaryChanged = item.summary !== prev.summary;
+
     return {
       ...item,
       pubDate: item.pubDate || prev.pubDate,
       image: prev.image || item.image,
-      titleZh: prev.titleZh || item.titleZh,
-      summaryZh: prev.summaryZh || item.summaryZh,
-      summaryAi: prev.summaryAi || item.summaryAi,
+      // If upstream English content changed, stale translated fields must be cleared
+      // so the translation pipeline can regenerate them from the new source text.
+      titleZh: titleChanged ? item.titleZh : prev.titleZh || item.titleZh,
+      summaryZh: summaryChanged ? item.summaryZh : prev.summaryZh || item.summaryZh,
+      summaryAi: summaryChanged ? item.summaryAi : prev.summaryAi || item.summaryAi,
     };
   });
 }
