@@ -40,7 +40,7 @@ export default async function DecisionDetailPage({ params }: DecisionDetailPageP
   const related = getRelatedDecisionEntries(entry.id, 3);
 
   return (
-    <div className="team-shell min-h-screen overflow-hidden">
+    <div className="team-shell system-shell system-shell-light min-h-screen overflow-hidden">
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute left-[-10%] top-[-8rem] h-72 w-72 rounded-full blur-3xl"

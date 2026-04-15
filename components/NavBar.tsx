@@ -38,7 +38,7 @@ export default function NavBar({
 
   return (
     <header
-      className="sticky top-0 z-20 border-b shadow-[0_12px_40px_rgba(15,23,42,0.04)]"
+      className="system-nav-shell sticky top-0 z-20 border-b"
       style={{
         borderColor: palette.headerBorder,
         background: palette.headerBackground,
@@ -46,9 +46,9 @@ export default function NavBar({
         WebkitBackdropFilter: "blur(22px)",
       }}
     >
-      <div className="mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/60 bg-white/75 shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
+      <div className="system-nav-bar mx-auto flex min-h-16 max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-2 sm:px-6">
+        <Link href="/" className="system-nav-brand flex items-center gap-3">
+          <span className="system-nav-logo flex h-10 w-10 items-center justify-center rounded-2xl border border-white/60 bg-white/75 shadow-[0_8px_24px_rgba(15,23,42,0.06)]">
             <Image
               src="/logo.png"
               alt="网络安全日报"
@@ -61,13 +61,13 @@ export default function NavBar({
             网络安全日报
           </span>
         </Link>
-        <nav className="flex items-center gap-2 rounded-full border border-white/70 bg-white/60 px-2 py-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+        <nav className="system-nav-group flex items-center gap-2 rounded-full border border-white/70 bg-white/60 px-2 py-1.5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
           <div className="flex items-center gap-1">
             {NAV_ITEMS.map(({ label, href }) => (
               <Link
                 key={label}
                 href={href}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
+                className={`system-nav-item rounded-full px-3.5 py-1.5 text-sm font-medium transition-all ${
                   active === label ? palette.activeItem : palette.inactiveItem
                 }`}
               >
