@@ -6,6 +6,18 @@
 - 仓库: [wjx88122-alt/cybersec-daily](https://github.com/wjx88122-alt/cybersec-daily)
 - 技术栈: Next.js 16, React 19, TypeScript, Tailwind CSS 4, Vercel Cron, Upstash Redis, OpenAI-compatible LLM providers
 
+## Design References
+
+这个项目已经引入仓库级设计说明文件 [`DESIGN.md`](./DESIGN.md)，用于约束 AI agent 和人工协作时的视觉输出。
+
+它的写法参考了：
+
+- [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
+
+但实际内容已经针对 `cybersec-daily` 的 5 个产品模式做了本地化适配，而不是直接照搬上游示例。
+
+第三方设计参考归属见 [`docs/third-party.md`](./docs/third-party.md)。
+
 ## 项目概览
 
 这个项目不是单纯的资讯列表页，而是一个围绕“安全资讯聚合 -> 翻译与修复 -> 摘要生成 -> 情报与运营展示”串起来的站点。
@@ -178,6 +190,8 @@ npm run build
 ## 目录说明
 
 ```text
+DESIGN.md                   仓库级设计系统说明，供 AI agent / 贡献者读取
+
 app/
   page.tsx                  安全资讯首页
   ai/page.tsx               AI 资讯页
@@ -205,6 +219,9 @@ lib/
 
 tests/
   *.test.mjs                关键回归测试
+
+docs/
+  third-party.md            第三方设计参考与归属说明
 ```
 
 ## 设计与内容定位
