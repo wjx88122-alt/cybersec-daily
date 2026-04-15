@@ -50,7 +50,7 @@ export default function Home() {
     : "";
 
   return (
-    <div className="public-shell min-h-screen">
+    <div className="public-shell system-shell system-shell-light min-h-screen">
       <NavBar active="安全" />
 
       <main className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">

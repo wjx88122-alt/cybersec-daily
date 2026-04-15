@@ -171,7 +171,7 @@ export default function DashboardPage() {
     })), []);
 
   return (
-    <div className="min-h-screen mdr-shell text-slate-900 overflow-hidden">
+    <div className="min-h-screen mdr-shell system-shell system-shell-light text-slate-900 overflow-hidden">
       <style jsx global>{`
         @keyframes scroll { 0% { transform: translateY(0); } 100% { transform: translateY(-50%); } }
         .animate-scroll { animation: scroll 20s linear infinite; }

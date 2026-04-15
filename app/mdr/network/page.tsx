@@ -156,7 +156,7 @@ export default function NetworkPage() {
   };
 
   return (
-    <div className="min-h-screen mdr-shell">
+    <div className="min-h-screen mdr-shell system-shell system-shell-light">
       <NavBar active="MDR" />
       <main className="max-w-7xl mx-auto px-4 py-6">
         {/* Header */}

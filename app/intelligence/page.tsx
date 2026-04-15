@@ -8,7 +8,7 @@ import AnalystDrilldown from "@/app/intelligence/components/AnalystDrilldown";
 
 export default function IntelligencePage() {
   return (
-    <div className="min-h-screen intelligence-command-center">
+    <div className="min-h-screen intelligence-command-center system-shell system-shell-dark">
       <NavBar active="情报中心" />
       <div className="homepage-shell">
         <Topbar topbar={intelligenceCommandCenterData.topbar} />

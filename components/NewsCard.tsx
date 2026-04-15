@@ -214,7 +214,7 @@ export default function NewsCard({
       href={safeHref}
       target="_blank"
       rel="noopener noreferrer"
-      className={`group block overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/82 shadow-[0_20px_60px_rgba(15,23,42,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] reveal-rise ${
+      className={`system-card group block overflow-hidden rounded-[30px] border border-slate-200/80 bg-white/82 shadow-[0_20px_60px_rgba(15,23,42,0.07)] transition-all duration-300 hover:-translate-y-1 hover:border-slate-300 hover:shadow-[0_28px_80px_rgba(15,23,42,0.12)] reveal-rise ${
         hero ? "public-panel-strong" : "public-panel"
       }`}
     >
@@ -223,11 +223,11 @@ export default function NewsCard({
           <div className="flex flex-col justify-between p-7 sm:p-9 lg:p-11">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <span className="system-pill rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
                   今日焦点
                 </span>
                 <span
-                  className={`rounded-full border px-3 py-1 text-[10px] font-semibold ${catAccent}`}
+                  className={`system-pill rounded-full border px-3 py-1 text-[10px] font-semibold ${catAccent}`}
                 >
                   {item.category}
                 </span>
@@ -243,7 +243,7 @@ export default function NewsCard({
             </div>
 
             <div className="mt-8 flex items-center gap-3 text-[11px] text-slate-500">
-              <span className="inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3 font-medium text-slate-700">
+              <span className="system-pill inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3 font-medium text-slate-700">
                 {item.source}
               </span>
               <span>{timeAgo}</span>
@@ -309,7 +309,7 @@ export default function NewsCard({
             </div>
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
               <span
-                className={`rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${catAccent}`}
+                className={`system-pill rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${catAccent}`}
               >
                 {item.category}
               </span>
