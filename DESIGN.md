@@ -1,94 +1,111 @@
 # DESIGN.md
 
-This file defines the visual system for `cybersec-daily`.
+This repository follows an Apple-inspired system design language.
 
 It is written for AI coding agents and human contributors who need to extend the UI without breaking the product's existing visual language.
 
-## Design Intent
+The target is not an Apple marketing clone.
+The target is a product suite that feels closer to macOS and iOS applications:
 
-`cybersec-daily` is not a single-surface marketing site.
-
-It is a multi-mode security product with four distinct but related experiences:
-
-1. Public security news
-2. Public AI news
-3. Intelligence command center
-4. MDR operations views
-5. Executive team / strategy pages
-
-The design system should make these modes feel like one product family, while allowing each mode to keep its own posture.
+- layered materials
+- calm typography
+- restrained color
+- precise spacing
+- consistent navigation chrome
 
 ## Reference Note
 
-This project's design guidance is adapted from the `DESIGN.md` workflow popularized by Google Stitch and informed by references from:
+This project's design guidance is informed by the `DESIGN.md` workflow popularized by Google Stitch and by design-reference collections such as:
 
 - `VoltAgent/awesome-design-md`
 
-The collection is used as inspiration and calibration, not as a file that should be copied blindly into the product.
+Those references are used as inspiration and calibration, not as files that should be copied blindly into the product.
 
-The final design decisions in this repository must follow the product needs of `cybersec-daily`, not the defaults of any external reference.
+The final decisions in this repository must follow the product needs of `cybersec-daily`.
 
-## Product Modes
+## Core Direction
 
-### 1. Public News Pages
+The site should feel like one system product across:
+
+- public security news
+- public AI news
+- intelligence command center
+- MDR operations
+- executive team pages
+
+The common reference point is:
+
+- macOS professional apps
+- iOS content surfaces
+- Apple system materials
+
+This means the UI should read as:
+
+- calmer
+- more precise
+- less decorative
+- more coherent
+
+## Apple System Rules
+
+### Material
+
+- prefer layered translucent surfaces over flat cards
+- use subtle inner highlights
+- use soft separators instead of hard borders where possible
+- let elevation come from material and spacing, not aggressive shadows
+
+### Typography
+
+- prefer system-like sans typography
+- use fewer dramatic display treatments
+- keep headings compact and highly legible
+- keep body copy smooth and quiet
+
+### Color
+
+- rely on neutrals first
+- keep accents disciplined
+- preserve functional status colors where operational meaning matters
+- do not use large neon atmospherics on most pages
+
+### Motion
+
+- subtle
+- short travel
+- slow enough to feel polished
+- avoid theatrical reveal effects
+
+## Mode Differences
+
+### Public Pages
 
 Routes:
 
 - `/`
 - `/ai`
 
-These pages should feel:
+Should feel like Apple News inside an application shell:
 
+- bright
 - editorial
-- light
-- calm
-- readable
-- premium but not luxurious
+- clean
+- spacious
 
-Visual characteristics:
-
-- bright backgrounds
-- glass-like white surfaces
-- soft borders
-- strong hierarchy
-- generous spacing
-- card-driven browsing
-
-Avoid:
-
-- dark enterprise dashboard styling
-- excessive color noise
-- crowded tables
-
-### 2. Intelligence Command Center
+### Intelligence
 
 Route:
 
 - `/intelligence`
 
-This page should feel:
+Should feel like a professional dark macOS tool:
 
-- dark
-- operational
-- high-signal
-- command-driven
-- analysis-first
+- layered dark panels
+- calmer accents
+- strong hierarchy
+- briefing-first
 
-Visual characteristics:
-
-- dark layered backgrounds
-- luminous accent colors
-- strong section rhythm
-- top-heavy first screen
-- clear demotion from briefing to drilldown
-
-Avoid:
-
-- generic SaaS card layouts
-- purple-on-black cliches everywhere
-- equal visual weight across all sections
-
-### 3. MDR
+### MDR
 
 Routes:
 
@@ -97,197 +114,30 @@ Routes:
 - `/mdr/network`
 - `/mdr/splunk`
 
-These pages should feel:
+Should feel like an operational control application:
 
-- operational
-- tactical
-- readable under pressure
-- dashboard-like
+- compact but readable
+- denser than public pages
+- still within the same Apple-style system
 
-Visual characteristics:
-
-- compact cards
-- tabular and metric-heavy blocks
-- strong status color usage
-- obvious operator actions
-
-Avoid:
-
-- marketing-site spacing
-- decorative gradients that hide signal
-
-### 4. Team / Executive Pages
+### Team
 
 Routes:
 
 - `/team`
 - `/team/decisions`
+- `/team/history`
 
-These pages should feel:
+Should feel like an executive workspace:
 
-- strategic
+- warmer
 - polished
-- human
 - narrative
+- restrained
 
-Visual characteristics:
+## Shared UI Requirements
 
-- warmer palette
-- stronger storytelling rhythm
-- premium cards
-- more expressive typographic pacing
-
-## Cross-Product Principles
-
-These rules apply everywhere:
-
-- Navigation should always feel consistent across the whole product.
-- Page headers should establish the mode immediately.
-- Surfaces should look intentional, not default framework output.
-- Visual density must match task density.
-- Layouts should guide the reading path rather than presenting everything at once.
-
-## Typography
-
-Use typography to separate product mode:
-
-- headlines: compact, high-contrast, decisive
-- section labels: uppercase or small-caps style with clear tracking
-- body copy: readable, neutral, no overly light contrast
-- metrics: large, direct, compact
-
-Preferred tone:
-
-- security + AI public pages: editorial sans
-- intelligence / MDR: tighter, more technical sans with occasional mono usage
-- team pages: refined sans with premium pacing
-
-Avoid:
-
-- default browser-looking type stacks without intent
-- oversized paragraphs
-- weak contrast in operational views
-
-## Color System
-
-### Shared Product Family
-
-The product should feel related through:
-
-- disciplined neutrals
-- restrained accent usage
-- consistent border softness
-- mode-specific background systems
-
-### Public Pages
-
-- off-white and pale slate backgrounds
-- subtle blue and gold atmospheric washes
-- dark text
-- mild shadows
-
-### Intelligence
-
-- deep navy / black backgrounds
-- cyan, amber, rose, green, violet accents
-- luminous but controlled glow
-
-### MDR
-
-- cool light operational palette
-- clear severity colors
-- less atmospheric styling than intelligence
-
-### Team
-
-- warmer cream / slate surfaces
-- soft gold, blue, and green accents
-
-## Component Rules
-
-### Cards
-
-Cards should not all look the same across the project.
-
-Use:
-
-- lighter editorial cards on public pages
-- layered dark panels in intelligence
-- compact operation cards in MDR
-- premium storytelling cards in team pages
-
-### Buttons and Actions
-
-Actions must visually reflect consequence:
-
-- primary = go do the thing
-- warning = high attention but not destructive
-- danger = escalation / destructive / urgent
-- secondary = navigation or less critical actions
-
-### Data Blocks
-
-Use data presentation appropriate to context:
-
-- public pages: cards and summaries
-- intelligence: priority rails and drilldown blocks
-- MDR: metrics, queues, timelines, operators
-
-## Layout Rules
-
-### Reading Order
-
-Every page should answer:
-
-1. What mode am I in?
-2. What matters first?
-3. What can I do next?
-4. Where do I drill deeper?
-
-### Section Rhythm
-
-Do not space every section equally.
-
-Use larger emphasis at the top of a page, then tighten rhythm as the user moves into deeper operational content.
-
-### Responsive Behavior
-
-On small screens:
-
-- preserve reading order
-- collapse columns aggressively
-- keep actions reachable
-- do not recreate desktop density in stacked form
-
-## Motion
-
-Motion should be restrained and useful:
-
-- subtle rise-in on public content
-- small pulse only for urgent states
-- no decorative looping motion in dense operational areas unless it signals state
-
-## AI Agent Guidance
-
-When generating new UI:
-
-- first identify which product mode the page belongs to
-- reuse existing mode-specific wrappers and classes where possible
-- preserve the current page's visual family before introducing new patterns
-- prefer extending the system over inventing a fresh visual language
-
-When uncertain:
-
-- public content should bias toward editorial clarity
-- intelligence should bias toward command-center hierarchy
-- MDR should bias toward operator efficiency
-- team should bias toward narrative polish
-
-## Non-Goals
-
-Do not:
-
-- flatten all modes into one visual style
-- turn every page into a dark dashboard
-- use a single card recipe everywhere
-- copy external reference styles literally without adapting them
+- Navigation must look identical across the whole product.
+- Shared cards, pills, inputs, and buttons should come from one system layer.
+- Every route wrapper should opt into the same system shell before adding mode-specific styling.
+- New UI work should extend this file rather than inventing a separate visual language.
