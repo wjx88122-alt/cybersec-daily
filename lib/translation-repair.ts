@@ -1,4 +1,14 @@
-import { CUTOFF_MS, type FeedItem } from "./feeds.ts";
+export const CUTOFF_MS = 24 * 60 * 60 * 1000;
+
+export type FeedItem = {
+  id: string;
+  title: string;
+  summary: string;
+  pubDate: string;
+  titleZh?: string;
+  summaryZh?: string;
+  summaryAi?: string;
+};
 
 const normalize = (text?: string) => (text ?? "").trim();
 const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);

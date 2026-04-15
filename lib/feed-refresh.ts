@@ -12,6 +12,8 @@ export type FeedRefreshResolution<T> = {
 type MergeableFeedItem = {
   id: string;
   pubDate: string;
+  title?: string;
+  summary?: string;
   image?: string;
   titleZh?: string;
   summaryZh?: string;

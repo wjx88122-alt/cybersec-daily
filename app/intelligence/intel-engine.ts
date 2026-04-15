@@ -150,8 +150,14 @@ export function normalizeIntakePayload(input: {
     }
 
     const parsed = JSON.parse(input.payload);
-    const source = Array.isArray(parsed) ? parsed : Array.isArray(parsed.objects) ? parsed.objects : [];
-    const records = source.map((record) => normalize(record as Record<string, unknown>)).filter((row) => row !== null);
+    const source: Array<Record<string, unknown>> = (Array.isArray(parsed)
+      ? parsed
+      : Array.isArray((parsed as { objects?: unknown[] }).objects)
+        ? (parsed as { objects: unknown[] }).objects
+        : []) as Array<Record<string, unknown>>;
+    const records = source
+      .map((record: Record<string, unknown>) => normalize(record))
+      .filter((row) => row !== null);
     return { ok: true, records };
   } catch (error) {
     return {

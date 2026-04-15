@@ -688,7 +688,7 @@ export const intelligenceCommandCenterData: IntelligenceCommandCenterData = {
       csv: "indicator,type\n198.51.100.47,ip\nmalicious.example,domain",
       json: '[{"indicator":"203.0.113.11","type":"ip"},{"indicator":"a1b2c3d4e5f6","type":"sha256"}]',
       stix:
-        '{"type":"bundle","objects":[{"type":"indicator","name":"vpn-c2-ip","pattern":"[ipv4-addr:value = \\'198.51.100.47\\']"}]}',
+        `{"type":"bundle","objects":[{"type":"indicator","name":"vpn-c2-ip","pattern":"[ipv4-addr:value = '198.51.100.47']"}]}`,
     },
   },
   detectionPipeline: {
