@@ -1,5 +1,9 @@
 import { CUTOFF_MS, FeedItem } from "./feeds";
 import { kv } from "./kv";
+import {
+  isLikelyLocalizedField,
+  isLikelyUntranslatedItem,
+} from "./translation-detection";
 
 const TRANSLATION_HEALTH_KEY = "translation-health";
 const TRANSLATION_REPAIR_LOCK_KEY = "translation-repair-lock";
@@ -42,32 +46,13 @@ export type TranslationHealth = {
   pass?: Record<string, unknown>;
 };
 
-const normalize = (text?: string) => (text ?? "").trim();
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
-
 function getTimestamp(item: FeedItem) {
   const value = new Date(item.pubDate).getTime();
   return Number.isNaN(value) ? 0 : value;
 }
 
 export function isLikelyUntranslated(item: FeedItem) {
-  const title = normalize(item.title);
-  const summary = normalize(item.summary);
-  const titleZh = normalize(item.titleZh);
-  const summaryZh = normalize(item.summaryZh);
-
-  const titleLooksChinese = isChinese(title);
-  const summaryLooksChinese = isChinese(summary);
-  const needsTitleTranslation = Boolean(title) && !titleLooksChinese;
-  const needsSummaryTranslation = Boolean(summary) && !summaryLooksChinese;
-
-  const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
-  const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
-
-  return (
-    (needsTitleTranslation && (!titleZh || titleCopiedFromSource)) ||
-    (needsSummaryTranslation && (!summaryZh || summaryCopiedFromSource))
-  );
+  return isLikelyUntranslatedItem(item);
 }
 
 function createTranslationHealth(
@@ -90,8 +75,12 @@ function createTranslationHealth(
     recentWindowHours: Math.round(CUTOFF_MS / (60 * 60 * 1000)),
     recentTotal: recentItems.length,
     recentMissing: recentMissingItems.length,
-    recentWithTitleZh: recentItems.filter((item) => normalize(item.titleZh)).length,
-    recentWithSummaryZh: recentItems.filter((item) => normalize(item.summaryZh)).length,
+    recentWithTitleZh: recentItems.filter((item) =>
+      isLikelyLocalizedField(item.title, item.titleZh),
+    ).length,
+    recentWithSummaryZh: recentItems.filter((item) =>
+      isLikelyLocalizedField(item.summary, item.summaryZh),
+    ).length,
     healthy,
     lastHealthyAt: healthy ? updatedAt : lastHealthyAt,
     sampleMissing: recentMissingItems.slice(0, SAMPLE_LIMIT).map((item) => ({
@@ -100,8 +89,12 @@ function createTranslationHealth(
       source: item.source,
       pubDate: item.pubDate,
       missing: [
-        ...(!normalize(item.titleZh) ? ["titleZh" as const] : []),
-        ...(!normalize(item.summaryZh) ? ["summaryZh" as const] : []),
+        ...(!isLikelyLocalizedField(item.title, item.titleZh)
+          ? ["titleZh" as const]
+          : []),
+        ...(!isLikelyLocalizedField(item.summary, item.summaryZh)
+          ? ["summaryZh" as const]
+          : []),
       ],
     })),
     ...extra,

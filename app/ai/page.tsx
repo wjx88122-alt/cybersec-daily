@@ -56,7 +56,7 @@ export default function AIPage() {
       <main className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">
         <section className="grid gap-6 pb-10 pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pb-14 lg:pt-16">
           <div className="reveal-rise">
-            <div className="public-eyebrow">AI Watch</div>
+            <div className="public-eyebrow">AI 观察</div>
             <h1 className="public-display mt-4 max-w-[11ch]">
               把 AI 赛道里真正影响产品与战略的变化，排进同一个视野。
             </h1>
@@ -75,7 +75,7 @@ export default function AIPage() {
           </div>
 
           <div className="public-panel-strong reveal-rise delay-1 rounded-[32px] p-6 sm:p-7">
-            <div className="public-section-label">AI Snapshot</div>
+            <div className="public-section-label">AI 概览</div>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {[
                 { label: "资讯数量", value: String(filtered.length) },
@@ -170,7 +170,7 @@ export default function AIPage() {
         {!loading && !error && filtered.length > 0 && (
           <section className="mt-12">
             <div className="mb-5 reveal-rise delay-2">
-              <div className="public-section-label">Today’s Focus</div>
+              <div className="public-section-label">今日焦点</div>
               <p className="mt-3 text-sm text-slate-600">
                 近 24 小时 <span className="font-semibold text-slate-950">{filtered.length}</span> 条 AI 资讯，
                 保留原有内容，只把阅读体验压得更干净、更接近品牌页面。
@@ -185,7 +185,7 @@ export default function AIPage() {
 
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <div className="public-section-label">More Stories</div>
+                <div className="public-section-label">更多资讯</div>
                 <p className="mt-2 text-sm text-slate-600">
                   从产品到政策，继续用同一套清晰的节奏往下看。
                 </p>

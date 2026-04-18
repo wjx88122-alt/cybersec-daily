@@ -48,29 +48,75 @@ const client = llm.baseURL
   : new OpenAI({ apiKey: llm.apiKey });
 
 const BATCH_SIZE = 10;
-const isChinese = (text) => /[\u4e00-\u9fff]/.test(text);
+const hasChineseCharacters = (text) => /[\u4e00-\u9fff]/.test(text);
 const normalize = (text) => (text ?? '').trim();
+const normalizeComparable = (text) =>
+  normalize(text).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/gi, '');
+
+function requiresChineseLocalization(source) {
+  const sourceText = normalize(source);
+  return Boolean(sourceText) && !hasChineseCharacters(sourceText);
+}
+
+function isLikelyLocalizedField(source, localized) {
+  const sourceText = normalize(source);
+  const localizedText = normalize(localized);
+
+  if (!localizedText) {
+    return false;
+  }
+
+  if (!requiresChineseLocalization(sourceText)) {
+    return true;
+  }
+
+  if (hasChineseCharacters(localizedText)) {
+    return true;
+  }
+
+  const sourceComparable = normalizeComparable(sourceText);
+  const localizedComparable = normalizeComparable(localizedText);
+  if (sourceComparable && sourceComparable === localizedComparable) {
+    return false;
+  }
+
+  return false;
+}
 
 function isLikelyUntranslated(item) {
   const title = normalize(item.title);
   const summary = normalize(item.summary);
-  const titleZh = normalize(item.titleZh);
-  const summaryZh = normalize(item.summaryZh);
+  const titleNeedsTranslation = requiresChineseLocalization(title);
+  const summaryNeedsTranslation = requiresChineseLocalization(summary);
 
-  const titleLooksChinese = isChinese(title);
-  const summaryLooksChinese = isChinese(summary);
+  const titleLocalized = isLikelyLocalizedField(title, item.titleZh);
+  const summaryLocalized = isLikelyLocalizedField(summary, item.summaryZh);
 
-  const titleCopiedFromSource = !titleLooksChinese && titleZh === title;
-  const summaryCopiedFromSource = !summaryLooksChinese && summaryZh === summary;
+  return (
+    (titleNeedsTranslation && !titleLocalized) ||
+    (summaryNeedsTranslation && !summaryLocalized)
+  );
+}
 
-  return !titleZh || !summaryZh || titleCopiedFromSource || summaryCopiedFromSource;
+function pickLocalizedField({ source, candidate, existing }) {
+  const nextCandidate = normalize(candidate);
+  if (isLikelyLocalizedField(source, nextCandidate)) {
+    return nextCandidate;
+  }
+
+  const existingValue = normalize(existing);
+  if (isLikelyLocalizedField(source, existingValue)) {
+    return existingValue;
+  }
+
+  return undefined;
 }
 
 function autoFillChineseFields(items) {
   items.forEach((item, i) => {
     const patch = {};
-    if (!normalize(item.titleZh) && isChinese(item.title)) patch.titleZh = item.title;
-    if (!normalize(item.summaryZh) && isChinese(item.summary)) patch.summaryZh = item.summary;
+    if (!normalize(item.titleZh) && hasChineseCharacters(item.title)) patch.titleZh = item.title;
+    if (!normalize(item.summaryZh) && hasChineseCharacters(item.summary)) patch.summaryZh = item.summary;
     if (Object.keys(patch).length > 0) items[i] = { ...item, ...patch };
   });
 }
@@ -136,8 +182,17 @@ async function run() {
       const results = await translateBatch(input);
       batch.forEach((item, j) => {
         const result = results[j];
-        if (normalize(result?.titleZh) || normalize(result?.summaryZh)) {
-          translationMap.set(item.id, result);
+        const titleZh = pickLocalizedField({
+          source: item.title,
+          candidate: result?.titleZh,
+        });
+        const summaryZh = pickLocalizedField({
+          source: item.summary,
+          candidate: result?.summaryZh,
+        });
+
+        if (titleZh || summaryZh) {
+          translationMap.set(item.id, { titleZh, summaryZh });
         }
       });
       done++;
@@ -152,14 +207,36 @@ async function run() {
   for (const item of allItems) {
     const t = translationMap.get(item.id);
     if (!t) continue;
-    item.titleZh = normalize(t.titleZh) || item.titleZh;
-    item.summaryZh = normalize(t.summaryZh) || item.summaryZh;
+
+    const nextTitleZh = pickLocalizedField({
+      source: item.title,
+      candidate: t.titleZh,
+      existing: item.titleZh,
+    });
+    const nextSummaryZh = pickLocalizedField({
+      source: item.summary,
+      candidate: t.summaryZh,
+      existing: item.summaryZh,
+    });
+    item.titleZh = nextTitleZh;
+    item.summaryZh = nextSummaryZh;
   }
   for (const item of ai) {
     const t = translationMap.get(item.id);
     if (!t) continue;
-    item.titleZh = normalize(t.titleZh) || item.titleZh;
-    item.summaryZh = normalize(t.summaryZh) || item.summaryZh;
+
+    const nextTitleZh = pickLocalizedField({
+      source: item.title,
+      candidate: t.titleZh,
+      existing: item.titleZh,
+    });
+    const nextSummaryZh = pickLocalizedField({
+      source: item.summary,
+      candidate: t.summaryZh,
+      existing: item.summaryZh,
+    });
+    item.titleZh = nextTitleZh;
+    item.summaryZh = nextSummaryZh;
   }
   await Promise.all([
     kv.set('feed-a', allItems.slice(0, a.length)),

@@ -6,6 +6,10 @@ import {
   isLikelyUntranslated,
   recordTranslationHealthFromItems,
 } from "@/lib/translation-health";
+import {
+  isLikelyLocalizedField,
+  pickLocalizedField,
+} from "@/lib/translation-detection";
 import { after, NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
@@ -44,16 +48,24 @@ function autoFillChineseFields(items: FeedItem[]) {
 /** Apply translation map back to item arrays (mutates in place) */
 function applyTranslations(
   items: FeedItem[],
-  map: Map<string, { titleZh: string; summaryZh: string }>,
+  map: Map<string, { titleZh?: string; summaryZh?: string }>,
 ) {
   items.forEach((item, i) => {
     const t = map.get(item.id);
     if (!t) return;
 
-    const nextTitleZh = normalize(t.titleZh) || item.titleZh;
-    const nextSummaryZh = normalize(t.summaryZh) || item.summaryZh;
+    const nextTitleZh = pickLocalizedField({
+      source: item.title,
+      candidate: t.titleZh,
+      existing: item.titleZh,
+    });
+    const nextSummaryZh = pickLocalizedField({
+      source: item.summary,
+      candidate: t.summaryZh,
+      existing: item.summaryZh,
+    });
 
-    if (nextTitleZh || nextSummaryZh) {
+    if (nextTitleZh !== item.titleZh || nextSummaryZh !== item.summaryZh) {
       items[i] = {
         ...item,
         titleZh: nextTitleZh,
@@ -128,7 +140,9 @@ export async function GET(req: NextRequest) {
         ];
 
   if (allToTranslate.length === 0) {
-    const totalWithZh = allItems.filter((i) => i.titleZh).length + aiItems.filter((i) => i.titleZh).length;
+    const totalWithZh =
+      allItems.filter((i) => isLikelyLocalizedField(i.title, i.titleZh)).length +
+      aiItems.filter((i) => isLikelyLocalizedField(i.title, i.titleZh)).length;
     if (feedAI) await kv.set("feed-ai", aiItems);
     triggerSummarize();
     return NextResponse.json({
@@ -144,7 +158,7 @@ export async function GET(req: NextRequest) {
     `translate[${scope}]: ${allToTranslate.length} items queued (${recentToTranslate.length} recent sec + ${recentToTranslateAI.length} recent ai + ${backlogToTranslate.length} backlog sec + ${backlogToTranslateAI.length} backlog ai)`,
   );
 
-  const translationMap = new Map<string, { titleZh: string; summaryZh: string }>();
+  const translationMap = new Map<string, { titleZh?: string; summaryZh?: string }>();
   let batchesDone = 0;
   let batchesFailed = 0;
 
@@ -160,8 +174,17 @@ export async function GET(req: NextRequest) {
       const results = await translateItems(batch);
       batch.forEach((item, j) => {
         const result = results[j];
-        if (normalize(result?.titleZh) || normalize(result?.summaryZh)) {
-          translationMap.set(item.id, result);
+        const titleZh = pickLocalizedField({
+          source: item.title,
+          candidate: result?.titleZh,
+        });
+        const summaryZh = pickLocalizedField({
+          source: item.summary,
+          candidate: result?.summaryZh,
+        });
+
+        if (titleZh || summaryZh) {
+          translationMap.set(item.id, { titleZh, summaryZh });
         }
       });
       batchesDone++;
@@ -193,11 +216,12 @@ export async function GET(req: NextRequest) {
     kv.set("feed-ai", aiItems),
   ]);
 
-  const withZh = allItems.filter((i) => i.titleZh).length;
-  const withZhAI = aiItems.filter((i) => i.titleZh).length;
-  const pending = allToTranslate.length - translationMap.size;
-  const recentPending = [...allItems, ...aiItems].filter(
-    (item) => getTimestamp(item) >= recentCutoff && isLikelyUntranslated(item),
+  const withZh = allItems.filter((i) => isLikelyLocalizedField(i.title, i.titleZh)).length;
+  const withZhAI = aiItems.filter((i) => isLikelyLocalizedField(i.title, i.titleZh)).length;
+  const unresolved = [...allItems, ...aiItems].filter(isLikelyUntranslated);
+  const pending = unresolved.length;
+  const recentPending = unresolved.filter(
+    (item) => getTimestamp(item) >= recentCutoff,
   ).length;
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 

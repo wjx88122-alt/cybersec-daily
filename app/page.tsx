@@ -56,7 +56,7 @@ export default function Home() {
       <main className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">
         <section className="grid gap-6 pb-10 pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pb-14 lg:pt-16">
           <div className="reveal-rise">
-            <div className="public-eyebrow">Security Daily</div>
+            <div className="public-eyebrow">安全日报</div>
             <h1 className="public-display mt-4 max-w-[11ch]">
               把过去 24 小时最值得看的安全变化，放在一页里。
             </h1>
@@ -75,7 +75,7 @@ export default function Home() {
           </div>
 
           <div className="public-panel-strong reveal-rise delay-1 rounded-[32px] p-6 sm:p-7">
-            <div className="public-section-label">Daily Snapshot</div>
+            <div className="public-section-label">今日概览</div>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {[
                 { label: "资讯数量", value: String(filtered.length) },
@@ -166,7 +166,7 @@ export default function Home() {
         {!loading && !error && filtered.length > 0 && (
           <section className="mt-12">
             <div className="mb-5 reveal-rise delay-2">
-              <div className="public-section-label">Today’s Briefing</div>
+              <div className="public-section-label">今日简报</div>
               <p className="mt-3 text-sm text-slate-600">
                 近 24 小时 <span className="font-semibold text-slate-950">{filtered.length}</span> 条资讯，按时间排序，
                 优先展示最值得先看的那一条。
@@ -181,7 +181,7 @@ export default function Home() {
 
             <div className="mb-5 flex items-end justify-between gap-4">
               <div>
-                <div className="public-section-label">More Stories</div>
+                <div className="public-section-label">更多资讯</div>
                 <p className="mt-2 text-sm text-slate-600">
                   保留原有信息密度，但用更清晰的层级来提高扫读效率。
                 </p>
