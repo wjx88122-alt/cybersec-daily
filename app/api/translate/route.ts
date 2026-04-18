@@ -10,6 +10,7 @@ import {
   isLikelyLocalizedField,
   pickLocalizedField,
 } from "@/lib/translation-detection";
+import { detectTranslationRunIssue } from "@/lib/translation-run";
 import { after, NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
@@ -85,6 +86,7 @@ export async function GET(req: NextRequest) {
   const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
   const recentCutoff = Date.now() - CUTOFF_MS;
   const scope = req.nextUrl.searchParams.get("scope") === "recent" ? "recent" : "all";
+  const reason = req.nextUrl.searchParams.get("reason") ?? null;
   const triggerSummarize = () => {
     const summarizeUrl = `${appBaseUrl}/api/summarize`;
     after(() => {
@@ -224,21 +226,59 @@ export async function GET(req: NextRequest) {
     (item) => getTimestamp(item) >= recentCutoff,
   ).length;
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+  const pass = {
+    scope,
+    translated: translationMap.size,
+    pending,
+    recentPending,
+    batchesDone,
+    batchesFailed,
+    elapsedSec: elapsed,
+    reason,
+  };
+  const runIssue = detectTranslationRunIssue({
+    queued: allToTranslate.length,
+    batchesDone,
+    batchesFailed,
+    translated: translationMap.size,
+  });
 
-  await recordTranslationHealthFromItems({
-    items: [...allItems, ...aiItems],
-    source: `translate:${scope}`,
-    extra: {
-      pass: {
+  if (runIssue) {
+    const failedPass = {
+      ...pass,
+      issueCode: runIssue.code,
+      issueMessage: runIssue.message,
+    };
+    await recordTranslationHealthFromItems({
+      items: [...allItems, ...aiItems],
+      source: `translate:${scope}`,
+      extra: {
+        pass: failedPass,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        ok: false,
         scope,
+        code: runIssue.code,
+        error: runIssue.message,
         translated: translationMap.size,
         pending,
         recentPending,
         batchesDone,
         batchesFailed,
         elapsedSec: elapsed,
-        reason: req.nextUrl.searchParams.get("reason") ?? null,
       },
+      { status: 503 },
+    );
+  }
+
+  await recordTranslationHealthFromItems({
+    items: [...allItems, ...aiItems],
+    source: `translate:${scope}`,
+    extra: {
+      pass,
     },
   });
 
