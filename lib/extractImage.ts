@@ -1,7 +1,9 @@
 import { isAllowedRemoteHttpsUrl, resolveSafeImageUrl } from "./remote-url";
+import { pickImageFromProxyText } from "./image-proxy";
 
 const MAX_HEAD_BYTES = 160 * 1024;
 const FETCH_TIMEOUT_MS = 6000;
+const PROXY_TIMEOUT_MS = 9000;
 const BASE_HEADERS = {
   "User-Agent":
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
@@ -64,6 +66,7 @@ async function readHeadChunk(res: Response): Promise<string> {
 export async function extractOgImage(url: string): Promise<string | null> {
   if (!isAllowedRemoteHttpsUrl(url)) return null;
 
+  let sawBlockedStatus = false;
   for (const useRange of [true, false]) {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
@@ -76,6 +79,9 @@ export async function extractOgImage(url: string): Promise<string | null> {
         signal: controller.signal,
         redirect: "follow",
       });
+      if (res.status === 401 || res.status === 403 || res.status === 429) {
+        sawBlockedStatus = true;
+      }
       const html = await readHeadChunk(res);
       const image = extractImageFromHtml(html, url);
       if (image) return image;
@@ -85,5 +91,26 @@ export async function extractOgImage(url: string): Promise<string | null> {
       clearTimeout(timeout);
     }
   }
+
+  if (sawBlockedStatus) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), PROXY_TIMEOUT_MS);
+    try {
+      const proxyTarget = url.replace(/^https?:\/\//i, "");
+      const proxyUrl = `https://r.jina.ai/http://${proxyTarget}`;
+      const proxyRes = await fetch(proxyUrl, {
+        headers: BASE_HEADERS,
+        signal: controller.signal,
+      });
+      const text = await proxyRes.text();
+      const fallbackImage = pickImageFromProxyText(text, url);
+      if (fallbackImage) return fallbackImage;
+    } catch {
+      // Fallback proxy fetch failed, return null below.
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   return null;
 }
