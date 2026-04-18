@@ -1,6 +1,7 @@
 import { kv } from "@/lib/kv";
 import { FeedItem } from "@/lib/feeds";
 import { resolveInternalAppBaseUrl } from "@/lib/app-url";
+import { triggerImageRepairIfNeeded } from "@/lib/image-health";
 import {
   loadAllFeedItemsFromKv,
   triggerTranslationRepairIfNeeded,
@@ -17,13 +18,22 @@ export async function GET(req: NextRequest) {
 
     after(async () => {
       const allItems = await loadAllFeedItemsFromKv();
-      await triggerTranslationRepairIfNeeded({
-        items: allItems,
-        appBaseUrl,
-        source: "feed-a:read",
-        reason: "public-feed-read",
-        authToken: process.env.CRON_SECRET,
-      });
+      await Promise.all([
+        triggerImageRepairIfNeeded({
+          items: allItems,
+          appBaseUrl,
+          source: "feed-a:read",
+          reason: "public-feed-read",
+          authToken: process.env.CRON_SECRET,
+        }),
+        triggerTranslationRepairIfNeeded({
+          items: allItems,
+          appBaseUrl,
+          source: "feed-a:read",
+          reason: "public-feed-read",
+          authToken: process.env.CRON_SECRET,
+        }),
+      ]);
     });
 
     return NextResponse.json({ items: safeItems });
