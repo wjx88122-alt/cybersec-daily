@@ -1,6 +1,7 @@
 import { kv } from "@/lib/kv";
 import { extractOgImage } from "@/lib/extractImage";
 import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
+import { fetchFeedImageMapForSources } from "@/lib/fetchFeeds";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 60;
@@ -41,11 +42,22 @@ export async function GET(req: NextRequest) {
       ({ item }) => !item.image && new Date(item.pubDate).getTime() >= cutoff,
     );
 
+  const pendingSources = [
+    ...new Set([...toProcess, ...toProcessAI].map(({ item }) => item.source)),
+  ];
+  const feedImageMap = await fetchFeedImageMapForSources(pendingSources);
+  const resolveImage = async (item: FeedItem) => {
+    const key = item.link.endsWith("/") ? item.link.slice(0, -1) : item.link;
+    const feedImage = feedImageMap.get(key);
+    if (feedImage) return feedImage;
+    return extractOgImage(item.link);
+  };
+
   const images = await Promise.all(
-    toProcess.map(({ item }) => extractOgImage(item.link)),
+    toProcess.map(({ item }) => resolveImage(item)),
   );
   const imagesAI = await Promise.all(
-    toProcessAI.map(({ item }) => extractOgImage(item.link)),
+    toProcessAI.map(({ item }) => resolveImage(item)),
   );
 
   const updatedItems = allItems.map((item, idx) => {

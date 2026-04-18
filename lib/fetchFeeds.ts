@@ -2,10 +2,19 @@ import Parser from "rss-parser";
 import { FEED_SOURCES_A, FEED_SOURCES_B, FEED_SOURCES_AI, FeedItem } from "./feeds";
 import crypto from "crypto";
 import { FeedFetchResult, normalizeFeedPubDate } from "./feed-refresh";
+import { pickFeedImage } from "./feed-image";
 
 const parser = new Parser({
   timeout: 5000,
   headers: { "User-Agent": "CybersecDaily/1.0" },
+  customFields: {
+    item: [
+      ["media:content", "mediaContent", { keepArray: true }],
+      ["media:thumbnail", "mediaThumbnail", { keepArray: true }],
+      ["content:encoded", "contentEncoded"],
+      ["enclosure", "enclosure", { keepArray: true }],
+    ],
+  },
 });
 
 type Source = { name: string; url: string; category: string };
@@ -27,6 +36,15 @@ async function fetchSources(sources: Source[]): Promise<FeedFetchResult<FeedItem
         source: source.name,
         category: source.category,
         pubDate: normalizeFeedPubDate(item.pubDate || item.isoDate),
+        image: pickFeedImage({
+          link: item.link,
+          content: item.content,
+          summary: item.summary,
+          contentEncoded: (item as unknown as { contentEncoded?: string }).contentEncoded,
+          mediaContent: (item as unknown as { mediaContent?: unknown }).mediaContent,
+          mediaThumbnail: (item as unknown as { mediaThumbnail?: unknown }).mediaThumbnail,
+          enclosure: (item as unknown as { enclosure?: unknown }).enclosure,
+        }),
       }));
     }),
   );
@@ -71,6 +89,55 @@ export async function fetchAllFeeds(): Promise<FeedItem[]> {
 export async function fetchFeedsAI(): Promise<FeedFetchResult<FeedItem>> {
   const result = await fetchSources(FEED_SOURCES_AI);
   return { ...result, items: sortFeedItems(result.items) };
+}
+
+function normalizeLinkKey(link: string) {
+  const trimmed = link.trim();
+  if (!trimmed) return "";
+  return trimmed.endsWith("/") ? trimmed.slice(0, -1) : trimmed;
+}
+
+export async function fetchFeedImageMapForSources(
+  sourceNames: string[],
+): Promise<Map<string, string>> {
+  const requested = new Set(sourceNames.map((name) => name.trim()).filter(Boolean));
+  if (requested.size === 0) return new Map();
+
+  const sources = [...FEED_SOURCES_A, ...FEED_SOURCES_B, ...FEED_SOURCES_AI].filter(
+    (source) => requested.has(source.name),
+  );
+  if (sources.length === 0) return new Map();
+
+  const map = new Map<string, string>();
+  const results = await Promise.allSettled(
+    sources.map(async (source) => {
+      const feed = await parser.parseURL(source.url);
+      (feed.items || []).slice(0, 30).forEach((item) => {
+        const link = normalizeLinkKey(item.link || "");
+        if (!link) return;
+        if (map.has(link)) return;
+
+        const image = pickFeedImage({
+          link: item.link,
+          content: item.content,
+          summary: item.summary,
+          contentEncoded: (item as unknown as { contentEncoded?: string }).contentEncoded,
+          mediaContent: (item as unknown as { mediaContent?: unknown }).mediaContent,
+          mediaThumbnail: (item as unknown as { mediaThumbnail?: unknown }).mediaThumbnail,
+          enclosure: (item as unknown as { enclosure?: unknown }).enclosure,
+        });
+        if (image) {
+          map.set(link, image);
+        }
+      });
+    }),
+  );
+
+  if (results.every((result) => result.status === "rejected")) {
+    return new Map();
+  }
+
+  return map;
 }
 
 function stripHtml(html: string): string {
