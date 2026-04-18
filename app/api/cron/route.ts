@@ -3,7 +3,7 @@ import { fetchFeedsA, fetchFeedsB, fetchFeedsAI } from "@/lib/fetchFeeds";
 import { FeedItem } from "@/lib/feeds";
 import { DailyDigest } from "@/lib/digest";
 import { generateSnapshot, mergeSnapshot, DailySnapshot } from "@/lib/snapshot";
-import { resolveAppBaseUrl } from "@/lib/app-url";
+import { resolveInternalAppBaseUrl } from "@/lib/app-url";
 import { mergeFeedItems, resolveFeedRefresh } from "@/lib/feed-refresh";
 import {
   recordTranslationHealthFromItems,
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     source: "cron:feed-refresh",
   });
 
-  const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const appBaseUrl = resolveInternalAppBaseUrl(req.nextUrl.origin);
   const authHeaders = {
     authorization: `Bearer ${process.env.CRON_SECRET}`,
   };

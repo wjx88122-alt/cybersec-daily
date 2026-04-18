@@ -1,6 +1,6 @@
 import { kv } from "@/lib/kv";
 import { FeedItem } from "@/lib/feeds";
-import { resolveAppBaseUrl } from "@/lib/app-url";
+import { resolveInternalAppBaseUrl } from "@/lib/app-url";
 import {
   loadAllFeedItemsFromKv,
   triggerTranslationRepairIfNeeded,
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   try {
     const items = await kv.get<FeedItem[]>("feed-b");
     const safeItems = items ?? [];
-    const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+    const appBaseUrl = resolveInternalAppBaseUrl(req.nextUrl.origin);
 
     after(async () => {
       const allItems = await loadAllFeedItemsFromKv();

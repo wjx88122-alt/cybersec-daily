@@ -4,7 +4,10 @@ import test from "node:test";
 const { resolveSafeExternalHref, resolveSafeImageUrl } = await import(
   "../lib/remote-url.ts"
 );
-const { resolveAppBaseUrlFromSources } = await import("../lib/app-url.ts");
+const {
+  resolveAppBaseUrlFromSources,
+  resolveInternalAppBaseUrlFromSources,
+} = await import("../lib/app-url.ts");
 
 test("resolveSafeExternalHref only allows http and https links", () => {
   assert.equal(resolveSafeExternalHref("https://example.com/news"), "https://example.com/news");
@@ -50,6 +53,27 @@ test("resolveAppBaseUrlFromSources still prefers explicit APP_BASE_URL", () => {
     resolveAppBaseUrlFromSources({
       appBaseUrl: "https://custom.example.com",
       requestOrigin: "http://localhost:3000",
+      linkedVercelBaseUrl: "https://cybersec-daily.vercel.app",
+    }),
+    "https://custom.example.com",
+  );
+});
+
+test("resolveInternalAppBaseUrlFromSources prefers request origin over APP_BASE_URL", () => {
+  assert.equal(
+    resolveInternalAppBaseUrlFromSources({
+      appBaseUrl: "https://custom.example.com",
+      requestOrigin: "https://cybersec-daily.vercel.app",
+      linkedVercelBaseUrl: "https://cybersec-daily.vercel.app",
+    }),
+    "https://cybersec-daily.vercel.app",
+  );
+});
+
+test("resolveInternalAppBaseUrlFromSources falls back to APP_BASE_URL without request origin", () => {
+  assert.equal(
+    resolveInternalAppBaseUrlFromSources({
+      appBaseUrl: "https://custom.example.com",
       linkedVercelBaseUrl: "https://cybersec-daily.vercel.app",
     }),
     "https://custom.example.com",

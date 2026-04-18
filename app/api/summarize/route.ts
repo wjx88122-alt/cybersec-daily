@@ -1,7 +1,7 @@
 import { kv } from "@/lib/kv";
 import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
 import { extractArticleText } from "@/lib/extractArticle";
-import { resolveAppBaseUrl } from "@/lib/app-url";
+import { resolveInternalAppBaseUrl } from "@/lib/app-url";
 import { summarizeItems } from "@/lib/summarize";
 import { after, NextRequest, NextResponse } from "next/server";
 
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const appBaseUrl = resolveInternalAppBaseUrl(req.nextUrl.origin);
   const triggerDigestRebuild = () => {
     const digestUrl = `${appBaseUrl}/api/digest`;
     after(() => {

@@ -1,6 +1,6 @@
 import { kv } from "@/lib/kv";
 import { FeedItem } from "@/lib/feeds";
-import { resolveAppBaseUrl } from "@/lib/app-url";
+import { resolveInternalAppBaseUrl } from "@/lib/app-url";
 import { triggerTranslationRepairIfNeeded } from "@/lib/translation-health";
 import { after, NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     ]);
 
     const items = [...(feedA ?? []), ...(feedB ?? [])];
-    const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+    const appBaseUrl = resolveInternalAppBaseUrl(req.nextUrl.origin);
 
     after(async () => {
       const feedAI = await kv.get<FeedItem[]>("feed-ai");

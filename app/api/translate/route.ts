@@ -1,7 +1,7 @@
 import { kv } from "@/lib/kv";
 import { translateItems } from "@/lib/translate";
 import { CUTOFF_MS, FeedItem } from "@/lib/feeds";
-import { resolveAppBaseUrl } from "@/lib/app-url";
+import { resolveInternalAppBaseUrl } from "@/lib/app-url";
 import {
   isLikelyUntranslated,
   recordTranslationHealthFromItems,
@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   }
 
   const startTime = Date.now();
-  const appBaseUrl = resolveAppBaseUrl(req.nextUrl.origin);
+  const appBaseUrl = resolveInternalAppBaseUrl(req.nextUrl.origin);
   const recentCutoff = Date.now() - CUTOFF_MS;
   const scope = req.nextUrl.searchParams.get("scope") === "recent" ? "recent" : "all";
   const reason = req.nextUrl.searchParams.get("reason") ?? null;
