@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import test from "node:test";
 
-const root = "/Users/kissbye/Projects/cybersec-daily";
+const root = process.cwd();
 
 test("vercel.json keeps a single scheduled cron entry", () => {
   const config = JSON.parse(

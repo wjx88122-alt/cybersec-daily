@@ -272,6 +272,43 @@ npm test
 3. 确认 cron 已启用
 4. 用生产域名配置 `APP_BASE_URL`
 
+### 正确提交到 Vercel 的推荐流程
+
+1. 在提交前先本地自检（你本地路径不是固定路径，所以先执行）：
+
+```bash
+npm test
+npm run build
+```
+
+2. 确认本地仓库已正确关联到 GitHub 仓库（不是本地路径）：
+
+```bash
+git remote -v
+# 若不是 https://github.com/wjx88122-alt/cybersec-daily.git，请先设置
+git remote set-url origin https://github.com/wjx88122-alt/cybersec-daily.git
+```
+
+3. 提交到远端（Vercel 推荐监听 `main` 分支）：
+
+```bash
+git add .
+git commit -m "chore: fix for Vercel submission"
+git push origin main
+```
+
+4. 在 Vercel 项目里确认 `Production Branch` 指向 `main`，推送后会自动触发生产部署。
+
+5. 仅在需要手工触发时，使用 Vercel CLI：
+
+```bash
+npm i -g vercel
+vercel link
+vercel --prod
+```
+
+如果你只希望生成预览版，可先跑 `vercel --prebuilt` 或在链接到仓库后创建 PR 触发预览部署。
+
 ## 后续可扩展方向
 
 - 增加更多安全 / AI 内容源

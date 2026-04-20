@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
 import { join } from "node:path";
 
-const root = "/Users/kissbye/Projects/cybersec-daily";
+const root = process.cwd();
 
 test("Huawei feature files are removed", () => {
   const removedPaths = [
