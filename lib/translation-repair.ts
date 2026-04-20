@@ -11,7 +11,11 @@ export type FeedItem = {
 };
 
 const normalize = (text?: string) => (text ?? "").trim();
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
+const MIN_CHINESE_CHARS_FOR_LOCALIZATION = 2;
+const countChineseCharacters = (text: string) =>
+  (normalize(text).match(/[\u4e00-\u9fff]/g) ?? []).length;
+const hasMeaningfulChineseLocalization = (text?: string) =>
+  countChineseCharacters(normalize(text)) >= MIN_CHINESE_CHARS_FOR_LOCALIZATION;
 
 function getTimestamp(item: Pick<FeedItem, "pubDate">) {
   const value = new Date(item.pubDate).getTime();
@@ -38,9 +42,12 @@ export function clearTranslatedFieldsForRetranslation<T extends FeedItem>(
       return item;
     }
 
-    const titleNeedsRetranslation = Boolean(normalize(item.title)) && !isChinese(item.title);
+    const titleNeedsRetranslation =
+      Boolean(normalize(item.title)) &&
+      !hasMeaningfulChineseLocalization(item.title);
     const summaryNeedsRetranslation =
-      Boolean(normalize(item.summary)) && !isChinese(item.summary);
+      Boolean(normalize(item.summary)) &&
+      !hasMeaningfulChineseLocalization(item.summary);
 
     let changed = false;
     const nextItem: T = { ...item };

@@ -7,6 +7,7 @@ import {
   recordTranslationHealthFromItems,
 } from "@/lib/translation-health";
 import {
+  hasMeaningfulChineseLocalization,
   isLikelyLocalizedField,
   pickLocalizedField,
 } from "@/lib/translation-detection";
@@ -19,8 +20,6 @@ export const maxDuration = 300;
 const TIME_BUDGET_MS = 270_000;
 const BATCH_SIZE = 10;
 
-/** Helper: detect Chinese content (skip translation for Chinese sources) */
-const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
 const normalize = (text?: string) => (text ?? "").trim();
 const getTimestamp = (item: FeedItem) => {
   const time = new Date(item.pubDate).getTime();
@@ -34,10 +33,10 @@ function sortByNewest(items: FeedItem[]) {
 function autoFillChineseFields(items: FeedItem[]) {
   items.forEach((item, i) => {
     const patch: Partial<FeedItem> = {};
-    if (!normalize(item.titleZh) && isChinese(item.title)) {
+    if (!normalize(item.titleZh) && hasMeaningfulChineseLocalization(item.title)) {
       patch.titleZh = item.title;
     }
-    if (!normalize(item.summaryZh) && isChinese(item.summary)) {
+    if (!normalize(item.summaryZh) && hasMeaningfulChineseLocalization(item.summary)) {
       patch.summaryZh = item.summary;
     }
     if (Object.keys(patch).length > 0) {

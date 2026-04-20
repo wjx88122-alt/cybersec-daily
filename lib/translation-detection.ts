@@ -7,12 +7,18 @@ export type TranslationDetectionItem = {
 
 export const normalizeTranslationText = (text?: string) => (text ?? "").trim();
 export const hasChineseCharacters = (text: string) => /[\u4e00-\u9fff]/.test(text);
+const MIN_CHINESE_CHARS_FOR_LOCALIZATION = 2;
+export const countChineseCharacters = (text: string) =>
+  (text.match(/[\u4e00-\u9fff]/g) ?? []).length;
+export const hasMeaningfulChineseLocalization = (text?: string) =>
+  countChineseCharacters(normalizeTranslationText(text)) >=
+  MIN_CHINESE_CHARS_FOR_LOCALIZATION;
 const normalizeComparable = (text: string) =>
   text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/gi, "");
 
 export function requiresChineseLocalization(source?: string) {
   const sourceText = normalizeTranslationText(source);
-  return Boolean(sourceText) && !hasChineseCharacters(sourceText);
+  return Boolean(sourceText) && !hasMeaningfulChineseLocalization(sourceText);
 }
 
 export function isLikelyLocalizedField(source?: string, localized?: string) {
@@ -27,7 +33,7 @@ export function isLikelyLocalizedField(source?: string, localized?: string) {
     return true;
   }
 
-  if (hasChineseCharacters(localizedText)) {
+  if (hasMeaningfulChineseLocalization(localizedText)) {
     return true;
   }
 

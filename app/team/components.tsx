@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ARCHIVE_STATUS_LABELS, ROLE_NAME_MAP } from "./data";
 import type {
@@ -157,9 +158,11 @@ export function RoleCard({ role }: { role: Role }) {
             {role.phase}
           </span>
           <div className="rounded-[32px] border border-slate-200 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(237,242,247,0.95))] p-1.5 shadow-[0_20px_48px_rgba(15,23,42,0.08)]">
-            <img
+            <Image
               src={role.avatarSrc}
               alt={`${role.personaName} 头像`}
+              width={192}
+              height={192}
               className="h-40 w-40 rounded-[28px] border border-white/70 object-cover sm:h-48 sm:w-48"
             />
           </div>

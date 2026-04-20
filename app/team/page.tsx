@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import NavBar from "@/components/NavBar";
@@ -178,9 +179,11 @@ export default function TeamPage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-3">
-                          <img
+                          <Image
                             src={role.avatarSrc}
                             alt={`${role.personaName} 头像`}
+                            width={80}
+                            height={80}
                             className="h-[4.5rem] w-[4.5rem] rounded-[22px] border border-[#50f7ff]/20 bg-[linear-gradient(145deg,rgba(80,247,255,0.1),rgba(15,23,42,0.35))] object-cover shadow-[0_0_24px_rgba(80,247,255,0.16)] sm:h-[5rem] sm:w-[5rem]"
                           />
                           <span

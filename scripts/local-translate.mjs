@@ -48,14 +48,18 @@ const client = llm.baseURL
   : new OpenAI({ apiKey: llm.apiKey });
 
 const BATCH_SIZE = 10;
-const hasChineseCharacters = (text) => /[\u4e00-\u9fff]/.test(text);
+const MIN_CHINESE_CHARS_FOR_LOCALIZATION = 2;
 const normalize = (text) => (text ?? '').trim();
+const countChineseCharacters = (text) =>
+  (normalize(text).match(/[\u4e00-\u9fff]/g) ?? []).length;
+const hasMeaningfulChineseLocalization = (text) =>
+  countChineseCharacters(text) >= MIN_CHINESE_CHARS_FOR_LOCALIZATION;
 const normalizeComparable = (text) =>
   normalize(text).toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/gi, '');
 
 function requiresChineseLocalization(source) {
   const sourceText = normalize(source);
-  return Boolean(sourceText) && !hasChineseCharacters(sourceText);
+  return Boolean(sourceText) && !hasMeaningfulChineseLocalization(sourceText);
 }
 
 function isLikelyLocalizedField(source, localized) {
@@ -70,7 +74,7 @@ function isLikelyLocalizedField(source, localized) {
     return true;
   }
 
-  if (hasChineseCharacters(localizedText)) {
+  if (hasMeaningfulChineseLocalization(localizedText)) {
     return true;
   }
 
@@ -115,8 +119,8 @@ function pickLocalizedField({ source, candidate, existing }) {
 function autoFillChineseFields(items) {
   items.forEach((item, i) => {
     const patch = {};
-    if (!normalize(item.titleZh) && hasChineseCharacters(item.title)) patch.titleZh = item.title;
-    if (!normalize(item.summaryZh) && hasChineseCharacters(item.summary)) patch.summaryZh = item.summary;
+    if (!normalize(item.titleZh) && hasMeaningfulChineseLocalization(item.title)) patch.titleZh = item.title;
+    if (!normalize(item.summaryZh) && hasMeaningfulChineseLocalization(item.summary)) patch.summaryZh = item.summary;
     if (Object.keys(patch).length > 0) items[i] = { ...item, ...patch };
   });
 }

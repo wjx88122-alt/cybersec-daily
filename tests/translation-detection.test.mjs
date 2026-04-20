@@ -28,6 +28,17 @@ test("isLikelyUntranslatedItem returns false once localized Chinese fields exist
   assert.equal(untranslated, false);
 });
 
+test("isLikelyUntranslatedItem keeps mixed English text with only one Chinese character as untranslated", () => {
+  const untranslated = isLikelyUntranslatedItem({
+    title: "Critical RCE in Popular Firewall",
+    summary: "Security teams should patch immediately.",
+    titleZh: "Critical firewall RCE patch 修",
+    summaryZh: "Vendor advisory recommends immediate patching 修",
+  });
+
+  assert.equal(untranslated, true);
+});
+
 test("pickLocalizedField prefers valid Chinese candidate and drops English fallback", () => {
   assert.equal(
     pickLocalizedField({
@@ -45,5 +56,14 @@ test("pickLocalizedField prefers valid Chinese candidate and drops English fallb
       existing: "Existing English fallback",
     }),
     undefined,
+  );
+
+  assert.equal(
+    pickLocalizedField({
+      source: "CISA issues emergency directive",
+      candidate: "Emergency directive from CISA 修",
+      existing: "CISA 发布紧急指令",
+    }),
+    "CISA 发布紧急指令",
   );
 });

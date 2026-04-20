@@ -1,6 +1,7 @@
 import { jsonrepair } from "jsonrepair";
 import { getDeepSeekClient, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
+import { hasMeaningfulChineseLocalization } from "./translation-detection";
 
 export type DigestItem = {
   headline: string;
@@ -36,20 +37,19 @@ function enrichDigestWithFeedItems(
   feedItems: FeedItem[],
 ): DailyDigest {
   const byLink = new Map(feedItems.map((item) => [normalizeLink(item.link), item]));
-  const isChinese = (text: string) => /[\u4e00-\u9fff]/.test(text);
 
   return {
     ...digest,
     items: digest.items.map((entry) => {
       const matched = byLink.get(normalizeLink(entry.sourceLink));
       if (!matched) {
-        if (isChinese(entry.sourceTitle)) return entry;
+        if (hasMeaningfulChineseLocalization(entry.sourceTitle)) return entry;
         return { ...entry, sourceTitle: entry.headline };
       }
 
       const resolvedSourceTitle =
         matched.titleZh || matched.title || entry.sourceTitle;
-      const sourceTitle = isChinese(resolvedSourceTitle)
+      const sourceTitle = hasMeaningfulChineseLocalization(resolvedSourceTitle)
         ? resolvedSourceTitle
         : entry.headline;
 
