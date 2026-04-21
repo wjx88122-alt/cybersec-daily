@@ -1,6 +1,7 @@
 "use client";
 
 import { FeedItem } from "@/lib/feeds";
+import { pickLocalizedField } from "@/lib/translation-detection";
 import { resolveSafeExternalHref, resolveSafeImageUrl } from "@/lib/remote-url";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -196,8 +197,15 @@ export default function NewsCard({
     timeAgo = item.pubDate;
   }
 
-  const title = item.titleZh || item.title;
-  const summary = item.summaryZh || item.summaryAi || item.summary;
+  const title = pickLocalizedField({
+    source: item.title,
+    candidate: item.titleZh,
+  }) || item.title;
+  const summaryZh = pickLocalizedField({
+    source: item.summary,
+    candidate: item.summaryZh,
+  });
+  const summary = summaryZh || item.summaryAi || item.summary;
   const safeHref = resolveSafeExternalHref(item.link);
   const imgSrc =
     !imgError && item.image

@@ -1,7 +1,7 @@
 import { jsonrepair } from "jsonrepair";
 import { getDeepSeekClient, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
-import { hasMeaningfulChineseLocalization } from "./translation-detection";
+import { pickLocalizedField } from "./translation-detection";
 
 export type DigestItem = {
   headline: string;
@@ -43,19 +43,18 @@ function enrichDigestWithFeedItems(
     items: digest.items.map((entry) => {
       const matched = byLink.get(normalizeLink(entry.sourceLink));
       if (!matched) {
-        if (hasMeaningfulChineseLocalization(entry.sourceTitle)) return entry;
-        return { ...entry, sourceTitle: entry.headline };
+        return { ...entry, sourceTitle: entry.sourceTitle || entry.headline };
       }
 
-      const resolvedSourceTitle =
-        matched.titleZh || matched.title || entry.sourceTitle;
-      const sourceTitle = hasMeaningfulChineseLocalization(resolvedSourceTitle)
-        ? resolvedSourceTitle
-        : entry.headline;
+      const resolvedSourceTitle = pickLocalizedField({
+        source: matched.title,
+        candidate: matched.titleZh,
+        existing: entry.sourceTitle,
+      });
 
       return {
         ...entry,
-        sourceTitle,
+        sourceTitle: resolvedSourceTitle || matched.title || entry.headline,
         category: matched.category || entry.category,
       };
     }),
@@ -94,7 +93,17 @@ function normalizeTitle(title: string): string {
 }
 
 function scoreFeedItem(item: FeedItem, now: number): number {
-  const text = `${item.titleZh || item.title} ${item.summaryZh || item.summaryAi || item.summary}`.toLowerCase();
+  const title = pickLocalizedField({
+    source: item.title,
+    candidate: item.titleZh,
+    existing: item.title,
+  });
+  const summary = pickLocalizedField({
+    source: item.summary,
+    candidate: item.summaryZh,
+    existing: item.summaryAi,
+  });
+  const text = `${title || item.title} ${summary || item.summaryAi || item.summary}`.toLowerCase();
   const patterns = isAiCategory(item.category) ? AI_KEYWORDS : SECURITY_KEYWORDS;
   const pub = new Date(item.pubDate).getTime();
   const ageHours = Number.isFinite(pub)
@@ -119,7 +128,15 @@ function scoreFeedItem(item: FeedItem, now: number): number {
   ) {
     score += 2;
   }
-  if (item.titleZh && (item.summaryZh || item.summaryAi)) score += 1;
+  if (
+    pickLocalizedField({ source: item.title, candidate: item.titleZh }) &&
+    pickLocalizedField({
+      source: item.summary,
+      candidate: item.summaryZh,
+      existing: item.summaryAi,
+    })
+  )
+    score += 1;
 
   return score;
 }
@@ -190,7 +207,12 @@ function selectRepresentativeItems(
 
   const seenTitles = new Set<string>();
   const deduped = sortedByTime.filter((item) => {
-    const key = normalizeTitle(item.titleZh || item.title);
+    const title = pickLocalizedField({
+      source: item.title,
+      candidate: item.titleZh,
+      existing: item.title,
+    });
+    const key = normalizeTitle(title || item.title);
     if (!key || seenTitles.has(key)) return false;
     seenTitles.add(key);
     return true;
@@ -240,8 +262,20 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
 
   const articlesText = recent
     .map(
-      (item, i) =>
-        `[${i + 1}] [${isAiCategory(item.category) ? "AI" : "SEC"}][${item.category}] ${item.source}: ${item.titleZh || item.title} — ${(item.summaryZh || item.summaryAi || item.summary).slice(0, 170)} | ${item.link}`,
+      (item, i) => {
+        const title = pickLocalizedField({
+          source: item.title,
+          candidate: item.titleZh,
+          existing: item.title,
+        });
+        const summary = pickLocalizedField({
+          source: item.summary,
+          candidate: item.summaryZh,
+          existing: item.summaryAi,
+        });
+
+        return `[${i + 1}] [${isAiCategory(item.category) ? "AI" : "SEC"}][${item.category}] ${item.source}: ${title || item.title} — ${(summary || item.summaryAi || item.summary).slice(0, 170)} | ${item.link}`;
+      },
     )
     .join("\n");
 
@@ -350,11 +384,30 @@ AI 方向：
     date: today,
     overview: "今日关键资讯摘要生成失败，请直接浏览原始资讯。",
     items: recent.slice(0, 9).map((item) => ({
-      headline: (item.titleZh || item.title).slice(0, 20),
-      summary: item.summaryZh || item.summaryAi || item.summary || item.title,
+      headline: (pickLocalizedField({
+        source: item.title,
+        candidate: item.titleZh,
+        existing: item.title,
+      }) ||
+        item.title ||
+        item.summary).slice(0, 20),
+      summary: (
+        pickLocalizedField({
+          source: item.summary,
+          candidate: item.summaryZh,
+          existing: item.summaryAi,
+        }) ||
+        item.summary ||
+        item.title
+      ).slice(0, 120),
       importance: "medium" as const,
       category: item.category,
-      sourceTitle: item.titleZh || item.title,
+      sourceTitle:
+        pickLocalizedField({
+          source: item.title,
+          candidate: item.titleZh,
+          existing: item.title,
+        }) || item.title,
       sourceLink: item.link,
     })),
   };

@@ -6,6 +6,7 @@ import { loadFeedCollection } from "@/lib/feed-client";
 import NewsCard from "@/components/NewsCard";
 import CategoryFilter, { AI_CATEGORIES } from "@/components/CategoryFilter";
 import NavBar from "@/components/NavBar";
+import { pickLocalizedField } from "@/lib/translation-detection";
 
 export default function AIPage() {
   const [items, setItems] = useState<FeedItem[]>([]);
@@ -25,15 +26,27 @@ export default function AIPage() {
   }, []);
 
   const filtered = items.filter((item) => {
+    const normalizedSearch = search.trim().toLowerCase();
     const t = new Date(item.pubDate).getTime();
     const matchTime = !isNaN(t) && t >= cutoff;
     const matchCat = category === "全部" || item.category === category;
+    const localizedTitle = pickLocalizedField({
+      source: item.title,
+      candidate: item.titleZh,
+      existing: item.title,
+    });
+    const localizedSummary = pickLocalizedField({
+      source: item.summary,
+      candidate: item.summaryZh,
+      existing: item.summaryAi,
+    });
     const matchSearch =
-      !search ||
-      item.title.toLowerCase().includes(search.toLowerCase()) ||
-      (item.titleZh || "").toLowerCase().includes(search.toLowerCase()) ||
-      item.summary.toLowerCase().includes(search.toLowerCase()) ||
-      (item.summaryZh || "").toLowerCase().includes(search.toLowerCase());
+      !normalizedSearch ||
+      item.title.toLowerCase().includes(normalizedSearch) ||
+      item.summary.toLowerCase().includes(normalizedSearch) ||
+      (item.summaryAi || "").toLowerCase().includes(normalizedSearch) ||
+      (localizedTitle || "").toLowerCase().includes(normalizedSearch) ||
+      (localizedSummary || "").toLowerCase().includes(normalizedSearch);
     return matchTime && matchCat && matchSearch;
   });
 
