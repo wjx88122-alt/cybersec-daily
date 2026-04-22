@@ -15,6 +15,60 @@ export const hasMeaningfulChineseLocalization = (text?: string) =>
   MIN_CHINESE_CHARS_FOR_LOCALIZATION;
 const normalizeComparable = (text: string) =>
   text.toLowerCase().replace(/[^a-z0-9\u4e00-\u9fff]+/gi, "");
+const PRODUCTISH_TITLE_TOKEN = /^[A-Za-z0-9][A-Za-z0-9:+._-]*$/;
+const VERSIONISH_TITLE_TOKEN = /^v?\d+(?:\.\d+)+(?:[a-z]\d*)?$/i;
+const PRODUCT_TITLE_STOPWORDS = new Set([
+  "a",
+  "an",
+  "and",
+  "are",
+  "as",
+  "at",
+  "by",
+  "for",
+  "from",
+  "how",
+  "in",
+  "into",
+  "is",
+  "new",
+  "of",
+  "on",
+  "or",
+  "the",
+  "this",
+  "to",
+  "what",
+  "when",
+  "where",
+  "why",
+  "with",
+]);
+
+function isLikelyProductVersionTitle(text?: string) {
+  const title = normalizeTranslationText(text);
+  if (!title || hasMeaningfulChineseLocalization(title) || title.length > 48) {
+    return false;
+  }
+
+  const tokens = title.split(/\s+/).filter(Boolean);
+  if (tokens.length < 2 || tokens.length > 6) {
+    return false;
+  }
+
+  if (!tokens.every((token) => PRODUCTISH_TITLE_TOKEN.test(token))) {
+    return false;
+  }
+
+  if (tokens.some((token) => PRODUCT_TITLE_STOPWORDS.has(token.toLowerCase()))) {
+    return false;
+  }
+
+  return (
+    tokens.some((token) => VERSIONISH_TITLE_TOKEN.test(token)) &&
+    tokens.some((token) => /[A-Za-z]/.test(token) && !VERSIONISH_TITLE_TOKEN.test(token))
+  );
+}
 
 export function requiresChineseLocalization(source?: string) {
   const sourceText = normalizeTranslationText(source);
@@ -55,9 +109,14 @@ export function isLikelyUntranslatedItem(item: TranslationDetectionItem) {
 
   const titleLocalized = isLikelyLocalizedField(title, item.titleZh);
   const summaryLocalized = isLikelyLocalizedField(summary, item.summaryZh);
+  const titleTranslationOptional =
+    titleNeedsTranslation &&
+    !titleLocalized &&
+    summaryLocalized &&
+    isLikelyProductVersionTitle(title);
 
   return (
-    (titleNeedsTranslation && !titleLocalized) ||
+    (titleNeedsTranslation && !titleLocalized && !titleTranslationOptional) ||
     (summaryNeedsTranslation && !summaryLocalized)
   );
 }
