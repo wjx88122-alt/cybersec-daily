@@ -6,6 +6,7 @@ import {
 } from "./translation-detection";
 
 const TRANSLATION_HEALTH_KEY = "translation-health";
+const TRANSLATION_RUN_STATUS_KEY = "translation-run-status";
 const TRANSLATION_REPAIR_LOCK_KEY = "translation-repair-lock";
 const TRANSLATION_REPAIR_COOLDOWN_SEC = 10 * 60;
 const SAMPLE_LIMIT = 6;
@@ -44,6 +45,24 @@ export type TranslationHealth = {
     error?: string | null;
   };
   pass?: Record<string, unknown>;
+};
+
+export type TranslationRunStatus = {
+  updatedAt: string;
+  source: string;
+  scope: "recent" | "all";
+  ok: boolean;
+  queued: number;
+  translated: number;
+  pending: number;
+  recentPending: number;
+  batchesDone: number;
+  batchesFailed: number;
+  elapsedSec: string;
+  reason?: string | null;
+  code?: string | null;
+  error?: string | null;
+  skipped?: boolean;
 };
 
 function getTimestamp(item: FeedItem) {
@@ -110,6 +129,11 @@ export async function saveTranslationHealth(health: TranslationHealth) {
   return health;
 }
 
+export async function saveTranslationRunStatus(status: TranslationRunStatus) {
+  await kv.set(TRANSLATION_RUN_STATUS_KEY, status);
+  return status;
+}
+
 export async function recordTranslationHealthFromItems(args: {
   items: FeedItem[];
   source: string;
@@ -128,6 +152,10 @@ export async function recordTranslationHealthFromItems(args: {
 
 export async function getTranslationHealth() {
   return kv.get<TranslationHealth>(TRANSLATION_HEALTH_KEY);
+}
+
+export async function getLastTranslationRunStatus() {
+  return kv.get<TranslationRunStatus>(TRANSLATION_RUN_STATUS_KEY);
 }
 
 export async function loadAllFeedItemsFromKv() {

@@ -5,6 +5,7 @@ import { resolveInternalAppBaseUrl } from "@/lib/app-url";
 import {
   isLikelyUntranslated,
   recordTranslationHealthFromItems,
+  saveTranslationRunStatus,
 } from "@/lib/translation-health";
 import {
   hasMeaningfulChineseLocalization,
@@ -145,6 +146,21 @@ export async function GET(req: NextRequest) {
       allItems.filter((i) => isLikelyLocalizedField(i.title, i.titleZh)).length +
       aiItems.filter((i) => isLikelyLocalizedField(i.title, i.titleZh)).length;
     if (feedAI) await kv.set("feed-ai", aiItems);
+    await saveTranslationRunStatus({
+      updatedAt: new Date().toISOString(),
+      source: `translate:${scope}`,
+      scope,
+      ok: true,
+      queued: 0,
+      translated: 0,
+      pending: 0,
+      recentPending: 0,
+      batchesDone: 0,
+      batchesFailed: 0,
+      elapsedSec: ((Date.now() - startTime) / 1000).toFixed(1),
+      reason,
+      skipped: true,
+    });
     triggerSummarize();
     return NextResponse.json({
       ok: true,
@@ -240,6 +256,22 @@ export async function GET(req: NextRequest) {
     batchesDone,
     batchesFailed,
     translated: translationMap.size,
+  });
+  await saveTranslationRunStatus({
+    updatedAt: new Date().toISOString(),
+    source: `translate:${scope}`,
+    scope,
+    ok: !runIssue,
+    queued: allToTranslate.length,
+    translated: translationMap.size,
+    pending,
+    recentPending,
+    batchesDone,
+    batchesFailed,
+    elapsedSec: elapsed,
+    reason,
+    code: runIssue?.code ?? null,
+    error: runIssue?.message ?? null,
   });
 
   if (runIssue) {

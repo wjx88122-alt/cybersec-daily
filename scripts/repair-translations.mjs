@@ -1,5 +1,6 @@
 import { Redis } from "@upstash/redis";
 import { clearTranslatedFieldsForRetranslation } from "../lib/translation-repair.ts";
+import { isLikelyUntranslatedItem } from "../lib/translation-detection.ts";
 
 const kvUrl = process.env.KV_REST_API_URL;
 const kvToken = process.env.KV_REST_API_TOKEN;
@@ -71,9 +72,14 @@ async function run() {
     repairedA.clearedItems + repairedB.clearedItems + repairedAI.clearedItems;
   const clearedFields =
     repairedA.clearedFields + repairedB.clearedFields + repairedAI.clearedFields;
+  const remainingUntranslated = [
+    ...repairedA.items,
+    ...repairedB.items,
+    ...repairedAI.items,
+  ].filter(isLikelyUntranslatedItem).length;
 
   console.log(
-    `repair-translations: scope=${scope} clearedItems=${clearedItems} clearedFields=${clearedFields}`,
+    `repair-translations: scope=${scope} clearedItems=${clearedItems} clearedFields=${clearedFields} remainingUntranslated=${remainingUntranslated}`,
   );
 
   if (dryRun) {
@@ -87,10 +93,10 @@ async function run() {
     kv.set("feed-ai", repairedAI.items),
   ]);
 
-  if (clearedItems > 0) {
+  if (clearedItems > 0 || remainingUntranslated > 0) {
     await triggerTranslate(scope);
   } else {
-    console.log("repair-translations: nothing cleared, skipping translate trigger");
+    console.log("repair-translations: nothing pending, skipping translate trigger");
   }
 }
 
