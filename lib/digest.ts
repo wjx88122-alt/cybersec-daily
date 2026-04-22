@@ -1,7 +1,7 @@
 import { jsonrepair } from "jsonrepair";
 import { getDeepSeekClient, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
-import { pickLocalizedField } from "./translation-detection";
+import { pickDisplayTitle, pickLocalizedField } from "./translation-detection";
 
 export type DigestItem = {
   headline: string;
@@ -46,10 +46,13 @@ function enrichDigestWithFeedItems(
         return { ...entry, sourceTitle: entry.sourceTitle || entry.headline };
       }
 
-      const resolvedSourceTitle = pickLocalizedField({
+      const resolvedSourceTitle = pickDisplayTitle({
         source: matched.title,
         candidate: matched.titleZh,
         existing: entry.sourceTitle,
+        summarySource: matched.summary,
+        summaryCandidate: matched.summaryZh,
+        summaryExisting: matched.summaryAi,
       });
 
       return {

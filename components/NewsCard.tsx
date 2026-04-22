@@ -1,7 +1,7 @@
 "use client";
 
 import { FeedItem } from "@/lib/feeds";
-import { pickLocalizedField } from "@/lib/translation-detection";
+import { pickDisplayTitle, pickLocalizedField } from "@/lib/translation-detection";
 import { resolveSafeExternalHref, resolveSafeImageUrl } from "@/lib/remote-url";
 import { formatDistanceToNow } from "date-fns";
 import { zhCN } from "date-fns/locale";
@@ -197,9 +197,13 @@ export default function NewsCard({
     timeAgo = item.pubDate;
   }
 
-  const title = pickLocalizedField({
+  const title = pickDisplayTitle({
     source: item.title,
     candidate: item.titleZh,
+    existing: item.title,
+    summarySource: item.summary,
+    summaryCandidate: item.summaryZh,
+    summaryExisting: item.summaryAi,
   }) || item.title;
   const summaryZh = pickLocalizedField({
     source: item.summary,

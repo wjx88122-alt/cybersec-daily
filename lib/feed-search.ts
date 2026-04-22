@@ -1,3 +1,5 @@
+import { pickDisplayTitle } from "./translation-detection";
+
 export type SearchableFeedItem = {
   title: string;
   summary: string;
@@ -36,10 +38,13 @@ export function pickLocalizedField(options: {
 
 export function getLocalizedFeedTitle(item: SearchableFeedItem) {
   return (
-    pickLocalizedField({
+    pickDisplayTitle({
       source: item.title,
       candidate: item.titleZh,
       existing: item.title,
+      summarySource: item.summary,
+      summaryCandidate: item.summaryZh,
+      summaryExisting: item.summaryAi,
     }) || item.title
   );
 }

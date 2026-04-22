@@ -138,3 +138,35 @@ export function pickLocalizedField(options: {
 
   return undefined;
 }
+
+export function pickDisplayTitle(options: {
+  source?: string;
+  candidate?: string;
+  existing?: string;
+  summarySource?: string;
+  summaryCandidate?: string;
+  summaryExisting?: string;
+}) {
+  const localizedTitle = pickLocalizedField({
+    source: options.source,
+    candidate: options.candidate,
+    existing: options.existing,
+  });
+  if (localizedTitle) {
+    return localizedTitle;
+  }
+
+  const sourceText = normalizeTranslationText(options.source);
+  const existingText = normalizeTranslationText(options.existing);
+  const localizedSummary = pickLocalizedField({
+    source: options.summarySource,
+    candidate: options.summaryCandidate,
+    existing: options.summaryExisting,
+  });
+
+  if (localizedSummary && isLikelyProductVersionTitle(sourceText)) {
+    return `${sourceText} 发布`;
+  }
+
+  return existingText || sourceText || undefined;
+}
