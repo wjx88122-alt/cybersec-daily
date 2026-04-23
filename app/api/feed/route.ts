@@ -1,43 +1,11 @@
-import { kv } from "@/lib/kv";
-import { FeedItem } from "@/lib/feeds";
-import { resolveInternalAppBaseUrl } from "@/lib/app-url";
-import { triggerImageRepairIfNeeded } from "@/lib/image-health";
-import { triggerTranslationRepairIfNeeded } from "@/lib/translation-health";
-import { after, NextRequest, NextResponse } from "next/server";
+import { readSecurityFeedItems } from "@/lib/feed-store";
+import { NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const [feedA, feedB] = await Promise.all([
-      kv.get<FeedItem[]>("feed-a"),
-      kv.get<FeedItem[]>("feed-b"),
-    ]);
-
-    const items = [...(feedA ?? []), ...(feedB ?? [])];
-    const appBaseUrl = resolveInternalAppBaseUrl(req.nextUrl.origin);
-
-    after(async () => {
-      const feedAI = await kv.get<FeedItem[]>("feed-ai");
-      const allItems = [...items, ...(feedAI ?? [])];
-      await Promise.all([
-        triggerImageRepairIfNeeded({
-          items: allItems,
-          appBaseUrl,
-          source: "feed:read",
-          reason: "public-feed-read",
-          authToken: process.env.CRON_SECRET,
-        }),
-        triggerTranslationRepairIfNeeded({
-          items: allItems,
-          appBaseUrl,
-          source: "feed:read",
-          reason: "public-feed-read",
-          authToken: process.env.CRON_SECRET,
-        }),
-      ]);
-    });
-
+    const items = await readSecurityFeedItems();
     return NextResponse.json({ items, updatedAt: new Date().toISOString() });
   } catch {
     return NextResponse.json(

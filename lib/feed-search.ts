@@ -1,5 +1,3 @@
-import { pickDisplayTitle } from "./translation-detection";
-
 export type SearchableFeedItem = {
   title: string;
   summary: string;
@@ -34,6 +32,35 @@ export function pickLocalizedField(options: {
   if (sourceComparable && sourceComparable === candidateComparable) return undefined;
 
   return undefined;
+}
+
+function pickDisplayTitle(options: {
+  source?: string;
+  candidate?: string;
+  existing?: string;
+  summarySource?: string;
+  summaryCandidate?: string;
+  summaryExisting?: string;
+}) {
+  const localizedTitle = pickLocalizedField({
+    source: options.source,
+    candidate: options.candidate,
+    existing: options.existing,
+  });
+  if (localizedTitle) {
+    return localizedTitle;
+  }
+
+  const localizedSummary = pickLocalizedField({
+    source: options.summarySource,
+    candidate: options.summaryCandidate,
+    existing: options.summaryExisting,
+  });
+  if (localizedSummary) {
+    return normalizeTranslationText(options.existing) || normalizeTranslationText(options.source);
+  }
+
+  return normalizeTranslationText(options.existing) || normalizeTranslationText(options.source);
 }
 
 export function getLocalizedFeedTitle(item: SearchableFeedItem) {

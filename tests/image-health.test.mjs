@@ -10,7 +10,7 @@ function recentIso(now, deltaMs = 60_000) {
 test("triggerImageRepairIfNeeded triggers image repair when recent items are missing images", async () => {
   const now = Date.now();
   const calls = [];
-  const fetchCalls = [];
+  const repairCalls = [];
 
   const result = await triggerImageRepairIfNeeded({
     items: [
@@ -20,10 +20,8 @@ test("triggerImageRepairIfNeeded triggers image repair when recent items are mis
         image: undefined,
       },
     ],
-    appBaseUrl: "https://example.com",
     source: "feed-a:read",
     reason: "public-feed-read",
-    authToken: "secret",
     now,
     lockStore: {
       async set(key, value, options) {
@@ -31,20 +29,14 @@ test("triggerImageRepairIfNeeded triggers image repair when recent items are mis
         return "OK";
       },
     },
-    fetchImpl: async (url, init) => {
-      fetchCalls.push({ url, init });
-      return {
-        status: 200,
-        async json() {
-          return { ok: true, imagesFound: 7 };
-        },
-      };
+    runRepair: async (scope) => {
+      repairCalls.push(scope);
+      return { ok: true, status: 200, imagesFound: 7 };
     },
   });
 
   assert.equal(calls.length, 1);
-  assert.equal(fetchCalls.length, 1);
-  assert.equal(fetchCalls[0].url.includes("/api/images"), true);
+  assert.deepEqual(repairCalls, ["recent"]);
   assert.deepEqual(result, {
     triggered: true,
     accepted: true,
@@ -57,7 +49,7 @@ test("triggerImageRepairIfNeeded triggers image repair when recent items are mis
 
 test("triggerImageRepairIfNeeded does not trigger when lock is not acquired", async () => {
   const now = Date.now();
-  let fetchCount = 0;
+  let repairCount = 0;
 
   const result = await triggerImageRepairIfNeeded({
     items: [
@@ -67,27 +59,20 @@ test("triggerImageRepairIfNeeded does not trigger when lock is not acquired", as
         image: undefined,
       },
     ],
-    appBaseUrl: "https://example.com",
     source: "feed-b:read",
-    authToken: "secret",
     now,
     lockStore: {
       async set() {
         return null;
       },
     },
-    fetchImpl: async () => {
-      fetchCount++;
-      return {
-        status: 200,
-        async json() {
-          return {};
-        },
-      };
+    runRepair: async () => {
+      repairCount++;
+      return { ok: true, status: 200, imagesFound: 0 };
     },
   });
 
-  assert.equal(fetchCount, 0);
+  assert.equal(repairCount, 0);
   assert.deepEqual(result, {
     triggered: false,
     accepted: false,
@@ -98,7 +83,7 @@ test("triggerImageRepairIfNeeded does not trigger when lock is not acquired", as
 test("triggerImageRepairIfNeeded does not trigger when recent items already have images", async () => {
   const now = Date.now();
   let setCount = 0;
-  let fetchCount = 0;
+  let repairCount = 0;
 
   const result = await triggerImageRepairIfNeeded({
     items: [
@@ -108,9 +93,7 @@ test("triggerImageRepairIfNeeded does not trigger when recent items already have
         image: "https://cdn.example.com/a.jpg",
       },
     ],
-    appBaseUrl: "https://example.com",
     source: "feed-ai:read",
-    authToken: "secret",
     now,
     lockStore: {
       async set() {
@@ -118,19 +101,14 @@ test("triggerImageRepairIfNeeded does not trigger when recent items already have
         return "OK";
       },
     },
-    fetchImpl: async () => {
-      fetchCount++;
-      return {
-        status: 200,
-        async json() {
-          return {};
-        },
-      };
+    runRepair: async () => {
+      repairCount++;
+      return { ok: true, status: 200, imagesFound: 0 };
     },
   });
 
   assert.equal(setCount, 0);
-  assert.equal(fetchCount, 0);
+  assert.equal(repairCount, 0);
   assert.deepEqual(result, {
     triggered: false,
     accepted: false,

@@ -1,9 +1,13 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { getArcLiftFactor } from "@/lib/threat-map";
 
 /* ── Orthographic projection helpers ── */
 function toRadians(deg: number) { return (deg * Math.PI) / 180; }
+function roundSvgCoord(value: number) { return Number(value.toFixed(3)); }
+function svgCoord(value: number) { return roundSvgCoord(value).toString(); }
+function svgPoint(x: number, y: number) { return `${svgCoord(x)},${svgCoord(y)}`; }
 
 // Project lat/lon to orthographic (returns null if on back side)
 function orthoProject(lat: number, lon: number, centerLat: number, centerLon: number, R: number, cx: number, cy: number): { x: number; y: number; visible: boolean } {
@@ -14,7 +18,7 @@ function orthoProject(lat: number, lon: number, centerLat: number, centerLon: nu
   const cosC = Math.sin(φ0) * Math.sin(φ) + Math.cos(φ0) * Math.cos(φ) * Math.cos(λ - λ0);
   const x = cx + R * Math.cos(φ) * Math.sin(λ - λ0);
   const y = cy - R * (Math.cos(φ0) * Math.sin(φ) - Math.sin(φ0) * Math.cos(φ) * Math.cos(λ - λ0));
-  return { x, y, visible: cosC > 0 };
+  return { x: roundSvgCoord(x), y: roundSvgCoord(y), visible: cosC > 0 };
 }
 
 /* ── World coastline data (simplified lat/lon polygons) ── */
@@ -134,12 +138,10 @@ const GLOBE_CX = 400;
 const GLOBE_CY = 210;
 
 export default function ThreatMap() {
-  const [arcs, setArcs] = useState<AttackArc[]>(() =>
-    createInitialArcs(INITIAL_ARC_COUNT),
-  );
+  const [arcs, setArcs] = useState<AttackArc[]>([]);
   const [stats, setStats] = useState({
     blocked: 47283,
-    active: INITIAL_ARC_COUNT,
+    active: 0,
   });
   const [latestAttack, setLatestAttack] = useState<AttackArc | null>(null);
   const [rotation, setRotation] = useState(80); // center longitude
@@ -152,6 +154,13 @@ export default function ThreatMap() {
   }, [rotation]);
 
   useEffect(() => {
+    const initialArcs = createInitialArcs(INITIAL_ARC_COUNT);
+    setArcs(initialArcs);
+    setStats({
+      blocked: blockedRef.current,
+      active: initialArcs.length,
+    });
+
     const animate = () => {
       setArcs((prev) => {
         let newArcs = prev.map((a) => ({ ...a, progress: a.progress + a.speed }));
@@ -192,13 +201,21 @@ export default function ThreatMap() {
       const t = (i / steps) * arc.progress;
       const geo = geoInterp(from, to, t);
       // Lift above surface
-      const liftT = Math.sin(t / arc.progress * Math.PI) * 0.15;
+      const liftT = getArcLiftFactor(arc.progress, t);
       const p = orthoProject(geo.lat, geo.lon, 20, rotation, GLOBE_R * (1 + liftT), GLOBE_CX, GLOBE_CY);
       pts.push(p);
     }
     const visiblePts = pts.filter((p) => p.visible);
     const headGeo = geoInterp(from, to, arc.progress);
-    const head = orthoProject(headGeo.lat, headGeo.lon, 20, rotation, GLOBE_R * (1 + Math.sin(arc.progress * Math.PI) * 0.15), GLOBE_CX, GLOBE_CY);
+    const head = orthoProject(
+      headGeo.lat,
+      headGeo.lon,
+      20,
+      rotation,
+      GLOBE_R * (1 + getArcLiftFactor(1, arc.progress)),
+      GLOBE_CX,
+      GLOBE_CY,
+    );
     const pathD = visiblePts.length > 1 ? visiblePts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ") : null;
     // Impact point (on surface)
     const toProj = proj(to.lat, to.lon);
@@ -285,17 +302,17 @@ export default function ThreatMap() {
               <path d={pathD} fill="none" stroke={colors.stroke} strokeWidth="4" opacity={0.08} filter="url(#g-glow)" />
             </>}
             {head.visible && <>
-              <circle cx={head.x} cy={head.y} r={3} fill={colors.particle} filter="url(#g-glow-sm)">
+              <circle cx={svgCoord(head.x)} cy={svgCoord(head.y)} r={3} fill={colors.particle} filter="url(#g-glow-sm)">
                 <animate attributeName="r" values="2;4;2" dur="0.4s" repeatCount="indefinite" />
               </circle>
               {/* Trail particles */}
               {visiblePts.slice(-5).map((p, i) => (
-                <circle key={i} cx={p.x} cy={p.y} r={1.5 - i * 0.2} fill={colors.particle} opacity={0.5 - i * 0.08} />
+                <circle key={i} cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={1.5 - i * 0.2} fill={colors.particle} opacity={0.5 - i * 0.08} />
               ))}
             </>}
             {/* Impact */}
             {arc.progress > 0.88 && toProj.visible && (
-              <circle cx={toProj.x} cy={toProj.y} r={(arc.progress - 0.88) * 120} fill="none" stroke={colors.stroke} strokeWidth="1" opacity={1 - (arc.progress - 0.88) * 8} />
+              <circle cx={svgCoord(toProj.x)} cy={svgCoord(toProj.y)} r={(arc.progress - 0.88) * 120} fill="none" stroke={colors.stroke} strokeWidth="1" opacity={1 - (arc.progress - 0.88) * 8} />
             )}
           </g>
         ))}
@@ -306,8 +323,8 @@ export default function ThreatMap() {
           if (!p.visible) return null;
           return (
             <g key={key}>
-              <circle cx={p.x} cy={p.y} r={1.5} fill="#475569" opacity={0.6} />
-              <text x={p.x} y={p.y - 5} textAnchor="middle" fontSize={6} fill="#475569" opacity={0.5}>{city.label}</text>
+              <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={1.5} fill="#475569" opacity={0.6} />
+              <text x={svgCoord(p.x)} y={svgCoord(p.y - 5)} textAnchor="middle" fontSize={6} fill="#475569" opacity={0.5}>{city.label}</text>
             </g>
           );
         })}
@@ -319,15 +336,15 @@ export default function ThreatMap() {
           if (!p.visible) return null;
           return (
             <g key={key}>
-              <circle cx={p.x} cy={p.y} r={16} fill="url(#def-glow)" />
-              <circle cx={p.x} cy={p.y} r={7} fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
+              <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={16} fill="url(#def-glow)" />
+              <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={7} fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
                 <animate attributeName="r" values="7;14;7" dur="3s" repeatCount="indefinite" />
                 <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite" />
               </circle>
-              <polygon points={`${p.x},${p.y - 5} ${p.x + 4.3},${p.y - 2.5} ${p.x + 4.3},${p.y + 2.5} ${p.x},${p.y + 5} ${p.x - 4.3},${p.y + 2.5} ${p.x - 4.3},${p.y - 2.5}`}
+              <polygon points={`${svgPoint(p.x, p.y - 5)} ${svgPoint(p.x + 4.3, p.y - 2.5)} ${svgPoint(p.x + 4.3, p.y + 2.5)} ${svgPoint(p.x, p.y + 5)} ${svgPoint(p.x - 4.3, p.y + 2.5)} ${svgPoint(p.x - 4.3, p.y - 2.5)}`}
                 fill="#3b82f6" fillOpacity="0.3" stroke="#60a5fa" strokeWidth="0.8" />
-              <circle cx={p.x} cy={p.y} r={2} fill="#60a5fa" filter="url(#g-glow-sm)" />
-              <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize={7.5} fill="#93c5fd" fontWeight={600}>{city.label}</text>
+              <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={2} fill="#60a5fa" filter="url(#g-glow-sm)" />
+              <text x={svgCoord(p.x)} y={svgCoord(p.y - 9)} textAnchor="middle" fontSize={7.5} fill="#93c5fd" fontWeight={600}>{city.label}</text>
             </g>
           );
         })}

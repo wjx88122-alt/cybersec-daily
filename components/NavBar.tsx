@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
+import { getActiveNavLabel } from "@/lib/nav";
 
 const NAV_ITEMS = [
   { label: "安全", href: "/" },
@@ -28,12 +30,12 @@ const TONE_STYLES = {
 } as const;
 
 export default function NavBar({
-  active,
   tone = "default",
 }: {
-  active: string;
   tone?: keyof typeof TONE_STYLES;
 }) {
+  const pathname = usePathname();
+  const active = getActiveNavLabel(pathname);
   const palette = TONE_STYLES[tone];
 
   return (

@@ -16,19 +16,41 @@ test("DESIGN.md exists and defines an Apple system direction", () => {
 });
 
 test("globals.css exposes a shared Apple-style system layer", () => {
-  const css = readFileSync(join(root, "app/globals.css"), "utf8");
+  const globals = readFileSync(join(root, "app/globals.css"), "utf8");
+  const tokens = readFileSync(join(root, "app/styles/tokens.css"), "utf8");
+  const system = readFileSync(join(root, "app/styles/system.css"), "utf8");
 
-  for (const tokenOrClass of [
+  for (const cssImport of [
+    '@import "./styles/tokens.css"',
+    '@import "./styles/system.css"',
+  ]) {
+    assert.equal(
+      globals.includes(cssImport),
+      true,
+      `expected ${cssImport} in globals.css`,
+    );
+  }
+
+  for (const token of [
     "--system-surface",
     "--system-surface-strong",
     "--system-separator",
+  ]) {
+    assert.equal(tokens.includes(token), true, `expected ${token} in app/styles/tokens.css`);
+  }
+
+  for (const className of [
     ".system-shell",
     ".system-card",
     ".system-nav-shell",
     ".system-pill",
     ".system-input",
   ]) {
-    assert.equal(css.includes(tokenOrClass), true, `expected ${tokenOrClass} in globals.css`);
+    assert.equal(
+      system.includes(className),
+      true,
+      `expected ${className} in app/styles/system.css`,
+    );
   }
 });
 
@@ -42,11 +64,11 @@ test("NavBar uses Apple-style system navigation classes", () => {
 
 test("top-level routes opt into the shared Apple-style shell", () => {
   const pages = [
-    ["app/page.tsx", "public-shell system-shell"],
-    ["app/ai/page.tsx", "public-shell system-shell"],
-    ["app/intelligence/page.tsx", "intelligence-command-center system-shell"],
-    ["app/mdr/page.tsx", "mdr-shell system-shell"],
-    ["app/team/page.tsx", "team-shell system-shell"],
+    ["app/(public)/page.tsx", "PublicShell"],
+    ["app/(public)/ai/page.tsx", "PublicShell"],
+    ["app/(executive)/intelligence/page.tsx", 'shellClassName="intelligence-command-center"'],
+    ["app/(ops)/mdr/page.tsx", "MdrShell"],
+    ["app/(executive)/team/page.tsx", "TeamShell"],
   ];
 
   for (const [file, needle] of pages) {

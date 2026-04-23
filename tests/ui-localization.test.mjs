@@ -10,7 +10,7 @@ function load(relativePath) {
 }
 
 test("security page keeps key UI labels in Chinese", () => {
-  const page = load("app/page.tsx");
+  const page = load("app/(public)/page.tsx");
 
   assert.ok(page.includes("安全日报"));
   assert.ok(page.includes("今日概览"));
@@ -24,7 +24,7 @@ test("security page keeps key UI labels in Chinese", () => {
 });
 
 test("ai page keeps key UI labels in Chinese", () => {
-  const page = load("app/ai/page.tsx");
+  const page = load("app/(public)/ai/page.tsx");
 
   assert.ok(page.includes("AI 观察"));
   assert.ok(page.includes("AI 概览"));

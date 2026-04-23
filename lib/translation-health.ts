@@ -170,10 +170,17 @@ export async function loadAllFeedItemsFromKv() {
 
 export async function triggerTranslationRepairIfNeeded(args: {
   items: FeedItem[];
-  appBaseUrl: string;
   source: string;
-  authToken?: string;
   reason?: string;
+  runRepair?: (
+    scope: "recent" | "all",
+  ) => Promise<{
+    ok?: boolean;
+    status?: number | null;
+    translated?: number | null;
+    recentPending?: number | null;
+    error?: string | null;
+  }>;
 }) {
   const previous = await getPreviousHealth();
   const requestedAt = new Date().toISOString();
@@ -183,7 +190,7 @@ export async function triggerTranslationRepairIfNeeded(args: {
     previous?.lastHealthyAt ?? null,
   );
 
-  if (baseHealth.recentMissing === 0 || !args.authToken) {
+  if (baseHealth.recentMissing === 0 || !args.runRepair) {
     await saveTranslationHealth(baseHealth);
     return { triggered: false, health: baseHealth };
   }
@@ -216,30 +223,11 @@ export async function triggerTranslationRepairIfNeeded(args: {
   }
 
   try {
-    const url = `${args.appBaseUrl}/api/translate?scope=recent&reason=${encodeURIComponent(args.reason ?? args.source)}`;
-    const response = await fetch(url, {
-      headers: {
-        authorization: `Bearer ${args.authToken}`,
-      },
-      cache: "no-store",
-    });
-
-    let payload: {
-      translated?: number;
-      recentPending?: number;
-    } | null = null;
-
-    try {
-      payload = (await response.json()) as {
-        translated?: number;
-        recentPending?: number;
-      };
-    } catch {
-      payload = null;
-    }
+    const payload = await args.runRepair("recent");
+    const latest = (await getPreviousHealth()) ?? baseHealth;
 
     const health = {
-      ...baseHealth,
+      ...latest,
       trigger: {
         requestedAt,
         source: args.source,
@@ -247,7 +235,7 @@ export async function triggerTranslationRepairIfNeeded(args: {
         cooldownSec: TRANSLATION_REPAIR_COOLDOWN_SEC,
         scope: "recent" as const,
         reason: args.reason,
-        resultStatus: response.status,
+        resultStatus: payload.status ?? null,
         translated: payload?.translated ?? null,
         recentPendingAfterRun: payload?.recentPending ?? null,
       },

@@ -27,14 +27,11 @@ async function getDefaultLockStore(): Promise<LockStore> {
 }
 
 type FetchLike = (
-  input: string,
-  init?: {
-    headers?: Record<string, string>;
-    cache?: RequestCache;
-  },
+  scope: "recent" | "all",
 ) => Promise<{
-  status: number;
-  json: () => Promise<unknown>;
+  ok?: boolean;
+  status?: number | null;
+  imagesFound?: number | null;
 }>;
 
 export function countRecentMissingImages(items: FeedLike[], now = Date.now()) {
@@ -50,19 +47,17 @@ export function countRecentMissingImages(items: FeedLike[], now = Date.now()) {
 
 export async function triggerImageRepairIfNeeded(args: {
   items: FeedLike[];
-  appBaseUrl: string;
   source: string;
-  authToken?: string;
   reason?: string;
   now?: number;
   lockStore?: LockStore;
-  fetchImpl?: FetchLike;
+  runRepair?: FetchLike;
 }) {
   const recentMissingImages = countRecentMissingImages(
     args.items,
     args.now ?? Date.now(),
   );
-  if (recentMissingImages === 0 || !args.authToken) {
+  if (recentMissingImages === 0 || !args.runRepair) {
     return {
       triggered: false as const,
       accepted: false as const,
@@ -89,29 +84,15 @@ export async function triggerImageRepairIfNeeded(args: {
     };
   }
 
-  const fetchImpl = args.fetchImpl ?? (fetch as FetchLike);
-  const url = `${args.appBaseUrl}/api/images?scope=recent&reason=${encodeURIComponent(args.reason ?? args.source)}`;
   try {
-    const response = await fetchImpl(url, {
-      headers: {
-        authorization: `Bearer ${args.authToken}`,
-      },
-      cache: "no-store",
-    });
-
-    let payload: { imagesFound?: number } | null = null;
-    try {
-      payload = (await response.json()) as { imagesFound?: number };
-    } catch {
-      payload = null;
-    }
+    const result = await args.runRepair("recent");
 
     return {
       triggered: true as const,
       accepted: true as const,
       recentMissingImages,
-      resultStatus: response.status,
-      imagesFound: payload?.imagesFound ?? null,
+      resultStatus: result.status ?? null,
+      imagesFound: result.imagesFound ?? null,
       error: null,
     };
   } catch (error) {

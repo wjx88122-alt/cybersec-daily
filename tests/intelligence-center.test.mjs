@@ -6,12 +6,12 @@ import test from "node:test";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const INTELLIGENCE_COMPONENT_FILES = [
-  "app/intelligence/components/Topbar.tsx",
-  "app/intelligence/components/ExecutiveBrief.tsx",
-  "app/intelligence/components/WhatChanged.tsx",
-  "app/intelligence/components/ExposurePriorities.tsx",
-  "app/intelligence/components/AnalystDrilldown.tsx",
-  "app/intelligence/components/OpsExtensions.tsx",
+  "app/(executive)/intelligence/components/Topbar.tsx",
+  "app/(executive)/intelligence/components/ExecutiveBrief.tsx",
+  "app/(executive)/intelligence/components/WhatChanged.tsx",
+  "app/(executive)/intelligence/components/ExposurePriorities.tsx",
+  "app/(executive)/intelligence/components/AnalystDrilldown.tsx",
+  "app/(executive)/intelligence/components/OpsExtensions.tsx",
 ];
 
 const ROUTE_COMPONENT_ORDER = [
@@ -33,17 +33,17 @@ const RETIRED_PHRASES = [
 
 test("top-level intelligence route exists", () => {
   assert.equal(
-    existsSync(join(root, "app/intelligence/page.tsx")),
+    existsSync(join(root, "app/(executive)/intelligence/page.tsx")),
     true,
-    "app/intelligence/page.tsx should exist",
+    "app/(executive)/intelligence/page.tsx should exist",
   );
 });
 
 test("route-local intelligence command center data file exists", () => {
   assert.equal(
-    existsSync(join(root, "app/intelligence/data.ts")),
+    existsSync(join(root, "app/(executive)/intelligence/data.ts")),
     true,
-    "app/intelligence/data.ts should exist",
+    "app/(executive)/intelligence/data.ts should exist",
   );
 });
 
@@ -58,7 +58,7 @@ test("route-local intelligence command center components exist", () => {
 });
 
 test("MDR landing page links to the Intelligence Center", () => {
-  const page = readFileSync(join(root, "app/mdr/page.tsx"), "utf8");
+  const page = readFileSync(join(root, "app/(ops)/mdr/page.tsx"), "utf8");
 
   assert.equal(page.includes("/intelligence"), true);
   assert.equal(page.includes("情报中心"), true);
@@ -72,19 +72,19 @@ test("top nav contains a first-class intelligence entry", () => {
 });
 
 test("Intelligence route composes the command-center page in the approved order", () => {
-  const page = readFileSync(join(root, "app/intelligence/page.tsx"), "utf8");
+  const page = readFileSync(join(root, "app/(executive)/intelligence/page.tsx"), "utf8");
   const expectedImports = [
-    'from "@/app/intelligence/data"',
-    'from "@/app/intelligence/components/Topbar"',
-    'from "@/app/intelligence/components/ExecutiveBrief"',
-    'from "@/app/intelligence/components/WhatChanged"',
-    'from "@/app/intelligence/components/ExposurePriorities"',
-    'from "@/app/intelligence/components/AnalystDrilldown"',
-    'from "@/app/intelligence/components/OpsExtensions"',
+    'from "@/app/(executive)/intelligence/data"',
+    'from "@/app/(executive)/intelligence/components/Topbar"',
+    'from "@/app/(executive)/intelligence/components/ExecutiveBrief"',
+    'from "@/app/(executive)/intelligence/components/WhatChanged"',
+    'from "@/app/(executive)/intelligence/components/ExposurePriorities"',
+    'from "@/app/(executive)/intelligence/components/AnalystDrilldown"',
+    'from "@/app/(executive)/intelligence/components/OpsExtensions"',
   ];
 
   for (const importText of expectedImports) {
-    assert.equal(page.includes(importText), true, `expected ${importText} in app/intelligence/page.tsx`);
+    assert.equal(page.includes(importText), true, `expected ${importText} in app/(executive)/intelligence/page.tsx`);
   }
 
   const orderedPositions = ROUTE_COMPONENT_ORDER.map((componentName) =>
@@ -110,7 +110,7 @@ test("command-center component files expose the new homepage domains and retire 
     .filter((relativePath) => existsSync(join(root, relativePath)))
     .map((relativePath) => readFileSync(join(root, relativePath), "utf8"))
     .join("\n");
-  const dataSource = readFileSync(join(root, "app/intelligence/data.ts"), "utf8");
+  const dataSource = readFileSync(join(root, "app/(executive)/intelligence/data.ts"), "utf8");
   const combinedSource = `${componentSource}\n${dataSource}`;
 
   for (const phrase of [

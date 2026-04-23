@@ -42,7 +42,7 @@ test("Huawei directories are removed", () => {
 });
 
 test("MDR dashboard no longer links to Huawei tools", () => {
-  const dashboard = readFileSync(join(root, "app/mdr/page.tsx"), "utf8");
+  const dashboard = readFileSync(join(root, "app/(ops)/mdr/page.tsx"), "utf8");
 
   assert.equal(dashboard.includes("/mdr/huawei"), false);
   assert.equal(dashboard.includes("华为防火墙处置"), false);

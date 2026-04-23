@@ -1,0 +1,35 @@
+:root {
+  --system-bg: #eef1f5;
+  --system-bg-elevated: rgba(255, 255, 255, 0.72);
+  --system-surface: rgba(255, 255, 255, 0.66);
+  --system-surface-strong: rgba(255, 255, 255, 0.82);
+  --system-surface-dark: rgba(22, 28, 38, 0.68);
+  --system-surface-dark-strong: rgba(18, 24, 34, 0.82);
+  --system-separator: rgba(15, 23, 42, 0.08);
+  --system-separator-strong: rgba(15, 23, 42, 0.14);
+  --system-text: #111827;
+  --system-text-secondary: #4b5563;
+  --system-text-muted: #6b7280;
+  --system-text-inverse: #eef2f7;
+  --system-radius: 24px;
+  --system-radius-sm: 18px;
+  --system-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
+  --system-shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.05);
+  --system-shadow-dark: 0 22px 60px rgba(0, 0, 0, 0.22);
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(255, 255, 255, 0.86), transparent 24%),
+    radial-gradient(circle at top right, rgba(191, 219, 254, 0.36), transparent 26%),
+    linear-gradient(180deg, #eef1f5 0%, #e7ebf1 100%);
+  color: var(--system-text);
+  font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    "SF Pro Text",
+    "SF Pro Display",
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+}
