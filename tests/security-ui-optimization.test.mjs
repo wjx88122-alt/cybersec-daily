@@ -100,15 +100,17 @@ test("intelligence command tabs wrap instead of keeping a horizontal slider", ()
   assert.equal(intelligence.includes(".topbar-scroll-row > *"), false);
 });
 
-test("intelligence hero avoids stretched whitespace by stacking posture metrics in the lead column", () => {
+test("intelligence hero avoids stretched whitespace by separating decisions from the overview row", () => {
   const executiveBrief = load("app/(executive)/intelligence/components/ExecutiveBrief.tsx");
   const intelligence = load("app/styles/intelligence.css");
-  const briefingRowBlock = intelligence.match(/\.intelligence-command-center \.briefing-row \{[\s\S]*?\n\}/)?.[0] ?? "";
+  const overviewGridBlock = intelligence.match(/\.intelligence-command-center \.brief-overview-grid \{[\s\S]*?\n\}/)?.[0] ?? "";
   const briefHeroBlock = intelligence.match(/\.intelligence-command-center \.brief-hero \{[\s\S]*?\n\}/)?.[0] ?? "";
   const heroTitleBlock = intelligence.match(/\.intelligence-command-center \.brief-hero h2 \{[\s\S]*?\n\}/)?.[0] ?? "";
 
-  assert.equal(executiveBrief.includes('className="brief-left-stack"'), true);
-  assert.equal(briefingRowBlock.includes("align-items: start"), true);
+  assert.equal(executiveBrief.includes("executive-brief-flow"), true);
+  assert.equal(executiveBrief.includes('className="briefing-row"'), false);
+  assert.equal(executiveBrief.includes("decision-section"), true);
+  assert.equal(overviewGridBlock.includes("align-items: start"), true);
   assert.equal(briefHeroBlock.includes("min-height"), false);
   assert.equal(heroTitleBlock.includes("max-width: 13em"), true);
 });

@@ -166,3 +166,20 @@ test("executive brief turns the KPI area into a filled posture snapshot", () => 
     "the action matrix should live in the filled posture snapshot instead of repeating in the rail",
   );
 });
+
+test("executive brief avoids a two-column height trap around decisions", () => {
+  const componentSource = readFileSync(
+    join(root, "app/(executive)/intelligence/components/ExecutiveBrief.tsx"),
+    "utf8",
+  );
+  const stylesheet = readFileSync(join(root, "app/styles/intelligence.css"), "utf8");
+
+  assert.equal(componentSource.includes("executive-brief-flow"), true);
+  assert.equal(componentSource.includes("brief-overview-grid"), true);
+  assert.equal(componentSource.includes("decision-section"), true);
+  assert.equal(componentSource.includes('className="briefing-row"'), false);
+  assert.equal(componentSource.includes('className="brief-left-stack"'), false);
+  assert.equal(componentSource.includes('className="decision-rail"'), false);
+  assert.equal(stylesheet.includes(".intelligence-command-center .briefing-row"), false);
+  assert.equal(stylesheet.includes(".intelligence-command-center .decision-list {\n  display: grid;\n  grid-template-columns: repeat(3"), true);
+});

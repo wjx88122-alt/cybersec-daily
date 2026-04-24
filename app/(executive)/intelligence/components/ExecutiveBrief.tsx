@@ -54,8 +54,8 @@ export default function ExecutiveBrief({
 
   return (
     <section className="executive-brief section" id={hero.sectionId} aria-label="组织威胁态势">
-      <div className="briefing-row">
-        <div className="brief-left-stack">
+      <div className="executive-brief-flow">
+        <div className="brief-overview-grid">
           <article className="brief-hero panel">
             <div className="eyebrow">{hero.eyebrow}</div>
             <h2>{hero.headline}</h2>
@@ -67,96 +67,6 @@ export default function ExecutiveBrief({
             </div>
           </article>
 
-          <section className="posture-snapshot" aria-label="Posture Snapshot">
-            <div className="posture-snapshot-header">
-              <div>
-                <div className="meta-label intel-icon-label">
-                  <SystemIcon className="system-icon" name="activity" size={13} />
-                  Priority snapshot
-                </div>
-                <h3>今日优先级快照</h3>
-              </div>
-              <StatusPill label="Context filled" tone="info" />
-            </div>
-            <div className="kpis">
-              {kpis.map((kpi) => (
-                <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: toneToken(kpi.tone) }}>
-                  <h4 className="intel-icon-label">
-                    <SystemIcon className="system-icon" name="activity" size={13} />
-                    {kpi.label}
-                  </h4>
-                  <div className="kpi-value">
-                    <strong>{kpi.value}</strong>
-                    <span>{kpi.delta}</span>
-                  </div>
-                  <p>{kpi.description}</p>
-                </article>
-              ))}
-            </div>
-            <div className="posture-followup">
-              <article className="signal-heatmap">
-                <div className="posture-mini-header">
-                  <div>
-                    <div className="meta-label intel-icon-label">
-                      <SystemIcon className="system-icon" name="eye" size={13} />
-                      Why this matters
-                    </div>
-                    <h4>{hero.signal.title}</h4>
-                  </div>
-                </div>
-                <p>{hero.signal.description}</p>
-                <div className="signal-meter-list">
-                  {hero.signal.items.map((item) => (
-                    <div
-                      key={item.label}
-                      className="signal-meter"
-                      style={{
-                        ["--tone" as string]: toneToken(item.tone),
-                        ["--score" as string]: `${item.value}%`,
-                      }}
-                    >
-                      <span>{item.label}</span>
-                      <div className="signal-track" aria-hidden="true">
-                        <i />
-                      </div>
-                      <strong>{item.value}</strong>
-                    </div>
-                  ))}
-                </div>
-              </article>
-
-              <article className="action-runway">
-                <div className="posture-mini-header">
-                  <div>
-                    <div className="meta-label intel-icon-label">
-                      <SystemIcon className="system-icon" name="timeline" size={13} />
-                      Recommended sequence
-                    </div>
-                    <h4>{hero.actionMatrix.title}</h4>
-                  </div>
-                </div>
-                <div className="action-runway-list">
-                  {hero.actionMatrix.rows.map((row) => (
-                    <div key={row.title} className="action-runway-row">
-                      <StatusPill
-                        label={
-                          row.tone === "critical" ? "Now" : row.tone === "warning" ? "Next" : "Watch"
-                        }
-                        tone={row.tone}
-                      />
-                      <div>
-                        <strong>{row.title}</strong>
-                        <p>{row.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            </div>
-          </section>
-        </div>
-
-        <aside className="decision-rail" aria-label="今日需要决策">
           <section className="panel verdict-panel">
             <div className="panel-header">
               <div>
@@ -193,7 +103,97 @@ export default function ExecutiveBrief({
               ))}
             </div>
           </section>
+        </div>
 
+        <section className="posture-snapshot" aria-label="Posture Snapshot">
+          <div className="posture-snapshot-header">
+            <div>
+              <div className="meta-label intel-icon-label">
+                <SystemIcon className="system-icon" name="activity" size={13} />
+                Priority snapshot
+              </div>
+              <h3>今日优先级快照</h3>
+            </div>
+            <StatusPill label="Context filled" tone="info" />
+          </div>
+          <div className="kpis">
+            {kpis.map((kpi) => (
+              <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: toneToken(kpi.tone) }}>
+                <h4 className="intel-icon-label">
+                  <SystemIcon className="system-icon" name="activity" size={13} />
+                  {kpi.label}
+                </h4>
+                <div className="kpi-value">
+                  <strong>{kpi.value}</strong>
+                  <span>{kpi.delta}</span>
+                </div>
+                <p>{kpi.description}</p>
+              </article>
+            ))}
+          </div>
+          <div className="posture-followup">
+            <article className="signal-heatmap">
+              <div className="posture-mini-header">
+                <div>
+                  <div className="meta-label intel-icon-label">
+                    <SystemIcon className="system-icon" name="eye" size={13} />
+                    Why this matters
+                  </div>
+                  <h4>{hero.signal.title}</h4>
+                </div>
+              </div>
+              <p>{hero.signal.description}</p>
+              <div className="signal-meter-list">
+                {hero.signal.items.map((item) => (
+                  <div
+                    key={item.label}
+                    className="signal-meter"
+                    style={{
+                      ["--tone" as string]: toneToken(item.tone),
+                      ["--score" as string]: `${item.value}%`,
+                    }}
+                  >
+                    <span>{item.label}</span>
+                    <div className="signal-track" aria-hidden="true">
+                      <i />
+                    </div>
+                    <strong>{item.value}</strong>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="action-runway">
+              <div className="posture-mini-header">
+                <div>
+                  <div className="meta-label intel-icon-label">
+                    <SystemIcon className="system-icon" name="timeline" size={13} />
+                    Recommended sequence
+                  </div>
+                  <h4>{hero.actionMatrix.title}</h4>
+                </div>
+              </div>
+              <div className="action-runway-list">
+                {hero.actionMatrix.rows.map((row) => (
+                  <div key={row.title} className="action-runway-row">
+                    <StatusPill
+                      label={
+                        row.tone === "critical" ? "Now" : row.tone === "warning" ? "Next" : "Watch"
+                      }
+                      tone={row.tone}
+                    />
+                    <div>
+                      <strong>{row.title}</strong>
+                      <p>{row.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section className="decision-section" aria-label="今日需要决策">
           <section className="panel decision-panel">
             <div className="panel-header">
               <div>
@@ -228,7 +228,7 @@ export default function ExecutiveBrief({
               ))}
             </div>
           </section>
-        </aside>
+        </section>
       </div>
     </section>
   );

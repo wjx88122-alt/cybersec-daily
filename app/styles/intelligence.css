@@ -256,24 +256,23 @@
   padding: 22px;
 }
 
-.intelligence-command-center .briefing-row {
+.intelligence-command-center .executive-brief-flow {
   display: grid;
-  grid-template-columns: minmax(0, 1.42fr) minmax(360px, 0.92fr);
+  gap: 18px;
+}
+
+.intelligence-command-center .brief-overview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.18fr) minmax(360px, 0.82fr);
   gap: 18px;
   align-items: start;
 }
 
-.intelligence-command-center .briefing-row > *,
+.intelligence-command-center .executive-brief-flow > *,
+.intelligence-command-center .brief-overview-grid > *,
 .intelligence-command-center .campaign-briefing > *,
-.intelligence-command-center .drilldown-stack > *,
-.intelligence-command-center .why-this-matters > * {
+.intelligence-command-center .drilldown-stack > * {
   min-width: 0;
-}
-
-.intelligence-command-center .brief-left-stack {
-  display: grid;
-  min-width: 0;
-  gap: 16px;
 }
 
 .intelligence-command-center .brief-hero {
@@ -326,14 +325,11 @@
   margin-top: 22px;
 }
 
-.intelligence-command-center .decision-rail {
-  display: grid;
-  gap: 16px;
-  align-content: start;
+.intelligence-command-center .decision-section {
+  min-width: 0;
 }
 
-.intelligence-command-center .decision-panel,
-.intelligence-command-center .priority-sequence {
+.intelligence-command-center .decision-panel {
   display: grid;
   gap: 16px;
   padding: 20px;
@@ -343,16 +339,17 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
 }
 
-.intelligence-command-center .priority-sequence {
-  background: linear-gradient(180deg, rgba(250, 253, 255, 0.98), rgba(246, 248, 251, 0.98));
-}
-
-.intelligence-command-center .decision-list,
 .intelligence-command-center .secondary-campaigns,
 .intelligence-command-center .exposure-priority-list,
 .intelligence-command-center .relation-list,
 .intelligence-command-center .tiny-stack {
   display: grid;
+  gap: 12px;
+}
+
+.intelligence-command-center .decision-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -566,44 +563,6 @@
   color: var(--intel-text-2);
   font-size: 12px;
   line-height: 1.55;
-}
-
-.intelligence-command-center .why-this-matters {
-  display: grid;
-  grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
-  gap: 16px;
-}
-
-.intelligence-command-center .change-drivers,
-.intelligence-command-center .action-sequence {
-  padding: 20px;
-}
-
-.intelligence-command-center .change-drivers .signal-grid,
-.intelligence-command-center .action-sequence .tiny-stack {
-  margin-top: 18px;
-}
-
-.intelligence-command-center .signal-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-}
-
-.intelligence-command-center .signal-item {
-  display: grid;
-  gap: 4px;
-}
-
-.intelligence-command-center .signal-item span {
-  color: var(--intel-text-3);
-  font-size: 12px;
-}
-
-.intelligence-command-center .signal-item strong {
-  color: var(--tone, var(--intel-cyan));
-  font-size: 30px;
-  line-height: 1.05;
 }
 
 .intelligence-command-center .detail-list span {
@@ -900,18 +859,20 @@
 .intelligence-command-center .node.ioc { left: 328px; top: 412px; }
 
 @media (max-width: 1320px) {
-  .intelligence-command-center .briefing-row,
+  .intelligence-command-center .brief-overview-grid,
   .intelligence-command-center .campaign-briefing,
   .intelligence-command-center .drilldown-stack,
-  .intelligence-command-center .why-this-matters,
   .intelligence-command-center .query-grid,
   .intelligence-command-center .playbook-grid {
     grid-template-columns: 1fr;
   }
 
-  .intelligence-command-center .kpis,
-  .intelligence-command-center .signal-grid {
+  .intelligence-command-center .kpis {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .intelligence-command-center .decision-list {
+    grid-template-columns: 1fr;
   }
 
   .intelligence-command-center .drilldown-panel:first-child {
@@ -938,7 +899,6 @@
   }
 
   .intelligence-command-center .kpis,
-  .intelligence-command-center .signal-grid,
   .intelligence-command-center .query-grid,
   .intelligence-command-center .playbook-grid {
     grid-template-columns: 1fr;
@@ -980,9 +940,6 @@
   }
 
   .intelligence-command-center .decision-panel,
-  .intelligence-command-center .priority-sequence,
-  .intelligence-command-center .change-drivers,
-  .intelligence-command-center .action-sequence,
   .intelligence-command-center .primary-campaign,
   .intelligence-command-center .drilldown-panel,
   .intelligence-command-center .exposure-priority-row {
