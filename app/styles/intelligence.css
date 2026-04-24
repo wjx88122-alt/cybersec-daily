@@ -383,11 +383,36 @@
 }
 
 .intelligence-command-center .posture-snapshot {
-  padding: 16px 18px 18px;
+  display: grid;
+  gap: 18px;
+  padding: 18px;
   border-radius: 24px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.94));
   box-shadow: var(--intel-shadow);
+}
+
+.intelligence-command-center .posture-snapshot-header,
+.intelligence-command-center .posture-mini-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.intelligence-command-center .posture-snapshot-header h3,
+.intelligence-command-center .posture-mini-header h4 {
+  margin: 6px 0 0;
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  line-height: 1.15;
+}
+
+.intelligence-command-center .posture-snapshot-header h3 {
+  font-size: 20px;
+}
+
+.intelligence-command-center .posture-mini-header h4 {
+  font-size: 16px;
 }
 
 .intelligence-command-center .kpis {
@@ -400,7 +425,7 @@
   position: relative;
   overflow: hidden;
   min-height: 0;
-  padding: 16px 18px;
+  padding: 15px 18px 16px;
   border-radius: 18px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
@@ -445,6 +470,102 @@
   color: var(--accent, var(--intel-cyan));
   font-size: 12px;
   font-weight: 600;
+}
+
+.intelligence-command-center .posture-followup {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.intelligence-command-center .signal-heatmap,
+.intelligence-command-center .action-runway {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 12px;
+}
+
+.intelligence-command-center .signal-heatmap > p {
+  margin: 0;
+  color: var(--intel-text-2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.intelligence-command-center .signal-meter-list,
+.intelligence-command-center .action-runway-list {
+  display: grid;
+  gap: 10px;
+}
+
+.intelligence-command-center .signal-meter {
+  display: grid;
+  grid-template-columns: minmax(86px, 0.38fr) minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 30px;
+}
+
+.intelligence-command-center .signal-meter span {
+  color: var(--intel-text-3);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.intelligence-command-center .signal-meter strong {
+  color: var(--tone, var(--intel-cyan));
+  font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.intelligence-command-center .signal-track {
+  overflow: hidden;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.intelligence-command-center .signal-track i {
+  display: block;
+  width: min(100%, var(--score, 0%));
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--tone, var(--intel-cyan)), rgba(14, 165, 233, 0.24));
+}
+
+.intelligence-command-center .action-runway-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(15, 23, 42, 0.07);
+}
+
+.intelligence-command-center .action-runway-row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.intelligence-command-center .action-runway-row:last-child {
+  padding-bottom: 0;
+}
+
+.intelligence-command-center .action-runway-row strong {
+  display: block;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.intelligence-command-center .action-runway-row p {
+  margin: 4px 0 0;
+  color: var(--intel-text-2);
+  font-size: 12px;
+  line-height: 1.55;
 }
 
 .intelligence-command-center .why-this-matters {
@@ -799,6 +920,7 @@
 }
 
 @media (max-width: 1040px) {
+  .intelligence-command-center .posture-followup,
   .intelligence-command-center .exposure-priority-row {
     grid-template-columns: 1fr;
   }
@@ -824,7 +946,9 @@
 
   .intelligence-command-center .topbar-command,
   .intelligence-command-center .bridge-headline,
-  .intelligence-command-center .panel-header {
+  .intelligence-command-center .panel-header,
+  .intelligence-command-center .posture-snapshot-header,
+  .intelligence-command-center .posture-mini-header {
     align-items: flex-start;
     flex-direction: column;
   }

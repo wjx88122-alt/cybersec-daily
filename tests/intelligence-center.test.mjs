@@ -134,3 +134,35 @@ test("command-center component files expose the new homepage domains and retire 
     assert.equal(combinedSource.includes(phrase), false, `did not expect retired phrase ${phrase}`);
   }
 });
+
+test("executive brief turns the KPI area into a filled posture snapshot", () => {
+  const componentSource = readFileSync(
+    join(root, "app/(executive)/intelligence/components/ExecutiveBrief.tsx"),
+    "utf8",
+  );
+  const stylesheet = readFileSync(join(root, "app/styles/intelligence.css"), "utf8");
+
+  for (const phrase of [
+    "posture-followup",
+    "signal-heatmap",
+    "action-runway",
+    "signal-meter",
+  ]) {
+    assert.equal(
+      `${componentSource}\n${stylesheet}`.includes(phrase),
+      true,
+      `expected filled posture snapshot affordance ${phrase}`,
+    );
+  }
+
+  assert.equal(
+    componentSource.includes('className="why-this-matters"'),
+    false,
+    "the old detached lower band should not leave an empty gap below KPI cards",
+  );
+  assert.equal(
+    componentSource.includes('className="panel priority-sequence"'),
+    false,
+    "the action matrix should live in the filled posture snapshot instead of repeating in the rail",
+  );
+});

@@ -23,6 +23,10 @@ function StatusPill({ label, tone }: { label: string; tone?: string }) {
   );
 }
 
+function toneToken(tone: string) {
+  return `var(--intel-${tone}, var(--intel-cyan))`;
+}
+
 export default function ExecutiveBrief({
   hero,
   kpis,
@@ -64,9 +68,19 @@ export default function ExecutiveBrief({
           </article>
 
           <section className="posture-snapshot" aria-label="Posture Snapshot">
+            <div className="posture-snapshot-header">
+              <div>
+                <div className="meta-label intel-icon-label">
+                  <SystemIcon className="system-icon" name="activity" size={13} />
+                  Priority snapshot
+                </div>
+                <h3>今日优先级快照</h3>
+              </div>
+              <StatusPill label="Context filled" tone="info" />
+            </div>
             <div className="kpis">
               {kpis.map((kpi) => (
-                <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: `var(--${kpi.tone})` }}>
+                <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: toneToken(kpi.tone) }}>
                   <h4 className="intel-icon-label">
                     <SystemIcon className="system-icon" name="activity" size={13} />
                     {kpi.label}
@@ -78,6 +92,66 @@ export default function ExecutiveBrief({
                   <p>{kpi.description}</p>
                 </article>
               ))}
+            </div>
+            <div className="posture-followup">
+              <article className="signal-heatmap">
+                <div className="posture-mini-header">
+                  <div>
+                    <div className="meta-label intel-icon-label">
+                      <SystemIcon className="system-icon" name="eye" size={13} />
+                      Why this matters
+                    </div>
+                    <h4>{hero.signal.title}</h4>
+                  </div>
+                </div>
+                <p>{hero.signal.description}</p>
+                <div className="signal-meter-list">
+                  {hero.signal.items.map((item) => (
+                    <div
+                      key={item.label}
+                      className="signal-meter"
+                      style={{
+                        ["--tone" as string]: toneToken(item.tone),
+                        ["--score" as string]: `${item.value}%`,
+                      }}
+                    >
+                      <span>{item.label}</span>
+                      <div className="signal-track" aria-hidden="true">
+                        <i />
+                      </div>
+                      <strong>{item.value}</strong>
+                    </div>
+                  ))}
+                </div>
+              </article>
+
+              <article className="action-runway">
+                <div className="posture-mini-header">
+                  <div>
+                    <div className="meta-label intel-icon-label">
+                      <SystemIcon className="system-icon" name="timeline" size={13} />
+                      Recommended sequence
+                    </div>
+                    <h4>{hero.actionMatrix.title}</h4>
+                  </div>
+                </div>
+                <div className="action-runway-list">
+                  {hero.actionMatrix.rows.map((row) => (
+                    <div key={row.title} className="action-runway-row">
+                      <StatusPill
+                        label={
+                          row.tone === "critical" ? "Now" : row.tone === "warning" ? "Next" : "Watch"
+                        }
+                        tone={row.tone}
+                      />
+                      <div>
+                        <strong>{row.title}</strong>
+                        <p>{row.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </article>
             </div>
           </section>
         </div>
@@ -154,83 +228,8 @@ export default function ExecutiveBrief({
               ))}
             </div>
           </section>
-
-          <section className="panel priority-sequence">
-            <div className="panel-header">
-              <div>
-                <div className="meta-label intel-icon-label">
-                  <SystemIcon className="system-icon" name="timeline" size={13} />
-                  Decision support
-                </div>
-                <h3>{hero.actionMatrix.title}</h3>
-              </div>
-            </div>
-            <div className="matrix-list">
-              {hero.actionMatrix.rows.map((row) => (
-                <div key={row.title} className="matrix-row">
-                  <StatusPill
-                    label={
-                      row.tone === "critical" ? "Now" : row.tone === "warning" ? "Next" : "Watch"
-                    }
-                    tone={row.tone}
-                  />
-                  <div>
-                    <strong>{row.title}</strong>
-                    <p>{row.description}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         </aside>
       </div>
-
-      <section className="why-this-matters">
-        <article className="panel change-drivers">
-          <div className="panel-header">
-            <div>
-              <div className="meta-label intel-icon-label">
-                <SystemIcon className="system-icon" name="eye" size={13} />
-                Why this matters
-              </div>
-              <h3>{hero.signal.title}</h3>
-            </div>
-            <StatusPill label="Live" tone="info" />
-          </div>
-          <p>{hero.signal.description}</p>
-          <div className="signal-grid">
-            {hero.signal.items.map((item) => (
-              <div key={item.label} className="signal-item" style={{ ["--tone" as string]: `var(--${item.tone})` }}>
-                <span className="intel-icon-label">
-                  <SystemIcon className="system-icon" name="target" size={13} />
-                  {item.label}
-                </span>
-                <strong>{item.value}</strong>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        <article className="panel action-sequence">
-          <div className="panel-header">
-            <div>
-              <div className="meta-label intel-icon-label">
-                <SystemIcon className="system-icon" name="list" size={13} />
-                Recommended sequence
-              </div>
-              <h3>建议动作顺序</h3>
-            </div>
-          </div>
-          <div className="tiny-stack">
-            {hero.decisions.items.map((item, index) => (
-              <div key={item.title} className="tiny-card">
-                <strong>{`${index + 1}. ${item.title}`}</strong>
-                <p>{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </article>
-      </section>
     </section>
   );
 }
