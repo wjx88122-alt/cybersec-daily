@@ -85,6 +85,88 @@ test("feed landing keeps the 24-hour scope when fresh items exist", () => {
   );
 });
 
+test("feed landing hero summary uses cached digest overview when available", () => {
+  const now = Date.parse("2026-04-23T12:00:00.000Z");
+  const state = buildFeedLandingState(
+    [
+      {
+        id: "fresh-security-1",
+        title: "Fresh story",
+        titleZh: "边界设备漏洞被利用",
+        summary: "Fresh summary",
+        summaryZh: "边界设备存在被利用风险。",
+        summaryAi: "",
+        pubDate: "2026-04-23T09:00:00.000Z",
+        category: "漏洞预警",
+        source: "Example",
+        link: "https://example.com/fresh",
+      },
+    ],
+    {
+      category: "全部",
+      search: "",
+      now,
+      digestOverview:
+        "今日重点是边界漏洞、凭据风险和勒索活动的连续升温。建议先查看可被利用漏洞与远程访问资产，再复核备份和身份策略。",
+    },
+  );
+
+  assert.equal(state.heroSummary.sourceLabel, "LLM 基于当前日报生成");
+  assert.equal(
+    state.heroSummary.title,
+    "今日重点是边界漏洞、凭据风险和勒索活动的连续升温。",
+  );
+  assert.equal(
+    state.heroSummary.body,
+    "建议先查看可被利用漏洞与远程访问资产，再复核备份和身份策略。",
+  );
+});
+
+test("feed landing hero summary falls back to current filtered items", () => {
+  const now = Date.parse("2026-04-23T12:00:00.000Z");
+  const state = buildFeedLandingState(
+    [
+      {
+        id: "fresh-security-1",
+        title: "Fresh story",
+        titleZh: "边界设备漏洞被利用",
+        summary: "Fresh summary",
+        summaryZh: "边界设备存在被利用风险。",
+        summaryAi: "",
+        pubDate: "2026-04-23T09:00:00.000Z",
+        category: "漏洞预警",
+        source: "Example",
+        link: "https://example.com/fresh",
+      },
+      {
+        id: "fresh-security-2",
+        title: "Credential phishing expands",
+        titleZh: "凭据钓鱼活动扩散",
+        summary: "Threat actors expand credential phishing.",
+        summaryZh: "攻击者扩大凭据钓鱼活动。",
+        summaryAi: "",
+        pubDate: "2026-04-23T08:00:00.000Z",
+        category: "威胁情报",
+        source: "Example",
+        link: "https://example.com/credential",
+      },
+    ],
+    {
+      category: "漏洞预警",
+      search: "",
+      now,
+      digestOverview: "",
+    },
+  );
+
+  assert.equal(state.heroSummary.sourceLabel, "基于当前列表生成");
+  assert.equal(state.heroSummary.title, "当前先看 1 条过去 24 小时安全资讯。");
+  assert.equal(
+    state.heroSummary.body,
+    "当前列表集中在漏洞预警。最新焦点是“边界设备漏洞被利用”。建议先看焦点卡片，再用分类和搜索补充细节。",
+  );
+});
+
 test("category filter keeps the base system pill shell off the active branch", () => {
   const source = load("components/CategoryFilter.tsx");
 

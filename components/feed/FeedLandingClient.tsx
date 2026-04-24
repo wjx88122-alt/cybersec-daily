@@ -10,6 +10,8 @@ import { buildFeedLandingState } from "@/lib/feed-view-model.js";
 type FeedLandingClientProps = {
   items: FeedItem[];
   categories?: string[];
+  heroMode?: "static" | "contentSummary";
+  digestOverview?: string;
   eyebrow: string;
   headline: string;
   lead: string;
@@ -27,6 +29,8 @@ type FeedLandingClientProps = {
 export default function FeedLandingClient({
   items,
   categories,
+  heroMode = "static",
+  digestOverview = "",
   eyebrow,
   headline,
   lead,
@@ -42,10 +46,20 @@ export default function FeedLandingClient({
 }: FeedLandingClientProps) {
   const [category, setCategory] = useState("全部");
   const [search, setSearch] = useState("");
-  const landingState = buildFeedLandingState(items, { category, search });
-  const { filtered, isFallback, scopeLabel } = landingState;
+  const landingState = buildFeedLandingState(items, {
+    category,
+    search,
+    digestOverview: heroMode === "contentSummary" ? digestOverview : "",
+  });
+  const { filtered, heroSummary, isFallback, scopeLabel } = landingState;
 
   const [hero, ...rest] = filtered;
+  const usesContentSummary = heroMode === "contentSummary";
+  const heroTitle = usesContentSummary ? heroSummary.title : headline;
+  const heroLead = usesContentSummary ? heroSummary.body || lead : lead;
+  const displayChips = usesContentSummary
+    ? [heroSummary.sourceLabel, ...chips]
+    : chips;
   const sourceCount = new Set(filtered.map((item) => item.source)).size;
   const categoryCount = new Set(filtered.map((item) => item.category)).size;
   const latestStamp = hero?.pubDate
@@ -67,10 +81,16 @@ export default function FeedLandingClient({
       <section className="grid gap-6 pb-10 pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pb-14 lg:pt-16">
         <div className="reveal-rise">
           <div className="public-eyebrow">{eyebrow}</div>
-          <h1 className="public-display mt-4 max-w-[11ch]">{headline}</h1>
-          <p className="public-lead mt-6 max-w-2xl">{lead}</p>
+          <h1
+            className={`public-display mt-4 ${
+              usesContentSummary ? "max-w-[13em]" : "max-w-[11ch]"
+            }`}
+          >
+            {heroTitle}
+          </h1>
+          {heroLead && <p className="public-lead mt-6 max-w-3xl">{heroLead}</p>}
           <div className="mt-8 flex flex-wrap gap-3 text-[12px] text-slate-600">
-            {chips.map((chip) => (
+            {displayChips.map((chip) => (
               <span
                 key={chip}
                 className="rounded-full border border-slate-200 bg-white/75 px-4 py-2 shadow-[0_10px_26px_rgba(15,23,42,0.04)]"
