@@ -51,16 +51,36 @@ export default function ExecutiveBrief({
   return (
     <section className="executive-brief section" id={hero.sectionId} aria-label="组织威胁态势">
       <div className="briefing-row">
-        <article className="brief-hero panel">
-          <div className="eyebrow">{hero.eyebrow}</div>
-          <h2>{hero.headline}</h2>
-          <p>{hero.body}</p>
-          <div className="hero-tags">
-            {hero.tags.map((tag) => (
-              <Chip key={tag} label={tag} />
-            ))}
-          </div>
-        </article>
+        <div className="brief-left-stack">
+          <article className="brief-hero panel">
+            <div className="eyebrow">{hero.eyebrow}</div>
+            <h2>{hero.headline}</h2>
+            <p>{hero.body}</p>
+            <div className="hero-tags">
+              {hero.tags.map((tag) => (
+                <Chip key={tag} label={tag} />
+              ))}
+            </div>
+          </article>
+
+          <section className="posture-snapshot" aria-label="Posture Snapshot">
+            <div className="kpis">
+              {kpis.map((kpi) => (
+                <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: `var(--${kpi.tone})` }}>
+                  <h4 className="intel-icon-label">
+                    <SystemIcon className="system-icon" name="activity" size={13} />
+                    {kpi.label}
+                  </h4>
+                  <div className="kpi-value">
+                    <strong>{kpi.value}</strong>
+                    <span>{kpi.delta}</span>
+                  </div>
+                  <p>{kpi.description}</p>
+                </article>
+              ))}
+            </div>
+          </section>
+        </div>
 
         <aside className="decision-rail" aria-label="今日需要决策">
           <section className="panel verdict-panel">
@@ -164,24 +184,6 @@ export default function ExecutiveBrief({
           </section>
         </aside>
       </div>
-
-      <section className="posture-snapshot" aria-label="Posture Snapshot">
-        <div className="kpis">
-          {kpis.map((kpi) => (
-          <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: `var(--${kpi.tone})` }}>
-              <h4 className="intel-icon-label">
-                <SystemIcon className="system-icon" name="activity" size={13} />
-                {kpi.label}
-              </h4>
-              <div className="kpi-value">
-                <strong>{kpi.value}</strong>
-                <span>{kpi.delta}</span>
-              </div>
-              <p>{kpi.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
 
       <section className="why-this-matters">
         <article className="panel change-drivers">
