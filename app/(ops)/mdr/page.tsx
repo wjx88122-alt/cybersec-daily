@@ -248,7 +248,7 @@ function AnalystCapacityRow({ analyst }: { analyst: Analyst }) {
 function AlertRow({ alert, onCreateTicket }: { alert: Alert; onCreateTicket: (alert: Alert) => void }) {
   return (
     <div className="glass rounded-2xl p-4 transition-all hover:border-black/[0.12]">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <div className="flex items-center gap-2">
           <span
             className={`h-2.5 w-2.5 rounded-full ${mdrSeverityDotClass(alert.severity)} ${
@@ -273,7 +273,7 @@ function AlertRow({ alert, onCreateTicket }: { alert: Alert; onCreateTicket: (al
         </div>
         <button
           onClick={() => onCreateTicket(alert)}
-          className={`system-control inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all ${mdrActionToneClass("dashboard")}`}
+          className={`system-control inline-flex min-w-[11rem] shrink-0 items-center justify-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all ${mdrActionToneClass("dashboard")}`}
         >
           <SystemIcon className="system-icon" name="case" size={13} />
           创建工单

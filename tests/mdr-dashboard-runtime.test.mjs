@@ -70,6 +70,18 @@ test("mdr command deck isolates live SLA text from server hydration", () => {
   assert.equal(mdr.includes("SLA 剩余 <span suppressHydrationWarning>"), true);
 });
 
+test("mdr incoming alert rows do not switch to horizontal layout at narrow tablet widths", () => {
+  const mdr = readFileSync(
+    join(root, "app/(ops)/mdr/page.tsx"),
+    "utf8",
+  );
+
+  assert.equal(mdr.includes("sm:flex-row sm:items-center"), false);
+  assert.equal(mdr.includes("lg:flex-row lg:items-center"), true);
+  assert.equal(mdr.includes("min-w-[11rem]"), true);
+  assert.equal(mdr.includes("justify-center"), true);
+});
+
 test("threat map does not seed random arcs during server render", () => {
   const source = readFileSync(join(root, "components/ThreatMap.tsx"), "utf8");
 
