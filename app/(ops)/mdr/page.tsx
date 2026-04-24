@@ -283,6 +283,73 @@ function AlertRow({ alert, onCreateTicket }: { alert: Alert; onCreateTicket: (al
   );
 }
 
+function AlertQueueCard({
+  alert,
+  index,
+  onCreateTicket,
+}: {
+  alert: Alert;
+  index: number;
+  onCreateTicket: (alert: Alert) => void;
+}) {
+  return (
+    <article className="alert-queue-card rounded-[24px] border border-slate-200/80 bg-white/85 p-4 shadow-[0_12px_28px_rgba(15,23,42,0.06)] transition-all hover:-translate-y-0.5 hover:border-blue-200 hover:bg-white">
+      <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-3">
+        <div className="flex flex-col items-center gap-2 pt-1">
+          <span
+            className={`h-2.5 w-2.5 rounded-full ${mdrSeverityDotClass(alert.severity)} ${
+              alert.severity === "critical" ? "animate-pulse" : ""
+            }`}
+          />
+          <span className="h-full min-h-12 w-px bg-slate-200" aria-hidden="true" />
+        </div>
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-semibold text-slate-500">
+              #{String(index + 1).padStart(2, "0")}
+            </span>
+            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${mdrSeverityBadgeClass(alert.severity)}`}>
+              {SEVERITY_LABELS[alert.severity]}
+            </span>
+            <span className={`rounded-full border px-2 py-0.5 text-[10px] font-semibold ${mdrSourceToneClass(alert.source)}`}>
+              {alert.source}
+            </span>
+          </div>
+          <h3 className="mt-3 text-base font-semibold leading-snug text-slate-950">
+            {alert.titleZh}
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-slate-500">
+            {alert.title}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-4 grid gap-2 rounded-2xl border border-slate-100 bg-slate-50/80 p-3 text-xs text-slate-600">
+        <div className="grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-2">
+          <span className="font-medium text-slate-400">资产</span>
+          <span className="break-words font-medium text-slate-700">{alert.host}</span>
+        </div>
+        <div className="grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-2">
+          <span className="font-medium text-slate-400">技战术</span>
+          <span className="break-words font-medium text-slate-700">{`${alert.mitreTactic} (${alert.mitreId})`}</span>
+        </div>
+        <div className="grid grid-cols-[5rem_minmax(0,1fr)] items-start gap-2">
+          <span className="font-medium text-slate-400">发现</span>
+          <span className="font-medium text-slate-700" suppressHydrationWarning>{timeAgo(alert.timestamp)}</span>
+        </div>
+      </div>
+
+      <button
+        onClick={() => onCreateTicket(alert)}
+        className={`system-control mt-4 inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border px-3 py-2.5 text-sm font-semibold transition-all ${mdrActionToneClass("dashboard")}`}
+      >
+        <SystemIcon className="system-icon" name="case" size={14} />
+        创建工单
+      </button>
+    </article>
+  );
+}
+
 function TicketCard({
   ticket,
   onStatusChange,
@@ -828,7 +895,7 @@ export default function MDRPage() {
 
         {tab === "dashboard" ? (
           <section className="mt-6 grid gap-5 xl:grid-cols-[1.06fr_0.94fr]">
-            <div className="space-y-5">
+            <div className="min-w-0 space-y-5">
               <div className="glass rounded-[30px] p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -888,7 +955,7 @@ export default function MDRPage() {
               </div>
             </div>
 
-            <div className="space-y-5">
+            <div className="min-w-0 space-y-5">
               <div className="glass rounded-[30px] p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
@@ -945,9 +1012,9 @@ export default function MDRPage() {
                   </div>
                   <span className="text-xs text-slate-500">{alerts.length} 条待处理</span>
                 </div>
-                <div className="mt-4 space-y-3">
-                  {alerts.slice(0, 4).map((alert) => (
-                    <AlertRow key={alert.id} alert={alert} onCreateTicket={handleCreateTicket} />
+                <div className="mt-5 grid gap-3">
+                  {alerts.slice(0, 4).map((alert, index) => (
+                    <AlertQueueCard key={alert.id} alert={alert} onCreateTicket={handleCreateTicket} index={index} />
                   ))}
                   {alerts.length === 0 ? (
                     <div className="rounded-2xl border border-dashed border-slate-300 bg-white/70 p-5 text-sm text-slate-500">

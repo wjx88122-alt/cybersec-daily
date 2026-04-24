@@ -82,6 +82,19 @@ test("mdr incoming alert rows do not switch to horizontal layout at narrow table
   assert.equal(mdr.includes("justify-center"), true);
 });
 
+test("mdr dashboard uses compact queue cards for the incoming alerts side rail", () => {
+  const mdr = readFileSync(
+    join(root, "app/(ops)/mdr/page.tsx"),
+    "utf8",
+  );
+
+  assert.equal(mdr.includes("function AlertQueueCard"), true);
+  assert.equal(mdr.includes("alert-queue-card"), true);
+  assert.equal(mdr.includes("<AlertQueueCard key={alert.id} alert={alert} onCreateTicket={handleCreateTicket} index={index} />"), true);
+  assert.equal(mdr.includes("grid-cols-[auto_minmax(0,1fr)]"), true);
+  assert.equal(mdr.includes('className="min-w-0 space-y-5"'), true);
+});
+
 test("threat map does not seed random arcs during server render", () => {
   const source = readFileSync(join(root, "components/ThreatMap.tsx"), "utf8");
 
