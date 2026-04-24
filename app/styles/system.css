@@ -330,3 +330,252 @@ textarea:focus-visible {
   height: 2rem;
   min-width: 2rem;
 }
+
+.mdr-dispatch-layer {
+  position: fixed;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 60;
+  width: min(440px, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+.mdr-dispatch-card {
+  position: relative;
+  overflow: hidden;
+  transform-origin: 100% 100%;
+  animation: mdr-dispatch-in 520ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  pointer-events: auto;
+}
+
+.mdr-dispatch-card::before {
+  content: "";
+  position: absolute;
+  inset: -40% -30%;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 30%, rgba(59, 130, 246, 0.13) 45%, transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), transparent 46%);
+  transform: translateX(-58%) rotate(7deg);
+  animation: mdr-dispatch-sheen 2800ms ease-out 240ms both;
+}
+
+.mdr-dispatch-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.mdr-dispatch-pulse {
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.46);
+  animation: mdr-dispatch-pulse 1300ms ease-out infinite;
+}
+
+.mdr-dispatch-progress {
+  position: relative;
+  height: 0.55rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(226, 232, 240, 0.98);
+  box-shadow:
+    inset 0 1px 2px rgba(15, 23, 42, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.mdr-dispatch-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb 0%, #06b6d4 48%, #10b981 100%);
+  transform-origin: left center;
+  animation: mdr-dispatch-progress 3600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.mdr-dispatch-progress::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: inherit;
+  background-image: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent);
+  transform: translateX(-100%);
+  animation: mdr-dispatch-scan 1200ms ease-in-out 420ms 3;
+}
+
+.mdr-dispatch-step {
+  position: relative;
+  overflow: hidden;
+  min-height: 4rem;
+  border: 1px solid rgba(226, 232, 240, 0.92);
+  border-radius: 1.25rem;
+  background: rgba(255, 255, 255, 0.78);
+  padding: 0.7rem 0.8rem;
+  opacity: 0;
+  transform: translate3d(0, 10px, 0) scale(0.985);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.04);
+  animation: mdr-dispatch-step-in 440ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.mdr-dispatch-step::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid transparent;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.14), rgba(16, 185, 129, 0.1)) border-box;
+  mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  opacity: 0;
+  animation: mdr-dispatch-step-ring 620ms ease-out both;
+}
+
+.mdr-dispatch-step > span {
+  transform: scale(0.84);
+  animation: mdr-dispatch-icon-pop 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.mdr-dispatch-step:nth-child(1) {
+  animation-delay: 220ms;
+}
+
+.mdr-dispatch-step:nth-child(1)::before,
+.mdr-dispatch-step:nth-child(1) > span {
+  animation-delay: 320ms;
+}
+
+.mdr-dispatch-step:nth-child(2) {
+  animation-delay: 740ms;
+}
+
+.mdr-dispatch-step:nth-child(2)::before,
+.mdr-dispatch-step:nth-child(2) > span {
+  animation-delay: 840ms;
+}
+
+.mdr-dispatch-step:nth-child(3) {
+  animation-delay: 1260ms;
+}
+
+.mdr-dispatch-step:nth-child(3)::before,
+.mdr-dispatch-step:nth-child(3) > span {
+  animation-delay: 1360ms;
+}
+
+.mdr-dispatch-step:nth-child(4) {
+  animation-delay: 1780ms;
+}
+
+.mdr-dispatch-step:nth-child(4)::before,
+.mdr-dispatch-step:nth-child(4) > span {
+  animation-delay: 1880ms;
+}
+
+@keyframes mdr-dispatch-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mdr-dispatch-progress {
+  from {
+    transform: scaleX(0.02);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes mdr-dispatch-step-in {
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes mdr-dispatch-step-ring {
+  0% {
+    opacity: 0;
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes mdr-dispatch-icon-pop {
+  0% {
+    transform: scale(0.84);
+  }
+  58% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes mdr-dispatch-pulse {
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+  }
+}
+
+@keyframes mdr-dispatch-sheen {
+  0% {
+    opacity: 0;
+    transform: translateX(-58%) rotate(7deg);
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(54%) rotate(7deg);
+  }
+}
+
+@keyframes mdr-dispatch-scan {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (max-width: 640px) {
+  .mdr-dispatch-layer {
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mdr-dispatch-card,
+  .mdr-dispatch-card::before,
+  .mdr-dispatch-pulse,
+  .mdr-dispatch-progress::before,
+  .mdr-dispatch-progress::after,
+  .mdr-dispatch-step,
+  .mdr-dispatch-step::before,
+  .mdr-dispatch-step > span {
+    animation: none !important;
+  }
+
+  .mdr-dispatch-card,
+  .mdr-dispatch-step {
+    opacity: 1;
+    transform: none;
+  }
+
+  .mdr-dispatch-progress::before {
+    transform: scaleX(1);
+  }
+}

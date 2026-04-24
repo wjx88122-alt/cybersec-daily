@@ -95,6 +95,25 @@ test("mdr dashboard uses compact queue cards for the incoming alerts side rail",
   assert.equal(mdr.includes('className="min-w-0 space-y-5"'), true);
 });
 
+test("mdr ticket creation feedback uses a staged dispatch animation", () => {
+  const mdr = readFileSync(
+    join(root, "app/(ops)/mdr/page.tsx"),
+    "utf8",
+  );
+  const system = readFileSync(join(root, "app/styles/system.css"), "utf8");
+
+  assert.equal(mdr.includes("function DispatchAnimation"), true);
+  assert.equal(mdr.includes("ticketId"), true);
+  assert.equal(mdr.includes("mdr-dispatch-layer"), true);
+  assert.equal(mdr.includes("mdr-dispatch-card"), true);
+  assert.equal(mdr.includes("mdr-dispatch-progress"), true);
+  assert.equal(mdr.includes("mdr-dispatch-step"), true);
+  assert.equal(system.includes(".mdr-dispatch-layer {\n  position: fixed;"), true);
+  assert.equal(system.includes("@keyframes mdr-dispatch-in"), true);
+  assert.equal(system.includes("@keyframes mdr-dispatch-progress"), true);
+  assert.equal(system.includes("@media (prefers-reduced-motion: reduce)"), true);
+});
+
 test("threat map does not seed random arcs during server render", () => {
   const source = readFileSync(join(root, "components/ThreatMap.tsx"), "utf8");
 

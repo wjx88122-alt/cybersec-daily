@@ -499,31 +499,102 @@ function AnalystCard({ analyst }: { analyst: Analyst }) {
   );
 }
 
-function DispatchToast({
+function DispatchAnimation({
   alert,
   analyst,
+  ticketId,
   onDone,
 }: {
   alert: Alert;
   analyst: Analyst | null;
+  ticketId: string;
   onDone: () => void;
 }) {
   useEffect(() => {
-    const timeout = setTimeout(onDone, 3000);
+    const timeout = setTimeout(onDone, 5200);
     return () => clearTimeout(timeout);
   }, [onDone]);
 
+  const steps: { label: string; detail: string; icon: SystemIconName; tone: string }[] = [
+    {
+      label: "告警接收",
+      detail: `${alert.source} · ${SEVERITY_LABELS[alert.severity]}等级`,
+      icon: "alert",
+      tone: "text-orange-700 bg-orange-50 border-orange-200",
+    },
+    {
+      label: "AI 分诊完成",
+      detail: "SLA 计时已启动",
+      icon: "spark",
+      tone: "text-violet-700 bg-violet-50 border-violet-200",
+    },
+    {
+      label: "工单生成",
+      detail: ticketId,
+      icon: "case",
+      tone: "text-blue-700 bg-blue-50 border-blue-200",
+    },
+    {
+      label: analyst ? "自动派发" : "进入待派发队列",
+      detail: analyst ? `${analyst.name} · Tier ${analyst.tier}` : "等待可用分析师接手",
+      icon: analyst ? "user" : "clock",
+      tone: analyst ? "text-emerald-700 bg-emerald-50 border-emerald-200" : "text-amber-700 bg-amber-50 border-amber-200",
+    },
+  ];
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 max-w-sm rounded-2xl border border-blue-200 bg-white/95 p-4 shadow-[0_24px_60px_rgba(37,99,235,0.16)] backdrop-blur">
-      <div className={`text-xs font-medium ${mdrStatToneClass("intake")}`}>工单已创建并自动派发</div>
-      <div className="mt-1 text-sm text-slate-950">{alert.titleZh}</div>
-      {analyst ? (
-        <div className="mt-1 text-xs text-slate-500">
-          派发至 {analyst.avatar} {analyst.name} (Tier {analyst.tier}, {alert.source} 专家)
+    <div className="mdr-dispatch-layer">
+      <section
+        role="status"
+        aria-live="polite"
+        className="mdr-dispatch-card rounded-[28px] border border-blue-200/80 bg-white/95 p-5 shadow-[0_28px_80px_rgba(37,99,235,0.2)] backdrop-blur-xl"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <div className="inline-flex items-center gap-2 rounded-full border border-blue-100 bg-blue-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-blue-700">
+              <span className="mdr-dispatch-pulse h-2 w-2 rounded-full bg-blue-500" />
+              Dispatch Flow
+            </div>
+            <h2 className="mt-3 text-xl font-semibold tracking-tight text-slate-950">工单创建完成</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600">{alert.titleZh}</p>
+          </div>
+          <div className="shrink-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-right">
+            <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Ticket</div>
+            <div className="mt-1 font-mono text-xs font-semibold text-slate-900">{ticketId}</div>
+          </div>
         </div>
-      ) : (
-        <div className={`mt-1 text-xs ${mdrStatToneClass("warning")}`}>暂无可用分析师，已进入待派发队列</div>
-      )}
+
+        <div className="mt-5 rounded-3xl border border-slate-100 bg-slate-50/80 p-4">
+          <div className="mdr-dispatch-progress" aria-hidden="true" />
+          <div className="mt-4 grid gap-3">
+            {steps.map((step, index) => (
+              <div
+                key={step.label}
+                className="mdr-dispatch-step grid grid-cols-[auto_minmax(0,1fr)] items-center gap-3"
+                style={{ ["--step-index" as string]: index }}
+              >
+                <span className={`inline-flex h-9 w-9 items-center justify-center rounded-2xl border ${step.tone}`}>
+                  <SystemIcon className="system-icon" name={step.icon} size={15} />
+                </span>
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold text-slate-950">{step.label}</div>
+                  <div className="mt-0.5 truncate text-xs text-slate-500">{step.detail}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm text-emerald-800">
+          {analyst ? (
+            <span>
+              已派发给 <strong>{analyst.name}</strong>，容量与 {alert.source} 技能已匹配。
+            </span>
+          ) : (
+            <span>暂无可用分析师，工单已进入待派发队列并保留 SLA 计时。</span>
+          )}
+        </div>
+      </section>
     </div>
   );
 }
@@ -535,7 +606,7 @@ export default function MDRPage() {
   const [alerts, setAlerts] = useState<Alert[]>(
     MOCK_ALERTS.filter((alert) => !MOCK_TICKETS.some((ticket) => ticket.alertId === alert.id)),
   );
-  const [toast, setToast] = useState<{ alert: Alert; analyst: Analyst | null } | null>(null);
+  const [toast, setToast] = useState<{ alert: Alert; analyst: Analyst | null; ticketId: string } | null>(null);
   const [nowTs, setNowTs] = useState(() => Date.now());
 
   useEffect(() => {
@@ -585,7 +656,7 @@ export default function MDRPage() {
         );
       }
 
-      setToast({ alert, analyst: assigned });
+      setToast({ alert, analyst: assigned, ticketId: newTicket.id });
     },
     [analysts, tickets.length],
   );
@@ -1119,7 +1190,14 @@ export default function MDRPage() {
         ) : null}
       </main>
 
-      {toast ? <DispatchToast alert={toast.alert} analyst={toast.analyst} onDone={() => setToast(null)} /> : null}
+      {toast ? (
+        <DispatchAnimation
+          alert={toast.alert}
+          analyst={toast.analyst}
+          ticketId={toast.ticketId}
+          onDone={() => setToast(null)}
+        />
+      ) : null}
     </MdrShell>
   );
 }
