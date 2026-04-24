@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { getArcLiftFactor } from "@/lib/threat-map";
+import { mdrDeviceStatusHex, mdrSeverityHex } from "@/app/(ops)/mdr/theme";
 
 /* ── Orthographic projection helpers ── */
 function toRadians(deg: number) { return (deg * Math.PI) / 180; }
@@ -77,12 +78,6 @@ const ATTACK_TYPES = [
   "DDoS 攻击", "APT 渗透", "勒索软件", "钓鱼攻击", "暴力破解",
   "C2 通信", "数据窃取", "漏洞利用", "供应链攻击", "零日攻击",
 ];
-
-const SEV_COLORS = {
-  critical: { stroke: "#ef4444", particle: "#ff6b6b" },
-  high: { stroke: "#f97316", particle: "#ffaa44" },
-  medium: { stroke: "#eab308", particle: "#ffd644" },
-};
 
 interface AttackArc {
   id: number;
@@ -193,7 +188,10 @@ export default function ThreatMap() {
   const projectedArcs = arcs.map((arc) => {
     const from = CITIES[arc.fromKey];
     const to = CITIES[arc.toKey];
-    const colors = SEV_COLORS[arc.severity];
+    const colors = {
+      stroke: mdrSeverityHex(arc.severity),
+      particle: mdrSeverityHex(arc.severity),
+    };
     // Sample points along great circle up to progress
     const pts: { x: number; y: number; visible: boolean }[] = [];
     const steps = 30;
@@ -234,13 +232,13 @@ export default function ThreatMap() {
         <div className="flex items-center gap-3">
           <span className="text-sm text-slate-800 font-bold tracking-wide">🌍 全球威胁态势感知</span>
           <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-            <span className="text-[10px] text-red-400 font-medium">LIVE</span>
+            <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: mdrSeverityHex("critical") }} />
+            <span className="text-[10px] font-medium text-red-700">LIVE</span>
           </span>
         </div>
         <div className="flex items-center gap-5 text-[11px]">
-          <div className="text-center"><div className="text-green-500 font-mono font-bold text-base">{stats.blocked.toLocaleString()}</div><div className="text-slate-500 text-[9px]">累计拦截</div></div>
-          <div className="text-center"><div className="text-red-500 font-mono font-bold text-base">{stats.active}</div><div className="text-slate-500 text-[9px]">活跃攻击</div></div>
+          <div className="text-center"><div className="font-mono font-bold text-base" style={{ color: mdrDeviceStatusHex("online") }}>{stats.blocked.toLocaleString()}</div><div className="text-slate-500 text-[9px]">累计拦截</div></div>
+          <div className="text-center"><div className="font-mono font-bold text-base" style={{ color: mdrSeverityHex("critical") }}>{stats.active}</div><div className="text-slate-500 text-[9px]">活跃攻击</div></div>
           <div className="text-center"><div className="text-blue-600 font-mono font-bold text-base">{DEFENDED.length}</div><div className="text-slate-500 text-[9px]">防护节点</div></div>
         </div>
       </div>
@@ -356,23 +354,23 @@ export default function ThreatMap() {
       {/* Latest attack */}
       {latestAttack && (
         <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-[10px] relative z-10">
-          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: SEV_COLORS[latestAttack.severity].stroke }} />
+          <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: mdrSeverityHex(latestAttack.severity) }} />
           <span className="text-slate-500">最新威胁:</span>
           <span className="text-slate-800 font-medium">{CITIES[latestAttack.fromKey].label}</span>
           <span className="text-slate-500">→</span>
           <span className="text-blue-600 font-medium">{CITIES[latestAttack.toKey].label}</span>
-          <span className="px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ background: `${SEV_COLORS[latestAttack.severity].stroke}15`, color: SEV_COLORS[latestAttack.severity].stroke }}>
+          <span className="px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ background: `${mdrSeverityHex(latestAttack.severity)}15`, color: mdrSeverityHex(latestAttack.severity) }}>
             {latestAttack.type}
           </span>
-          <span className="text-green-500 ml-auto font-medium">✓ 已拦截</span>
+          <span className="ml-auto font-medium" style={{ color: mdrDeviceStatusHex("online") }}>✓ 已拦截</span>
         </div>
       )}
 
       {/* Legend */}
       <div className="flex items-center justify-center gap-5 mt-2 text-[9px] text-slate-500 relative z-10">
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" />严重</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" />高危</span>
-        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" />中危</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: mdrSeverityHex("critical") }} />严重</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: mdrSeverityHex("high") }} />高危</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full" style={{ background: mdrSeverityHex("medium") }} />中危</span>
         <span className="flex items-center gap-1">
           <svg width="10" height="10"><polygon points="5,0 8.7,2.5 8.7,7.5 5,10 1.3,7.5 1.3,2.5" fill="#3b82f6" fillOpacity="0.5" stroke="#60a5fa" strokeWidth="0.8" /></svg>
           防护节点

@@ -800,6 +800,15 @@
     flex-direction: column;
   }
 
+  .intelligence-command-center .top-actions,
+  .intelligence-command-center .section-nav,
+  .intelligence-command-center .filter-strip {
+    width: 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
   .intelligence-command-center .brief-hero {
     min-height: 0;
     padding: 28px 24px 24px;
@@ -827,66 +836,6 @@
     margin-top: 46px;
   }
 }
-.intelligence-command-center {
-  --intel-bg: #0a1018;
-  --intel-panel: rgba(26, 34, 46, 0.68);
-  --intel-panel-deep: rgba(19, 26, 37, 0.82);
-  --intel-text: #f2f5f9;
-  --intel-text-2: #c7d0db;
-  --intel-text-3: #95a1b2;
-  --intel-cyan: #8cc7ff;
-  --intel-amber: #ffca80;
-  --intel-rose: #ff9aa7;
-  --intel-green: #8fe0bc;
-  --intel-violet: #b5baf6;
-  --intel-border: rgba(255, 255, 255, 0.08);
-  --intel-border-active: rgba(255, 255, 255, 0.16);
-  --intel-shadow: var(--system-shadow-dark);
-  --intel-shadow-strong: 0 26px 70px rgba(0, 0, 0, 0.28);
-  background:
-    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.08), transparent 18%),
-    linear-gradient(180deg, #0c1118 0%, #080d13 100%);
-}
-
-.intelligence-command-center .topbar {
-  border-color: rgba(255, 255, 255, 0.08);
-  background:
-    linear-gradient(180deg, rgba(22, 28, 38, 0.76), rgba(18, 24, 34, 0.7));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    var(--intel-shadow);
-}
-
-.intelligence-command-center .panel,
-.intelligence-command-center .primary-campaign > .panel,
-.intelligence-command-center .drilldown-panel,
-.intelligence-command-center .decision-item,
-.intelligence-command-center .tiny-card,
-.intelligence-command-center .query-card,
-.intelligence-command-center .playbook-card,
-.intelligence-command-center .relation-item,
-.intelligence-command-center .signal-item,
-.intelligence-command-center .matrix-row,
-.intelligence-command-center .posture-snapshot,
-.intelligence-command-center .kpi-card {
-  background: rgba(24, 31, 42, 0.7);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 18px 50px rgba(0, 0, 0, 0.18);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-}
-
-.intelligence-command-center .brief-hero {
-  background:
-    radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.12), transparent 28%),
-    linear-gradient(180deg, rgba(30, 38, 52, 0.84), rgba(18, 24, 34, 0.88));
-}
-
-.intelligence-command-center .query-card code {
-  background: rgba(10, 15, 23, 0.8);
-}
 
 .reveal-rise {
   animation: reveal-rise 520ms cubic-bezier(0.22, 1, 0.36, 1) both;
@@ -910,7 +859,7 @@
 .intelligence-command-center .filter-pill em {
   font-style: normal;
   font-size: 11px;
-  color: var(--text-3);
+  color: var(--intel-text-3);
 }
 
 .intelligence-command-center .filter-pill.is-active {
@@ -920,7 +869,7 @@
 }
 
 .intelligence-command-center .filter-summary {
-  color: var(--text-3);
+  color: var(--intel-text-3);
   font-size: 12px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -954,7 +903,7 @@
   padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid rgba(124, 167, 220, 0.14);
-  color: var(--text-2);
+  color: var(--intel-text-2);
   font-size: 11px;
 }
 
@@ -976,14 +925,14 @@
 }
 
 .intelligence-command-center .verdict-factor span {
-  color: var(--text-2);
+  color: var(--intel-text-2);
   font-size: 12px;
 }
 
 .intelligence-command-center .verdict-factor strong {
   font-family: "Space Grotesk", sans-serif;
   font-size: 16px;
-  color: var(--cyan);
+  color: var(--intel-cyan);
 }
 
 .intelligence-command-center .decision-meta {
@@ -1001,7 +950,7 @@
   border-radius: 999px;
   border: 1px solid rgba(124, 167, 220, 0.14);
   background: rgba(255, 255, 255, 0.03);
-  color: var(--text-3);
+  color: var(--intel-text-3);
   font-size: 11px;
 }
 
@@ -1021,7 +970,7 @@
   border-radius: 999px;
   border: 1px solid rgba(124, 167, 220, 0.18);
   background: rgba(8, 16, 28, 0.74);
-  color: var(--text-2);
+  color: var(--intel-text-2);
   cursor: pointer;
 }
 
@@ -1035,7 +984,7 @@
 .intelligence-command-center .surface-toggle em {
   font-style: normal;
   font-size: 11px;
-  color: var(--text-3);
+  color: var(--intel-text-3);
 }
 
 .intelligence-command-center .surface-toggle.is-active {
@@ -1083,7 +1032,7 @@
 }
 
 .intelligence-command-center .intel-table th {
-  color: var(--text-3);
+  color: var(--intel-text-3);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   font-weight: 600;
@@ -1102,7 +1051,7 @@
   padding: 6px 10px;
   border-radius: 999px;
   border: 1px solid rgba(88, 225, 255, 0.2);
-  color: var(--cyan);
+  color: var(--intel-cyan);
   font-size: 11px;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1122,7 +1071,7 @@
 }
 
 .intelligence-command-center .coverage-row span {
-  color: var(--text-2);
+  color: var(--intel-text-2);
   font-size: 12px;
 }
 
@@ -1140,7 +1089,7 @@
 }
 
 .intelligence-command-center .coverage-row strong {
-  color: var(--text);
+  color: var(--intel-text);
   font-family: "IBM Plex Mono", monospace;
   font-size: 12px;
 }

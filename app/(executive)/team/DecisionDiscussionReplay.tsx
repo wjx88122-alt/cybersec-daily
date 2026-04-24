@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import { ROLES } from "./data";
+import { teamReplayToneClass } from "./theme";
 import type { DecisionArchiveEntry, RoleId } from "./data";
 
 type ReplaySpeakerId = RoleId | "user";
@@ -24,21 +25,11 @@ type ReplaySpeaker = {
   shortRole: string;
 };
 
-const ROLE_ACCENTS: Record<RoleId, string> = {
-  chief: "from-[#e5ff00]/25 to-[#e5ff00]/5 border-[#e5ff00]/25",
-  market: "from-violet-400/20 to-violet-400/5 border-violet-400/25",
-  intel: "from-cyan-400/20 to-cyan-400/5 border-cyan-400/25",
-  product: "from-blue-400/20 to-blue-400/5 border-blue-400/25",
-  pmo: "from-emerald-400/20 to-emerald-400/5 border-emerald-400/25",
-  field: "from-orange-400/20 to-orange-400/5 border-orange-400/25",
-  studio: "from-pink-400/20 to-pink-400/5 border-pink-400/25",
-};
-
 const USER_SPEAKER: ReplaySpeaker = {
   id: "user",
   name: "你",
   role: "提问者",
-  accent: "from-white/10 to-white/5 border-white/15",
+  accent: "from-slate-100 to-white border-slate-200",
   shortRole: "Question",
 };
 
@@ -151,7 +142,7 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
             name: role.personaName,
             role: role.chineseName,
             avatarSrc: role.avatarSrc,
-            accent: ROLE_ACCENTS[role.id],
+            accent: teamReplayToneClass(role.tone),
             shortRole: role.shortLabel,
           } satisfies ReplaySpeaker,
         ]),
@@ -199,15 +190,15 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
   const progress = turns.length > 1 ? ((visibleCount - 1) / (turns.length - 1)) * 100 : 100;
 
   return (
-    <div className="glass glass-premium rounded-3xl p-6 sm:p-8">
+    <div className="team-card-strong rounded-3xl p-6 sm:p-8">
       <div className="top-shine" />
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-3 py-1 text-xs font-semibold text-[#e5ff00]">
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700">
             DISCUSSION REPLAY
           </span>
-          <span className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#94a3b8]">
+          <span className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-500">
             自动复现：谁先说、谁接着拆、谁最后收口
           </span>
         </div>
@@ -216,7 +207,7 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
           <button
             type="button"
             onClick={() => setIsPlaying((value) => !value)}
-            className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#dbe4ee] transition hover:border-white/20 hover:text-[#f0f6fc]"
+            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:text-slate-950"
           >
             {isPlaying ? "暂停" : "继续"}
           </button>
@@ -226,14 +217,14 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
               setVisibleCount(1);
               setIsPlaying(true);
             }}
-            className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-xs text-[#dbe4ee] transition hover:border-white/20 hover:text-[#f0f6fc]"
+            className="rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs text-slate-600 transition hover:border-slate-300 hover:text-slate-950"
           >
             重播
           </button>
         </div>
       </div>
 
-      <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/[0.05]">
+      <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-200">
         <div
           className="h-full rounded-full bg-[linear-gradient(90deg,rgba(96,165,250,0.95),rgba(229,255,0,0.95),rgba(34,197,94,0.95))] transition-all duration-700"
           style={{ width: `${progress}%` }}
@@ -241,8 +232,8 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
       </div>
 
       <div className="mt-6 grid gap-5 xl:grid-cols-[320px_1fr]">
-        <aside className="panel-deep rounded-3xl p-4 sm:p-5">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+        <aside className="team-deep-surface rounded-3xl p-4 sm:p-5">
+          <p className="team-eyebrow">
             参会角色
           </p>
 
@@ -253,7 +244,7 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
                 <div
                   key={speaker.id}
                   className={`rounded-2xl border bg-gradient-to-br px-3 py-3 transition-all ${speaker.accent} ${
-                    isActive ? "scale-[1.02] shadow-[0_0_30px_rgba(229,255,0,0.12)]" : "opacity-75"
+                    isActive ? "scale-[1.02] shadow-[0_16px_36px_rgba(217,119,6,0.12)]" : "opacity-75"
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -263,24 +254,24 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
                         alt={speaker.name}
                         width={56}
                         height={56}
-                        className="h-14 w-14 rounded-[18px] border border-white/10 object-cover"
+                        className="h-14 w-14 rounded-[18px] border border-slate-200 object-cover"
                       />
                     ) : (
-                      <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-white/10 bg-white/[0.05] text-sm font-semibold text-[#f0f6fc]">
+                      <div className="flex h-14 w-14 items-center justify-center rounded-[18px] border border-slate-200 bg-white text-sm font-semibold text-slate-950">
                         你
                       </div>
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-semibold text-[#f0f6fc]">{speaker.name}</p>
+                        <p className="truncate text-sm font-semibold text-slate-950">{speaker.name}</p>
                         {isActive && (
-                          <span className="rounded-full border border-[#e5ff00]/20 bg-[#e5ff00]/10 px-2 py-0.5 text-[10px] font-semibold text-[#e5ff00]">
+                          <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700">
                             正在发言
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 text-xs text-[#94a3b8]">{speaker.role}</p>
-                      <p className="mt-1 text-[11px] text-[#64748b]">{speaker.shortRole}</p>
+                      <p className="mt-1 text-xs text-slate-600">{speaker.role}</p>
+                      <p className="mt-1 text-[11px] text-slate-500">{speaker.shortRole}</p>
                     </div>
                   </div>
                 </div>
@@ -289,15 +280,15 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
           </div>
         </aside>
 
-        <div className="panel-soft rounded-3xl p-4 sm:p-5">
-          <div className="mb-4 flex items-center justify-between gap-3 border-b border-white/8 pb-4">
+        <div className="team-soft-surface rounded-3xl p-4 sm:p-5">
+          <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-200 pb-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#64748b]">
+              <p className="team-eyebrow">
                 讨论现场
               </p>
-              <p className="mt-1 text-sm text-[#94a3b8]">{entry.archiveNo} · {entry.title}</p>
+              <p className="mt-1 text-sm text-slate-500">{entry.archiveNo} · {entry.title}</p>
             </div>
-            <div className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-[#dbe4ee]">
+            <div className="rounded-full border border-slate-200 bg-white px-3 py-1 text-xs text-slate-600">
               {visibleCount}/{turns.length} 段对话
             </div>
           </div>
@@ -325,18 +316,18 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
                         alt={speaker.name}
                         width={60}
                         height={60}
-                        className="mt-1 h-[3.75rem] w-[3.75rem] shrink-0 rounded-[20px] border border-white/10 object-cover"
+                        className="mt-1 h-[3.75rem] w-[3.75rem] shrink-0 rounded-[20px] border border-slate-200 object-cover"
                       />
                     ) : null
                   )}
 
                   <div className={`max-w-[85%] ${isUser ? "items-end" : "items-start"} flex flex-col`}>
                     <div className={`mb-1 flex flex-wrap items-center gap-2 ${isUser ? "justify-end" : "justify-start"}`}>
-                      <span className="text-sm font-semibold text-[#f0f6fc]">{speaker.name}</span>
-                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#94a3b8]">
+                      <span className="text-sm font-semibold text-slate-950">{speaker.name}</span>
+                      <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
                         {speaker.role}
                       </span>
-                      <span className="rounded-full border border-white/10 bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#64748b]">
+                      <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
                         {turn.label}
                       </span>
                     </div>
@@ -344,11 +335,11 @@ export default function DecisionDiscussionReplay({ entry }: { entry: DecisionArc
                     <div
                       className={`rounded-[22px] border px-4 py-3 text-sm leading-7 shadow-[0_18px_36px_rgba(0,0,0,0.12)] ${
                         isUser
-                          ? "border-blue-400/20 bg-blue-500/10 text-[#f0f6fc]"
-                          : `bg-gradient-to-br ${speaker.accent} text-[#dbe4ee]`
+                          ? "border-blue-200 bg-blue-50 text-slate-900"
+                          : `bg-gradient-to-br ${speaker.accent} text-slate-700`
                       }`}
                     >
-                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748b]">
+                      <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                         {turn.stage}
                       </p>
                       <p>{turn.text}</p>

@@ -37,10 +37,10 @@ export default function CategoryFilter({
         <button
           key={cat}
           onClick={() => onChange(cat)}
-          className={`system-pill px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all duration-200 ${
+          className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all duration-200 ${
             active === cat
               ? CATEGORY_ACTIVE[cat] ?? "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30"
-              : "bg-white/78 text-slate-500 border-slate-200 hover:bg-white hover:text-slate-900 hover:border-slate-300 hover:shadow-[0_8px_20px_rgba(15,23,42,0.05)]"
+              : `system-pill bg-white/78 text-slate-500 border-slate-200 hover:bg-white hover:text-slate-900 hover:border-slate-300 hover:shadow-[0_8px_20px_rgba(15,23,42,0.05)]`
           }`}
         >
           {cat}

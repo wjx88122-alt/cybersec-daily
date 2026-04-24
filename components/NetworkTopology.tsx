@@ -2,16 +2,14 @@
 
 import { useState } from "react";
 import {
-  DEVICE_TYPE_ICONS, DEVICE_TYPE_LABELS, STATUS_COLORS,
+  DEVICE_TYPE_ICONS, DEVICE_TYPE_LABELS,
   type NetworkDevice, type NetworkAlert, type DeviceStatus,
 } from "@/lib/network-mock";
-
-const STATUS_SVG: Record<DeviceStatus, string> = {
-  online: "#22c55e", warning: "#eab308", critical: "#ef4444", offline: "#6b7280",
-};
-const SEV_SVG: Record<string, string> = {
-  critical: "#ef4444", high: "#f97316", medium: "#eab308", low: "#3b82f6",
-};
+import {
+  mdrDeviceStatusDotClass,
+  mdrDeviceStatusHex,
+  mdrSeverityHex,
+} from "@/app/(ops)/mdr/theme";
 
 // Vendor logo mapping based on firmware string
 function getVendorLogo(firmware: string): { url: string; name: string } | null {
@@ -168,7 +166,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
         {/* Device nodes */}
         {nodes.map((n) => {
           const isHov = hovered === n.id;
-          const color = STATUS_SVG[n.device.status];
+          const color = mdrDeviceStatusHex(n.device.status);
           const devAlerts = alertMap[n.id] || [];
           const unacked = devAlerts.filter((a) => !a.acknowledged);
           const worstSev = unacked.find((a) => a.severity === "critical")?.severity
@@ -193,7 +191,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
               {/* Alert glow ring */}
               {hasAlerts && (
                 <rect x={n.x - 27} y={n.y - 21} width={54} height={42} rx={10}
-                  fill="none" stroke={SEV_SVG[worstSev || "medium"]} strokeWidth={2} opacity={0.3}>
+                  fill="none" stroke={mdrSeverityHex((worstSev as "critical" | "high" | "medium" | "low") || "medium")} strokeWidth={2} opacity={0.3}>
                   <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
                 </rect>
               )}
@@ -208,7 +206,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
               {/* Alert badge */}
               {hasAlerts && (
                 <g>
-                  <circle cx={n.x - 18} cy={n.y - 14} r={8} fill={SEV_SVG[worstSev || "medium"]} />
+                  <circle cx={n.x - 18} cy={n.y - 14} r={8} fill={mdrSeverityHex((worstSev as "critical" | "high" | "medium" | "low") || "medium")} />
                   <text x={n.x - 18} y={n.y - 10} textAnchor="middle" fontSize={8} fill="#fff" fontWeight={700}>{unacked.length}</text>
                 </g>
               )}
@@ -244,12 +242,12 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
                   {hasAlerts && (
                     <g>
                       <line x1={n.x - tipW / 2 + 10} y1={n.y - tipH + 28} x2={n.x + tipW / 2 - 10} y2={n.y - tipH + 28} stroke="#334155" strokeWidth={0.5} />
-                      <text x={n.x - tipW / 2 + 12} y={n.y - tipH + 40} fontSize={8} fill={SEV_SVG[worstSev || "medium"]} fontWeight={600}>
+                      <text x={n.x - tipW / 2 + 12} y={n.y - tipH + 40} fontSize={8} fill={mdrSeverityHex((worstSev as "critical" | "high" | "medium" | "low") || "medium")} fontWeight={600}>
                         ⚠ {unacked.length} 条安全事件:
                       </text>
                       {unacked.slice(0, 3).map((a, ai) => (
                         <g key={a.id}>
-                          <circle cx={n.x - tipW / 2 + 16} cy={n.y - tipH + 51 + ai * 14} r={2.5} fill={SEV_SVG[a.severity]} />
+                          <circle cx={n.x - tipW / 2 + 16} cy={n.y - tipH + 51 + ai * 14} r={2.5} fill={mdrSeverityHex(a.severity)} />
                           <text x={n.x - tipW / 2 + 24} y={n.y - tipH + 54 + ai * 14} fontSize={8} fill="#cbd5e1">
                             {a.title.length > 28 ? a.title.slice(0, 28) + "…" : a.title}
                           </text>
@@ -281,7 +279,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
       <div className="flex items-center justify-center gap-4 mt-3 text-[10px] text-[#64748b] flex-wrap">
         {(["online", "warning", "critical", "offline"] as DeviceStatus[]).map((s) => (
           <div key={s} className="flex items-center gap-1">
-            <span className={`w-2 h-2 rounded-full ${STATUS_COLORS[s]}`} />
+            <span className={`w-2 h-2 rounded-full ${mdrDeviceStatusDotClass(s)}`} />
             {{ online: "正常", warning: "警告", critical: "严重", offline: "离线" }[s]}
           </div>
         ))}
@@ -290,7 +288,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
         <span>╌ 区内连接</span>
         <span className="text-[#cbd5e1]">|</span>
         <div className="flex items-center gap-1">
-          <span className="inline-block w-4 h-4 rounded-full bg-red-500 text-[8px] text-white text-center leading-4 font-bold">3</span>
+          <span className="inline-block w-4 h-4 rounded-full text-[8px] text-white text-center leading-4 font-bold" style={{ background: mdrSeverityHex("critical") }}>3</span>
           安全事件数
         </div>
       </div>

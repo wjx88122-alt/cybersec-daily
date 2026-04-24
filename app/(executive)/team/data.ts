@@ -1,3 +1,5 @@
+import type { TeamAccentTone } from "./theme";
+
 export type RoleId =
   | "chief"
   | "market"
@@ -26,7 +28,7 @@ export type Role = {
   boundaries: string[];
   usage: string;
   phase: string;
-  accentClass: string;
+  tone: TeamAccentTone;
   emoji: string;
   thinkingFramework: string;
   workingPattern: string;
@@ -43,7 +45,7 @@ export type WeeklyNode = {
   title: string;
   label: string;
   detail: string;
-  accentClass: string;
+  tone: TeamAccentTone;
 };
 
 export type PhasePlan = {
@@ -139,8 +141,7 @@ export const ROLES: Role[] = [
     usage:
       "任何问题优先先找沈策。由沈策判断是否需要林岚、顾闻、纪衡、程准、陆野或苏墨参与。",
     phase: "Phase 1",
-    accentClass:
-      "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_30px_rgba(229,255,0,0.08)]",
+    tone: "chief",
     emoji: "🎯",
     thinkingFramework: "四维判断框架：吸引力、可赢性、战略匹配度、执行负担",
     workingPattern: "接住问题 → 重写问题 → 判断类型 → 调度角色 → 统一收口",
@@ -179,7 +180,7 @@ export const ROLES: Role[] = [
     usage:
       "当问题是“机会在哪里、值不值得进、需求往哪变”时，沈策优先叫林岚上桌。",
     phase: "Phase 1",
-    accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    tone: "market",
     emoji: "📊",
     thinkingFramework: "机会三问：值不值得看、进得去吗、能复制吗",
     workingPattern: "识别信号 → 判断真伪 → 评估窗口 → 给出优先级",
@@ -218,7 +219,7 @@ export const ROLES: Role[] = [
     usage:
       "当问题是“竞品动了没有、影响多大、要不要跟”时，沈策优先叫顾闻上桌。",
     phase: "Phase 1",
-    accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    tone: "intel",
     emoji: "🔍",
     thinkingFramework: "情报三层：发生了什么、为什么重要、对我方意味着什么",
     workingPattern: "收集证据 → 拆解动作 → 判断意图 → 评估影响",
@@ -257,7 +258,7 @@ export const ROLES: Role[] = [
     usage:
       "只要问题进入“先做 / 后做 / 不做 / 场景切入 / 路线图动作”，沈策会自动补上纪衡。",
     phase: "Phase 1",
-    accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+    tone: "product",
     emoji: "🎨",
     thinkingFramework: "产品三问：做什么、不做什么、先做什么",
     workingPattern: "理解意图 → 定义边界 → 排优先级 → 输出路线图",
@@ -296,7 +297,7 @@ export const ROLES: Role[] = [
     usage:
       "当问题进入试点计划、资源配置、阶段推进或组织协同时，沈策会把程准叫进来。",
     phase: "Phase 2",
-    accentClass: "border-orange-500/30 bg-orange-500/10 text-orange-300",
+    tone: "pmo",
     emoji: "⚡",
     thinkingFramework: "推进四要素：责任人、时间点、依赖项、阻塞点",
     workingPattern: "拆解动作 → 设计里程碑 → 识别依赖 → 追踪偏差",
@@ -335,7 +336,7 @@ export const ROLES: Role[] = [
     usage:
       "当“竞品跟不跟”进入投资决策，或需要验证客户是否真在买时，沈策会补上陆野。",
     phase: "Phase 3",
-    accentClass: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
+    tone: "field",
     emoji: "🎯",
     thinkingFramework: "验证三步：聚类反馈、判断真假、归因问题",
     workingPattern: "收集反馈 → 聚类分析 → 验证需求 → 给出建议",
@@ -374,7 +375,7 @@ export const ROLES: Role[] = [
     usage:
       "当结论需要进入汇报、周报、对外口径或高层表达时，最后再由苏墨接力。",
     phase: "Phase 2",
-    accentClass: "border-fuchsia-500/30 bg-fuchsia-500/10 text-fuchsia-300",
+    tone: "studio",
     emoji: "✍️",
     thinkingFramework: "表达三层：对象是谁、核心信息、表达方式",
     workingPattern: "理解对象 → 提取核心 → 选择形式 → 打磨表达",
@@ -428,29 +429,28 @@ export const WEEKLY_FLOW: WeeklyNode[] = [
     label: "机会记忆",
     detail:
       "每周输出：市场机会、需求迁移、区域变化、增长信号与先做 / 后做 / 不做建议。",
-    accentClass: "border-violet-500/30 bg-violet-500/10 text-violet-300",
+    tone: "market",
   },
   {
     title: "顾闻的情报雷达",
     label: "威胁记忆",
     detail:
       "每周输出：竞品动作、定价变化、渠道/生态变化、政策监管信号与我方应对判断。",
-    accentClass: "border-cyan-500/30 bg-cyan-500/10 text-cyan-300",
+    tone: "intel",
   },
   {
     title: "沈策的桌边纪要",
     label: "统一记忆",
     detail:
       "把林岚 / 顾闻等输入压成管理层一页纸：结论、风险、本周动作、待拍板事项。",
-    accentClass:
-      "border-[#e5ff00]/30 bg-[#e5ff00]/10 text-[#e5ff00] shadow-[0_0_24px_rgba(229,255,0,0.06)]",
+    tone: "chief",
   },
   {
     title: "秘书处成册",
     label: "分发成稿",
     detail:
       "系统会生成 AI 安全周报汇总版，自动转成 PDF，并通过 WhatsApp 推送给家兴。",
-    accentClass: "border-blue-500/30 bg-blue-500/10 text-blue-300",
+    tone: "product",
   },
 ];
 

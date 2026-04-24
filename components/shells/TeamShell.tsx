@@ -1,35 +1,37 @@
 import { ReactNode } from "react";
+import { teamShellGlowClass } from "@/app/(executive)/team/theme";
 import ProductSectionShell from "./ProductSectionShell";
+import type { TeamShellGlowTone } from "@/app/(executive)/team/theme";
 
 export default function TeamShell({
   children,
   className = "",
   contentClassName = "",
-  bottomGlow = "rgba(34,197,94,0.1)",
+  glowTone = "default",
 }: {
   children: ReactNode;
   className?: string;
   contentClassName?: string;
-  bottomGlow?: string;
+  glowTone?: TeamShellGlowTone;
 }) {
   return (
     <ProductSectionShell
       shellClassName="team-shell"
       systemTone="system-shell-light"
-      className={`overflow-hidden ${className}`.trim()}
+      className={`${teamShellGlowClass(glowTone)} overflow-hidden ${className}`.trim()}
     >
       <div className="pointer-events-none absolute inset-0">
         <div
           className="absolute left-[-10%] top-[-8rem] h-72 w-72 rounded-full blur-3xl"
-          style={{ background: "rgba(37,99,235,0.22)" }}
+          style={{ background: "var(--team-shell-glow-left)" }}
         />
         <div
           className="absolute right-[-8%] top-24 h-80 w-80 rounded-full blur-3xl"
-          style={{ background: "rgba(229,255,0,0.12)" }}
+          style={{ background: "var(--team-shell-glow-right)" }}
         />
         <div
           className="absolute bottom-[-8rem] left-1/3 h-72 w-72 rounded-full blur-3xl"
-          style={{ background: bottomGlow }}
+          style={{ background: "var(--team-shell-glow-bottom)" }}
         />
       </div>
 

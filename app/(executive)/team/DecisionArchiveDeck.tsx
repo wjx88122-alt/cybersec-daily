@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ARCHIVE_STATUS_LABELS, ROLE_NAME_MAP } from "./data";
+import { teamBadgeToneClass } from "./theme";
 import type { DecisionArchiveEntry } from "./data";
 
 function DecisionArchiveStackCard({ entry }: { entry: DecisionArchiveEntry }) {
@@ -154,7 +155,7 @@ function DecisionArchiveStackCard({ entry }: { entry: DecisionArchiveEntry }) {
             {entry.relatedMilestones.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-xs text-slate-700"
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${teamBadgeToneClass("product")}`}
               >
                 {item}
               </span>

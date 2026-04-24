@@ -1,6 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ARCHIVE_STATUS_LABELS, ROLE_NAME_MAP } from "./data";
+import {
+  teamBadgeToneClass,
+  teamRoleAura,
+  teamStatToneClass,
+  teamTimelineToneClass,
+  teamTimelineToneLabel,
+} from "./theme";
 import type {
   Role,
   DispatchCard,
@@ -9,6 +16,7 @@ import type {
   DecisionCase,
   DecisionArchiveEntry,
 } from "./data";
+import type { TeamStatTone } from "./theme";
 
 export function SectionTitle({
   eyebrow,
@@ -75,18 +83,18 @@ export function TeamTabs({ active }: { active: "overview" | "evolution" | "decis
 export function StatCard({
   value,
   label,
-  accentClass,
+  tone,
 }: {
   value: string;
   label: string;
-  accentClass: string;
+  tone: TeamStatTone;
 }) {
   return (
     <div className="team-deep-surface rounded-[20px] p-4">
       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
         {label}
       </p>
-      <p className={`mt-3 text-3xl font-semibold tracking-tight ${accentClass}`}>{value}</p>
+      <p className={`mt-3 text-3xl font-semibold tracking-tight ${teamStatToneClass(tone)}`}>{value}</p>
     </div>
   );
 }
@@ -111,19 +119,14 @@ function RoleListBlock({ title, items }: { title: string; items: string[] }) {
 
 export function RoleCard({ role }: { role: Role }) {
   const isChief = role.id === "chief";
+  const roleAura = teamRoleAura(role.tone);
 
   return (
     <article
-      className={`team-card h-full rounded-[30px] p-5 transition-all hover:-translate-y-1 sm:p-6 ${
-        isChief ? "shadow-[0_28px_80px_rgba(234,179,8,0.12)]" : ""
-      }`}
+      className={`team-card h-full rounded-[30px] p-5 transition-all hover:-translate-y-1 sm:p-6 ${roleAura.cardShadow}`}
     >
       <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-28 opacity-90 ${
-          isChief
-            ? "bg-[radial-gradient(circle_at_top,rgba(250,204,21,0.18),transparent_68%)]"
-            : "bg-[radial-gradient(circle_at_top,rgba(96,165,250,0.16),transparent_68%)]"
-        }`}
+        className={`pointer-events-none absolute inset-x-0 top-0 h-28 opacity-90 ${roleAura.spotlight}`}
       />
 
       <div className="relative flex flex-wrap items-start justify-between gap-3">
@@ -133,7 +136,7 @@ export function RoleCard({ role }: { role: Role }) {
               {role.emoji}
             </span>
             <span
-              className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${role.accentClass}`}
+              className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${teamBadgeToneClass(role.tone)}`}
             >
               {role.code}
             </span>
@@ -194,7 +197,7 @@ export function RoleCard({ role }: { role: Role }) {
               {role.personalityTags.map((tag) => (
                 <span
                   key={tag}
-                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${role.accentClass}`}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${teamBadgeToneClass(role.tone)}`}
                 >
                   {tag}
                 </span>
@@ -281,7 +284,7 @@ export function WeeklyNodeCard({ node }: { node: WeeklyNode }) {
   return (
     <div className="team-soft-surface rounded-[22px] p-5">
       <span
-        className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${node.accentClass}`}
+        className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${teamBadgeToneClass(node.tone)}`}
       >
         {node.label}
       </span>
@@ -292,25 +295,13 @@ export function WeeklyNodeCard({ node }: { node: WeeklyNode }) {
 }
 
 export function TimelineCard({ milestone }: { milestone: HistoryMilestone }) {
-  const categoryColors = {
-    evolution: "border-blue-500/30 bg-blue-500/10 text-blue-300",
-    decision: "border-violet-500/30 bg-violet-500/10 text-violet-300",
-    integration: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300",
-  };
-
-  const categoryLabels = {
-    evolution: "架构演进",
-    decision: "关键决策",
-    integration: "系统集成",
-  };
-
   return (
     <article className="team-card rounded-[24px] p-5 transition-all hover:-translate-y-1">
       <div className="flex items-start justify-between gap-3">
         <span
-          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${categoryColors[milestone.category]}`}
+          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${teamTimelineToneClass(milestone.category)}`}
         >
-          {categoryLabels[milestone.category]}
+          {teamTimelineToneLabel(milestone.category)}
         </span>
         <span className="text-xs text-slate-500">{milestone.date}</span>
       </div>
@@ -518,7 +509,7 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
             {entry.relatedMilestones.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-xs text-blue-200"
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${teamBadgeToneClass("product")}`}
               >
                 {item}
               </span>

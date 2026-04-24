@@ -3,8 +3,8 @@
 import { useState } from "react";
 import CategoryFilter from "@/components/CategoryFilter";
 import NewsCard from "@/components/NewsCard";
-import { FeedItem, CUTOFF_MS } from "@/lib/feeds";
-import { matchesFeedSearch } from "@/lib/feed-search";
+import { type FeedItem } from "@/lib/feeds";
+import { buildFeedLandingState } from "@/lib/feed-view-model.js";
 
 type FeedLandingClientProps = {
   items: FeedItem[];
@@ -41,15 +41,8 @@ export default function FeedLandingClient({
 }: FeedLandingClientProps) {
   const [category, setCategory] = useState("全部");
   const [search, setSearch] = useState("");
-  const [cutoff] = useState(() => Date.now() - CUTOFF_MS);
-
-  const filtered = items.filter((item) => {
-    const t = new Date(item.pubDate).getTime();
-    const matchTime = !Number.isNaN(t) && t >= cutoff;
-    const matchCat = category === "全部" || item.category === category;
-    const matchSearch = matchesFeedSearch(item, search);
-    return matchTime && matchCat && matchSearch;
-  });
+  const landingState = buildFeedLandingState(items, { category, search });
+  const { filtered, isFallback, scopeLabel } = landingState;
 
   const [hero, ...rest] = filtered;
   const sourceCount = new Set(filtered.map((item) => item.source)).size;
@@ -116,6 +109,17 @@ export default function FeedLandingClient({
       </section>
 
       <section className="public-panel reveal-rise delay-2 rounded-[30px] p-4 sm:p-5">
+        <div className={`public-state-banner ${isFallback ? "fallback" : "live"}`}>
+          <div>
+            <div className="public-section-label">当前展示范围</div>
+            <p>
+              {isFallback
+                ? "近 24 小时暂无新增，已自动切换为最近可用内容，避免首页出现“空站”感。"
+                : "优先展示过去 24 小时内的最新内容，让首屏先给你可执行的扫描视角。"}
+            </p>
+          </div>
+          <strong>{scopeLabel}</strong>
+        </div>
         <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="relative">
             <svg
@@ -150,8 +154,16 @@ export default function FeedLandingClient({
       </section>
 
       {filtered.length === 0 && (
-        <div className="py-32 text-center">
-          <p className="text-sm text-slate-500">{emptyMessage}</p>
+        <div className="public-empty py-24 text-center">
+          <div className="public-section-label">暂无可展示内容</div>
+          <p className="mt-3 text-base font-medium text-slate-900">
+            {search.trim() || category !== "全部" ? "当前筛选下没有匹配内容" : emptyMessage}
+          </p>
+          <p className="mt-3 text-sm leading-7 text-slate-500">
+            {search.trim() || category !== "全部"
+              ? "可以清空搜索词，或切回“全部”查看最近可用的安全资讯。"
+              : "数据源暂时没有符合条件的内容时，页面会在下次刷新后自动恢复。"}
+          </p>
         </div>
       )}
 
@@ -160,9 +172,17 @@ export default function FeedLandingClient({
           <div className="mb-5 reveal-rise delay-2">
             <div className="public-section-label">{briefLabel}</div>
             <p className="mt-3 text-sm text-slate-600">
-              {briefDescription}{" "}
+              {briefDescription}
+              {" · "}
+              <span className="font-semibold text-slate-950">{scopeLabel}</span>
+              {" · "}
               <span className="font-semibold text-slate-950">{filtered.length}</span> 条资讯。
             </p>
+            {isFallback && (
+              <p className="mt-2 text-[13px] leading-6 text-slate-500">
+                暂无 24 小时内新增内容时，优先保留最近仍值得浏览的条目，避免用户把空状态误判为站点异常。
+              </p>
+            )}
           </div>
 
           {hero && (

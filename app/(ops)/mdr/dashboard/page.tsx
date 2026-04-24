@@ -10,6 +10,16 @@ import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
 } from "@/lib/network-mock";
 import ThreatMap from "@/components/ThreatMap";
+import {
+  mdrConnectionDotClass,
+  mdrDeviceStatusHex,
+  mdrHealthScoreHex,
+  mdrHealthScoreToneClass,
+  mdrSeverityHex,
+  mdrSourceHex,
+  mdrTicketStatusHex,
+} from "../theme";
+import type { AlertSource, Severity } from "@/lib/mdr-mock";
 
 function AnimatedNumber({ value, duration = 1500 }: { value: number; duration?: number }) {
   const [display, setDisplay] = useState(0);
@@ -85,13 +95,15 @@ function BarChart({ data, maxH = 80 }: { data: { label: string; value: number; c
 
 /* ── Scrolling Alert Ticker ── */
 function AlertTicker({ items }: { items: { text: string; severity: string; time: string }[] }) {
-  const sevDot: Record<string, string> = { critical: "#ef4444", high: "#f97316", medium: "#eab308", low: "#3b82f6" };
   return (
     <div className="overflow-hidden h-[180px] relative">
       <div className="animate-scroll space-y-2">
         {[...items, ...items].map((item, i) => (
           <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white">
-            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: sevDot[item.severity] || "#3b82f6" }} />
+            <span
+              className="w-2 h-2 rounded-full shrink-0"
+              style={{ background: mdrSeverityHex((item.severity as Severity) || "low") }}
+            />
             <span className="text-xs text-slate-700 flex-1 truncate">{item.text}</span>
             <span className="text-[10px] text-slate-500 shrink-0" suppressHydrationWarning>{item.time}</span>
           </div>
@@ -124,18 +136,18 @@ export default function DashboardPage() {
     const counts: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
     [...MOCK_ALERTS, ...MOCK_NET_ALERTS].forEach((a) => counts[a.severity]++);
     return [
-      { label: "严重", value: counts.critical, color: "#ef4444" },
-      { label: "高危", value: counts.high, color: "#f97316" },
-      { label: "中危", value: counts.medium, color: "#eab308" },
-      { label: "低危", value: counts.low, color: "#3b82f6" },
+      { label: "严重", value: counts.critical, color: mdrSeverityHex("critical") },
+      { label: "高危", value: counts.high, color: mdrSeverityHex("high") },
+      { label: "中危", value: counts.medium, color: mdrSeverityHex("medium") },
+      { label: "低危", value: counts.low, color: mdrSeverityHex("low") },
     ];
   }, []);
 
   const sourceData = useMemo(() => {
     const counts: Record<string, number> = {};
     MOCK_ALERTS.forEach((a) => { counts[a.source] = (counts[a.source] || 0) + 1; });
-    return Object.entries(counts).map(([k, v], i) => ({
-      label: k, value: v, color: ["#06b6d4", "#8b5cf6", "#f97316", "#22c55e", "#ec4899"][i % 5],
+    return Object.entries(counts).map(([k, v]) => ({
+      label: k, value: v, color: mdrSourceHex(k as AlertSource),
     }));
   }, []);
 
@@ -143,10 +155,10 @@ export default function DashboardPage() {
     const counts: Record<string, number> = { online: 0, warning: 0, critical: 0, offline: 0 };
     MOCK_DEVICES.forEach((d) => counts[d.status]++);
     return [
-      { label: "正常", value: counts.online, color: "#22c55e" },
-      { label: "警告", value: counts.warning, color: "#eab308" },
-      { label: "严重", value: counts.critical, color: "#ef4444" },
-      { label: "离线", value: counts.offline, color: "#6b7280" },
+      { label: "正常", value: counts.online, color: mdrDeviceStatusHex("online") },
+      { label: "警告", value: counts.warning, color: mdrDeviceStatusHex("warning") },
+      { label: "严重", value: counts.critical, color: mdrDeviceStatusHex("critical") },
+      { label: "离线", value: counts.offline, color: mdrDeviceStatusHex("offline") },
     ];
   }, []);
 
@@ -164,7 +176,12 @@ export default function DashboardPage() {
   const analystData = useMemo(() =>
     MOCK_ANALYSTS.map((a) => ({
       label: a.name, value: a.activeTickets,
-      color: a.activeTickets >= a.maxTickets ? "#ef4444" : a.activeTickets >= a.maxTickets * 0.6 ? "#eab308" : "#22c55e",
+      color:
+        a.activeTickets >= a.maxTickets
+          ? mdrSeverityHex("critical")
+          : a.activeTickets >= a.maxTickets * 0.6
+            ? mdrSeverityHex("medium")
+            : mdrDeviceStatusHex("online"),
     })), []);
 
   return (
@@ -189,8 +206,8 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs text-green-400">系统运行中</span>
+            <span className={`w-2 h-2 rounded-full animate-pulse ${mdrConnectionDotClass("success")}`} />
+            <span className="text-xs text-emerald-700">系统运行中</span>
           </div>
           <div className="text-right">
             <div className="text-sm font-mono text-blue-600" suppressHydrationWarning>
@@ -255,10 +272,10 @@ export default function DashboardPage() {
         <div className="mdr-board-card col-span-5 rounded-xl p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
             <div className="text-xs text-slate-600 font-medium">⚡ 实时安全事件</div>
-            <div className="flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-              <span className="text-[10px] text-red-400">LIVE</span>
-            </div>
+          <div className="flex items-center gap-1">
+            <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${mdrConnectionDotClass("error")}`} />
+            <span className="text-[10px] text-red-700">LIVE</span>
+          </div>
           </div>
           <AlertTicker items={tickerItems} />
         </div>
@@ -285,7 +302,7 @@ export default function DashboardPage() {
           <div className="text-xs text-slate-600 font-medium mb-3">🏆 客户安全健康排名</div>
           <div className="space-y-2">
             {clientRanking.map((c, i) => {
-              const scoreColor = c.networkScore >= 90 ? "#22c55e" : c.networkScore >= 75 ? "#eab308" : c.networkScore >= 60 ? "#f97316" : "#ef4444";
+              const scoreColor = mdrHealthScoreHex(c.networkScore);
               return (
                 <div key={c.id} className="flex items-center gap-3 px-3 py-2 rounded-lg border border-slate-200 bg-slate-50">
                   <span className="text-sm font-bold text-slate-500 w-5">{i + 1}</span>
@@ -294,7 +311,7 @@ export default function DashboardPage() {
                     <div className="text-[10px] text-slate-500">{c.industry} · {c.region} · {c.deviceCount} 台设备</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-lg font-bold font-mono" style={{ color: scoreColor }}>{c.networkScore}</div>
+                    <div className={`text-lg font-bold font-mono ${mdrHealthScoreToneClass(c.networkScore)}`}>{c.networkScore}</div>
                     <div className="w-16 h-1 rounded-full bg-slate-200 mt-1">
                       <div className="h-full rounded-full transition-all duration-1000" style={{ width: `${c.networkScore}%`, background: scoreColor }} />
                     </div>
@@ -319,7 +336,7 @@ export default function DashboardPage() {
             ].map((s) => (
               <div key={s.label} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
                 <div className="text-lg mb-0.5">{s.icon}</div>
-                <div className="text-base font-bold text-blue-400 font-mono">{s.value}</div>
+                <div className="text-base font-bold text-blue-700 font-mono">{s.value}</div>
                 <div className="text-[10px] text-slate-700 mt-0.5">{s.label}</div>
                 <div className="text-[9px] text-slate-500">{s.desc}</div>
               </div>
@@ -335,10 +352,10 @@ export default function DashboardPage() {
             <div className="text-xs text-slate-600 font-medium mb-2">📋 工单状态分布</div>
             <div className="flex justify-center gap-3">
               {[
-                { label: "待处理", count: MOCK_TICKETS.filter((t) => t.status === "pending").length, color: "#6b7280" },
-                { label: "调查中", count: MOCK_TICKETS.filter((t) => t.status === "investigating").length, color: "#06b6d4" },
-                { label: "等待反馈", count: MOCK_TICKETS.filter((t) => t.status === "awaiting_feedback").length, color: "#8b5cf6" },
-                { label: "已解决", count: MOCK_TICKETS.filter((t) => t.status === "resolved" || t.status === "closed").length, color: "#22c55e" },
+                { label: "待处理", count: MOCK_TICKETS.filter((t) => t.status === "pending").length, color: mdrTicketStatusHex("pending") },
+                { label: "调查中", count: MOCK_TICKETS.filter((t) => t.status === "investigating").length, color: mdrTicketStatusHex("investigating") },
+                { label: "等待反馈", count: MOCK_TICKETS.filter((t) => t.status === "awaiting_feedback").length, color: mdrTicketStatusHex("awaiting_feedback") },
+                { label: "已解决", count: MOCK_TICKETS.filter((t) => t.status === "resolved" || t.status === "closed").length, color: mdrTicketStatusHex("resolved") },
               ].map((s) => (
                 <div key={s.label} className="text-center">
                   <div className="text-base font-bold font-mono" style={{ color: s.color }}>{s.count}</div>

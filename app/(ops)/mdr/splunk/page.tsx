@@ -2,6 +2,15 @@
 
 import { useState, useCallback } from "react";
 import MdrShell from "@/components/shells/MdrShell";
+import {
+  mdrActionToneClass,
+  mdrConnectionDotClass,
+  mdrConnectionToneClass,
+  mdrSeverityBadgeClass,
+  mdrSeverityHex,
+  mdrSourceHex,
+} from "../theme";
+import type { Severity } from "@/lib/mdr-mock";
 
 /* ── Types ── */
 interface SplunkConfig {
@@ -102,13 +111,6 @@ const MOCK_PREVIEW: PreviewAlert[] = [
 
 type SplunkTab = "connection" | "sources" | "mapping" | "preview";
 
-const sevColor: Record<string, string> = {
-  critical: "bg-red-500/20 text-red-400 border-red-500/30",
-  high: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-  medium: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-  low: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-};
-
 /* ── Input Component ── */
 function Field({ label, children, hint }: { label: string; children: React.ReactNode; hint?: string }) {
   return (
@@ -154,7 +156,7 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
             <div className="flex gap-3">
               {(["token", "basic"] as const).map((t) => (
                 <button key={t} onClick={() => upd("authType", t)}
-                  className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${config.authType === t ? "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30" : "bg-black/[0.03] text-[#64748b] border-black/[0.06] hover:bg-black/[0.04]"}`}>
+                  className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${config.authType === t ? mdrActionToneClass("primary") : mdrActionToneClass("secondary")}`}>
                   {t === "token" ? "Bearer Token" : "用户名/密码"}
                 </button>
               ))}
@@ -191,12 +193,12 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm font-medium text-[#1a1a2e]">🧪 连接测试</div>
           <button onClick={onTest} disabled={testResult.status === "testing"}
-            className="px-4 py-1.5 text-xs font-medium rounded-lg bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/20 hover:bg-[#2563eb]/20 disabled:opacity-50 transition-all">
+            className={`px-4 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 transition-all ${mdrActionToneClass("primary")}`}>
             {testResult.status === "testing" ? "测试中..." : "测试连接"}
           </button>
         </div>
         {testResult.status !== "idle" && (
-          <div className={`rounded-lg p-3 text-xs ${testResult.status === "success" ? "bg-green-500/10 border border-green-500/20" : testResult.status === "error" ? "bg-red-500/10 border border-red-500/20" : "bg-black/[0.03] border border-black/[0.06]"}`}>
+          <div className={`rounded-lg border p-3 text-xs ${mdrConnectionToneClass(testResult.status)}`}>
             {testResult.status === "testing" && (
               <div className="flex items-center gap-2 text-[#64748b]">
                 <div className="w-3 h-3 rounded-full border-2 border-[#2563eb] border-t-transparent animate-spin" />
@@ -205,12 +207,12 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
             )}
             {testResult.status === "success" && (
               <div className="space-y-1">
-                <div className="text-green-400 font-medium">✅ 连接成功</div>
+                <div className="font-medium text-emerald-700">✅ 连接成功</div>
                 <div className="text-[#64748b]">服务器: {testResult.serverName} · 版本: {testResult.version} · 延迟: {testResult.latency}ms</div>
               </div>
             )}
             {testResult.status === "error" && (
-              <div className="text-red-400">❌ {testResult.message}</div>
+              <div className="text-red-700">❌ {testResult.message}</div>
             )}
           </div>
         )}
@@ -260,8 +262,8 @@ function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSourc
               </div>
             </div>
             <button onClick={() => toggle(src.id)}
-              className={`shrink-0 w-10 h-5 rounded-full transition-all relative ${src.enabled ? "bg-[#2563eb]/30" : "bg-black/[0.05]"}`}>
-              <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all ${src.enabled ? "left-5 bg-[#2563eb]" : "left-0.5 bg-[#484f58]"}`} />
+              className={`shrink-0 w-10 h-5 rounded-full transition-all relative ${src.enabled ? "bg-blue-200" : "bg-black/[0.05]"}`}>
+              <div className={`absolute top-0.5 w-4 h-4 rounded-full transition-all ${src.enabled ? "left-5 bg-blue-600" : "left-0.5 bg-[#484f58]"}`} />
             </button>
           </div>
         </div>
@@ -289,8 +291,8 @@ function MappingPanel({ mappings }: { mappings: FieldMapping[] }) {
         </div>
         {mappings.map((m, i) => (
           <div key={i} className="grid grid-cols-3 gap-px bg-black/[0.03] text-xs">
-            <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono text-cyan-400/80">{m.splunkField}</div>
-            <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono text-[#2563eb]/80">{m.mdrField}</div>
+            <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono" style={{ color: `${mdrSourceHex("NDR")}cc` }}>{m.splunkField}</div>
+            <div className="bg-[var(--bg-card)] px-4 py-2.5 font-mono" style={{ color: `${mdrSourceHex("EDR")}cc` }}>{m.mdrField}</div>
             <div className="bg-[var(--bg-card)] px-4 py-2.5 text-[#78859b]">{m.transform}</div>
           </div>
         ))}
@@ -299,16 +301,16 @@ function MappingPanel({ mappings }: { mappings: FieldMapping[] }) {
         <div className="text-xs text-[#64748b] font-medium mb-2">📊 严重等级映射</div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
-            { splunk: "critical / urgent", mdr: "critical", color: "text-red-400" },
-            { splunk: "high", mdr: "high", color: "text-orange-400" },
-            { splunk: "medium / notable", mdr: "medium", color: "text-yellow-400" },
-            { splunk: "low / informational", mdr: "low", color: "text-blue-400" },
+            { splunk: "critical / urgent", mdr: "critical" },
+            { splunk: "high", mdr: "high" },
+            { splunk: "medium / notable", mdr: "medium" },
+            { splunk: "low / informational", mdr: "low" },
           ].map((s) => (
             <div key={s.mdr} className="bg-black/[0.02] rounded-lg p-2.5 text-center">
               <div className="text-[10px] text-[#94a3b8] mb-1">Splunk</div>
               <div className="text-xs font-mono text-[#64748b]">{s.splunk}</div>
               <div className="text-[#94a3b8] my-1">↓</div>
-              <div className={`text-xs font-medium ${s.color}`}>{s.mdr.toUpperCase()}</div>
+              <div className="text-xs font-medium" style={{ color: mdrSeverityHex(s.mdr as Severity) }}>{s.mdr.toUpperCase()}</div>
             </div>
           ))}
         </div>
@@ -326,7 +328,7 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
       <div className="flex items-center justify-between">
         <div className="text-sm font-medium text-[#1a1a2e]">👁 告警拉取预览</div>
         <button onClick={handleSync} disabled={syncing}
-          className="px-3 py-1.5 text-xs font-medium rounded-lg bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 hover:bg-cyan-500/20 disabled:opacity-50 transition-all">
+          className={`px-3 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 transition-all ${mdrActionToneClass("preview")}`}>
           {syncing ? "同步中..." : "🔄 模拟拉取"}
         </button>
       </div>
@@ -342,10 +344,10 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
         {alerts.map((a, i) => (
           <div key={i} className="glass rounded-xl p-4 hover:border-black/[0.12] transition-all">
             <div className="flex items-center gap-2 mb-1.5">
-              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${sevColor[a.severity] || sevColor.low}`}>
+              <span className={`text-[10px] px-2 py-0.5 rounded-full border ${mdrSeverityBadgeClass((a.severity as Severity) || "low")}`}>
                 {a.severity.toUpperCase()}
               </span>
-              <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/[0.04] text-[#64748b]">{a.source}</span>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded border ${mdrActionToneClass("secondary")}`}>{a.source}</span>
               <span className="text-[10px] text-[#94a3b8] ml-auto">{a._time.slice(11, 19)}</span>
             </div>
             <div className="text-sm text-[#1a1a2e] font-medium">{a.description}</div>
@@ -354,8 +356,8 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
               {a.raw}
             </div>
             <div className="flex gap-2 mt-2">
-              <span className="text-[10px] px-2 py-0.5 rounded bg-green-500/10 text-green-400">✓ 字段映射成功</span>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400">→ 可创建 MDR 工单</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded border ${mdrActionToneClass("success")}`}>✓ 字段映射成功</span>
+              <span className={`text-[10px] px-2 py-0.5 rounded border ${mdrActionToneClass("preview")}`}>→ 可创建 MDR 工单</span>
             </div>
           </div>
         ))}
@@ -410,15 +412,15 @@ export default function SplunkPage() {
         <div className="glass rounded-xl p-3 mb-6 flex items-center justify-between">
           <div className="flex items-center gap-4 text-xs">
             <div className="flex items-center gap-1.5">
-              <span className={`w-2 h-2 rounded-full ${testResult.status === "success" ? "bg-green-500 animate-pulse" : "bg-[#484f58]"}`} />
+              <span className={`w-2 h-2 rounded-full ${mdrConnectionDotClass(testResult.status === "success" ? "success" : "idle")} ${testResult.status === "success" ? "animate-pulse" : ""}`} />
               <span className="text-[#64748b]">{testResult.status === "success" ? "已连接" : "未连接"}</span>
             </div>
             <div className="text-[#94a3b8]">数据源: {sources.filter((s) => s.enabled).length}/{sources.length} 启用</div>
             <div className="text-[#94a3b8]">映射规则: {DEFAULT_MAPPINGS.length} 条</div>
           </div>
           <div className="flex gap-2">
-            <button className="px-3 py-1 text-[11px] rounded-lg bg-black/[0.03] text-[#64748b] hover:bg-black/[0.05] transition-all">导出配置</button>
-            <button className="px-3 py-1 text-[11px] rounded-lg bg-[#2563eb]/10 text-[#2563eb] border border-[#2563eb]/20 hover:bg-[#2563eb]/20 transition-all">保存</button>
+            <button className={`px-3 py-1 text-[11px] rounded-lg border transition-all ${mdrActionToneClass("secondary")}`}>导出配置</button>
+            <button className={`px-3 py-1 text-[11px] rounded-lg border transition-all ${mdrActionToneClass("primary")}`}>保存</button>
           </div>
         </div>
 
