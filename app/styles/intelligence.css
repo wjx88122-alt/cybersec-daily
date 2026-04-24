@@ -192,8 +192,8 @@
 }
 
 .intelligence-command-center .topbar-scroll-row {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(15, 23, 42, 0.2) transparent;
+  min-width: 0;
+  overflow: visible;
 }
 
 .intelligence-command-center .intel-icon-label {
@@ -828,13 +828,9 @@
   .intelligence-command-center .section-nav,
   .intelligence-command-center .filter-strip {
     width: 100%;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding-bottom: 4px;
-  }
-
-  .intelligence-command-center .topbar-scroll-row > * {
-    flex: 0 0 auto;
+    flex-wrap: wrap;
+    overflow-x: visible;
+    padding-bottom: 0;
   }
 
   .intelligence-command-center .brief-hero {

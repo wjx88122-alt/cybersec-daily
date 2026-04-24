@@ -87,3 +87,15 @@ test("intelligence center uses the shared light shell and keeps tabs in document
   assert.equal(topbarBlock.includes("position: sticky"), false);
   assert.equal(topbarBlock.includes("top:"), false);
 });
+
+test("intelligence command tabs wrap instead of keeping a horizontal slider", () => {
+  const intelligence = load("app/styles/intelligence.css");
+  const mobileTopbarRows =
+    intelligence.match(
+      /\.intelligence-command-center \.top-actions,[\s\S]*?\.intelligence-command-center \.filter-strip \{[\s\S]*?\n  \}/,
+    )?.[0] ?? "";
+
+  assert.equal(mobileTopbarRows.includes("flex-wrap: wrap"), true);
+  assert.equal(mobileTopbarRows.includes("overflow-x: auto"), false);
+  assert.equal(intelligence.includes(".topbar-scroll-row > *"), false);
+});
