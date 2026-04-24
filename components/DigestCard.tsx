@@ -1,3 +1,4 @@
+import { SystemIcon } from "@/components/ui/SystemIcon";
 import { DigestItem } from "@/lib/digest";
 import { resolveSafeExternalHref } from "@/lib/remote-url";
 
@@ -52,11 +53,13 @@ export default function DigestCard({
         {/* Badges row */}
         <div className="flex items-center gap-2 mb-3">
           <span
-            className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${cfg.badge}`}
+            className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${cfg.badge}`}
           >
+            <SystemIcon className="system-icon" name="alert" size={12} />
             {cfg.label}
           </span>
-          <span className="truncate rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500 max-w-[140px]">
+          <span className="inline-flex max-w-[140px] items-center gap-1.5 truncate rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
+            <SystemIcon className="system-icon shrink-0" name="filter" size={12} />
             {item.category}
           </span>
         </div>
@@ -77,22 +80,15 @@ export default function DigestCard({
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between border-t border-slate-200/80 pt-3">
-          <span className="truncate max-w-[80%] text-[11px] text-slate-500">
+          <span className="inline-flex max-w-[80%] items-center gap-1.5 truncate text-[11px] text-slate-500">
+            <SystemIcon className="system-icon shrink-0" name="globe" size={13} />
             {item.sourceTitle}
           </span>
-          <svg
-            className={`h-3.5 w-3.5 shrink-0 ${cfg.accent} opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100`}
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            strokeWidth={2}
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M7 17L17 7M17 7H7M17 7v10"
-            />
-          </svg>
+          <SystemIcon
+            className={`system-icon shrink-0 ${cfg.accent} opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100`}
+            name="external"
+            size={14}
+          />
         </div>
       </div>
     </a>

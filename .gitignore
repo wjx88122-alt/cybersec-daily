@@ -12,6 +12,9 @@
 
 # testing
 /coverage
+/output/
+/.playwright-cli/
+/.superpowers/
 
 # next.js
 /.next/

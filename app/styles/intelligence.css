@@ -50,12 +50,18 @@
 
 .intelligence-command-center .dashboard {
   display: grid;
+  min-width: 0;
   gap: 0;
   padding: 26px 0 84px;
 }
 
 .intelligence-command-center .section {
+  min-width: 0;
   margin-top: 34px;
+}
+
+.intelligence-command-center .dashboard > * {
+  min-width: 0;
 }
 
 .intelligence-command-center .executive-brief {
@@ -112,6 +118,9 @@
 }
 
 .intelligence-command-center .brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 48px;
   height: 48px;
   border-radius: 16px;
@@ -121,6 +130,7 @@
     linear-gradient(135deg, #13243d, #0d1626);
   box-shadow: 0 0 26px rgba(88, 225, 255, 0.14);
   position: relative;
+  color: var(--intel-cyan);
 }
 
 .intelligence-command-center .brand-mark::after {
@@ -185,6 +195,18 @@
   gap: 8px;
 }
 
+.intelligence-command-center .topbar-scroll-row {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 167, 220, 0.24) transparent;
+}
+
+.intelligence-command-center .intel-icon-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
 .intelligence-command-center .chip,
 .intelligence-command-center .section-link,
 .intelligence-command-center .filter-pill,
@@ -230,6 +252,7 @@
 }
 
 .intelligence-command-center .panel {
+  min-width: 0;
   border-radius: 22px;
   border: 1px solid var(--intel-border);
   background: linear-gradient(180deg, rgba(16, 29, 49, 0.96), rgba(10, 19, 33, 0.98));
@@ -242,6 +265,13 @@
   grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.9fr);
   gap: 18px;
   align-items: stretch;
+}
+
+.intelligence-command-center .briefing-row > *,
+.intelligence-command-center .campaign-briefing > *,
+.intelligence-command-center .drilldown-stack > *,
+.intelligence-command-center .why-this-matters > * {
+  min-width: 0;
 }
 
 .intelligence-command-center .brief-hero {
@@ -275,10 +305,12 @@
 
 .intelligence-command-center .brief-hero h2 {
   margin: 18px 0 16px;
-  max-width: 11ch;
-  font-size: clamp(48px, 5vw, 74px);
-  line-height: 0.94;
-  letter-spacing: -0.05em;
+  max-width: 16ch;
+  font-size: clamp(42px, 4.4vw, 64px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .intelligence-command-center .brief-hero p {
@@ -668,7 +700,7 @@
 .intelligence-command-center .graph-canvas {
   position: relative;
   min-height: 520px;
-  overflow: hidden;
+  overflow: auto;
   border-radius: 24px;
   border: 1px solid rgba(124, 167, 220, 0.14);
   background:
@@ -809,17 +841,25 @@
     padding-bottom: 4px;
   }
 
+  .intelligence-command-center .topbar-scroll-row > * {
+    flex: 0 0 auto;
+  }
+
   .intelligence-command-center .brief-hero {
     min-height: 0;
     padding: 28px 24px 24px;
   }
 
   .intelligence-command-center .brief-hero h2 {
-    font-size: clamp(36px, 12vw, 52px);
+    max-width: 100%;
+    font-size: 34px;
+    line-height: 1.08;
+    word-break: break-all;
   }
 
   .intelligence-command-center .graph-canvas {
     min-height: 680px;
+    overflow-x: auto;
   }
 
   .intelligence-command-center .decision-panel,

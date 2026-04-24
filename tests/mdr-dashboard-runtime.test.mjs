@@ -50,6 +50,26 @@ test("mdr operational timestamps suppress hydration warnings", () => {
   assert.equal(mdr.includes("suppressHydrationWarning"), true);
 });
 
+test("mdr dashboard alert ticker renders dynamic rows after hydration", () => {
+  const dashboard = readFileSync(
+    join(root, "app/(ops)/mdr/dashboard/page.tsx"),
+    "utf8",
+  );
+
+  assert.equal(dashboard.includes("const [tickerReady, setTickerReady] = useState(false);"), true);
+  assert.equal(dashboard.includes("setTickerReady(true);"), true);
+  assert.equal(dashboard.includes("tickerReady ? [...items, ...items] : []"), true);
+});
+
+test("mdr command deck isolates live SLA text from server hydration", () => {
+  const mdr = readFileSync(
+    join(root, "app/(ops)/mdr/page.tsx"),
+    "utf8",
+  );
+
+  assert.equal(mdr.includes("SLA 剩余 <span suppressHydrationWarning>"), true);
+});
+
 test("threat map does not seed random arcs during server render", () => {
   const source = readFileSync(join(root, "components/ThreatMap.tsx"), "utf8");
 

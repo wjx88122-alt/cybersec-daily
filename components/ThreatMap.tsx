@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { SystemIcon } from "@/components/ui/SystemIcon";
 import { getArcLiftFactor } from "@/lib/threat-map";
 import { mdrDeviceStatusHex, mdrSeverityHex } from "@/app/(ops)/mdr/theme";
 
@@ -149,13 +150,6 @@ export default function ThreatMap() {
   }, [rotation]);
 
   useEffect(() => {
-    const initialArcs = createInitialArcs(INITIAL_ARC_COUNT);
-    setArcs(initialArcs);
-    setStats({
-      blocked: blockedRef.current,
-      active: initialArcs.length,
-    });
-
     const animate = () => {
       setArcs((prev) => {
         let newArcs = prev.map((a) => ({ ...a, progress: a.progress + a.speed }));
@@ -173,8 +167,21 @@ export default function ThreatMap() {
       setRotation((r) => (r + 0.08) % 360);
       frameRef.current = requestAnimationFrame(animate);
     };
-    frameRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(frameRef.current);
+
+    const startFrame = requestAnimationFrame(() => {
+      const initialArcs = createInitialArcs(INITIAL_ARC_COUNT);
+      setArcs(initialArcs);
+      setStats({
+        blocked: blockedRef.current,
+        active: initialArcs.length,
+      });
+      frameRef.current = requestAnimationFrame(animate);
+    });
+
+    return () => {
+      cancelAnimationFrame(startFrame);
+      cancelAnimationFrame(frameRef.current);
+    };
   }, []);
 
   // Project land polygons
@@ -230,7 +237,10 @@ export default function ThreatMap() {
       {/* Header */}
       <div className="flex items-center justify-between mb-2 relative z-10">
         <div className="flex items-center gap-3">
-          <span className="text-sm text-slate-800 font-bold tracking-wide">🌍 全球威胁态势感知</span>
+          <span className="flex items-center gap-2 text-sm font-bold tracking-wide text-slate-800">
+            <SystemIcon className="system-icon" name="globe" size={15} />
+            全球威胁态势感知
+          </span>
           <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 border border-red-500/20">
             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: mdrSeverityHex("critical") }} />
             <span className="text-[10px] font-medium text-red-700">LIVE</span>
@@ -362,7 +372,10 @@ export default function ThreatMap() {
           <span className="px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ background: `${mdrSeverityHex(latestAttack.severity)}15`, color: mdrSeverityHex(latestAttack.severity) }}>
             {latestAttack.type}
           </span>
-          <span className="ml-auto font-medium" style={{ color: mdrDeviceStatusHex("online") }}>✓ 已拦截</span>
+          <span className="ml-auto inline-flex items-center gap-1 font-medium" style={{ color: mdrDeviceStatusHex("online") }}>
+            <SystemIcon className="system-icon" name="check" size={12} />
+            已拦截
+          </span>
         </div>
       )}
 

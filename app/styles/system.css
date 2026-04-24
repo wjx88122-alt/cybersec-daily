@@ -282,3 +282,51 @@
 .mdr-board-card:hover {
   border-color: var(--system-separator-strong);
 }
+
+.system-focus-ring:focus-visible,
+.system-control:focus-visible,
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.78);
+  outline-offset: 3px;
+}
+
+.system-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.system-icon-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 12px;
+  border: 1px solid var(--system-separator);
+  background: rgba(255, 255, 255, 0.78);
+  color: #2563eb;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.system-control {
+  min-height: 2.5rem;
+  border-radius: 12px;
+}
+
+.system-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.system-section-heading .system-icon-badge {
+  width: 2rem;
+  height: 2rem;
+  min-width: 2rem;
+}

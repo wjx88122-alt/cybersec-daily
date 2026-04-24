@@ -3,6 +3,7 @@
 import { useState } from "react";
 import CategoryFilter from "@/components/CategoryFilter";
 import NewsCard from "@/components/NewsCard";
+import { SystemIcon } from "@/components/ui/SystemIcon";
 import { type FeedItem } from "@/lib/feeds";
 import { buildFeedLandingState } from "@/lib/feed-view-model.js";
 
@@ -55,6 +56,11 @@ export default function FeedLandingClient({
         minute: "2-digit",
       })
     : "";
+  const overviewStats = [
+    { label: "资讯数量", value: String(filtered.length), icon: "list" as const },
+    { label: "信息来源", value: String(sourceCount), icon: "globe" as const },
+    { label: "分类覆盖", value: String(categoryCount), icon: "filter" as const },
+  ];
 
   return (
     <main className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">
@@ -78,17 +84,18 @@ export default function FeedLandingClient({
         <div className="public-panel-strong reveal-rise delay-1 rounded-[32px] p-6 sm:p-7">
           <div className="public-section-label">{overviewTitle}</div>
           <div className="mt-4 grid gap-4 sm:grid-cols-3">
-            {[
-              { label: "资讯数量", value: String(filtered.length) },
-              { label: "信息来源", value: String(sourceCount) },
-              { label: "分类覆盖", value: String(categoryCount) },
-            ].map((stat) => (
+            {overviewStats.map((stat) => (
               <div
                 key={stat.label}
                 className="rounded-2xl border border-slate-200 bg-white/80 p-4"
               >
-                <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                  {stat.label}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    {stat.label}
+                  </div>
+                  <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-600">
+                    <SystemIcon className="system-icon" name={stat.icon} size={15} />
+                  </span>
                 </div>
                 <div className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950">
                   {stat.value}
@@ -97,12 +104,16 @@ export default function FeedLandingClient({
             ))}
           </div>
           <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/90 p-4">
-            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              <SystemIcon className="system-icon text-slate-500" name="workflow" size={14} />
               浏览方式
             </div>
             <p className="mt-2 text-sm leading-7 text-slate-600">{browseHint}</p>
             {latestStamp && (
-              <p className="mt-3 text-[12px] text-slate-500">最近一条更新于 {latestStamp}</p>
+              <p className="mt-3 inline-flex items-center gap-1.5 text-[12px] text-slate-500">
+                <SystemIcon className="system-icon" name="clock" size={13} />
+                最近一条更新于 {latestStamp}
+              </p>
             )}
           </div>
         </div>
@@ -110,31 +121,32 @@ export default function FeedLandingClient({
 
       <section className="public-panel reveal-rise delay-2 rounded-[30px] p-4 sm:p-5">
         <div className={`public-state-banner ${isFallback ? "fallback" : "live"}`}>
-          <div>
+          <div className="flex items-start gap-3">
+            <span className="system-icon-badge mt-1 h-9 min-w-9 w-9">
+              <SystemIcon
+                className="system-icon"
+                name={isFallback ? "refresh" : "activity"}
+                size={16}
+              />
+            </span>
+            <div>
             <div className="public-section-label">当前展示范围</div>
             <p>
               {isFallback
                 ? "近 24 小时暂无新增，已自动切换为最近可用内容，避免首页出现“空站”感。"
                 : "优先展示过去 24 小时内的最新内容，让首屏先给你可执行的扫描视角。"}
             </p>
+            </div>
           </div>
           <strong>{scopeLabel}</strong>
         </div>
         <div className="grid gap-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div className="relative">
-            <svg
-              className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <SystemIcon
+              className="system-icon absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+              name="search"
+              size={16}
+            />
             <input
               type="text"
               placeholder={searchPlaceholder}
@@ -155,6 +167,9 @@ export default function FeedLandingClient({
 
       {filtered.length === 0 && (
         <div className="public-empty py-24 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl border border-slate-200 bg-white text-slate-600 shadow-[0_16px_36px_rgba(15,23,42,0.06)]">
+            <SystemIcon className="system-icon" name="search" size={20} />
+          </div>
           <div className="public-section-label">暂无可展示内容</div>
           <p className="mt-3 text-base font-medium text-slate-900">
             {search.trim() || category !== "全部" ? "当前筛选下没有匹配内容" : emptyMessage}
@@ -193,10 +208,16 @@ export default function FeedLandingClient({
 
           <div className="mb-5 flex items-end justify-between gap-4">
             <div>
-              <div className="public-section-label">{listLabel}</div>
+              <div className="public-section-label inline-flex items-center gap-2">
+                <SystemIcon className="system-icon" name="list" size={14} />
+                {listLabel}
+              </div>
               <p className="mt-2 text-sm text-slate-600">{listDescription}</p>
             </div>
-            <div className="hidden text-[12px] text-slate-500 md:block">按时间倒序排列</div>
+            <div className="hidden items-center gap-1.5 text-[12px] text-slate-500 md:flex">
+              <SystemIcon className="system-icon" name="clock" size={13} />
+              按时间倒序排列
+            </div>
           </div>
 
           <div className="grid items-start gap-5 sm:grid-cols-2 lg:grid-cols-3">

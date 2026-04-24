@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 import MdrShell from "@/components/shells/MdrShell";
 import { formatShanghaiDateTime } from "@/lib/threat-map";
 import {
@@ -95,10 +96,21 @@ function BarChart({ data, maxH = 80 }: { data: { label: string; value: number; c
 
 /* ── Scrolling Alert Ticker ── */
 function AlertTicker({ items }: { items: { text: string; severity: string; time: string }[] }) {
+  const [tickerReady, setTickerReady] = useState(false);
+  const tickerItems = tickerReady ? [...items, ...items] : [];
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      setTickerReady(true);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, []);
+
   return (
     <div className="overflow-hidden h-[180px] relative">
       <div className="animate-scroll space-y-2">
-        {[...items, ...items].map((item, i) => (
+        {tickerItems.map((item, i) => (
           <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white">
             <span
               className="w-2 h-2 rounded-full shrink-0"
@@ -108,6 +120,11 @@ function AlertTicker({ items }: { items: { text: string; severity: string; time:
             <span className="text-[10px] text-slate-500 shrink-0" suppressHydrationWarning>{item.time}</span>
           </div>
         ))}
+        {!tickerReady && (
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed border-slate-200 bg-white/70 text-xs text-slate-500">
+            实时安全事件同步中...
+          </div>
+        )}
       </div>
     </div>
   );
@@ -119,9 +136,14 @@ function AlertTicker({ items }: { items: { text: string; severity: string; time:
 export default function DashboardPage() {
   const [clock, setClock] = useState("");
   useEffect(() => {
-    setClock(formatShanghaiDateTime());
-    const iv = setInterval(() => setClock(formatShanghaiDateTime()), 1000);
-    return () => clearInterval(iv);
+    const updateClock = () => setClock(formatShanghaiDateTime());
+    const frame = requestAnimationFrame(updateClock);
+    const iv = setInterval(updateClock, 1000);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      clearInterval(iv);
+    };
   }, []);
 
   const totalClients = MOCK_CLIENTS.length;
@@ -223,17 +245,19 @@ export default function DashboardPage() {
         {/* KPI Cards */}
         <div className="col-span-12 grid grid-cols-6 gap-3">
           {[
-            { icon: "🏢", label: "托管客户", value: totalClients, unit: "家", color: "from-blue-600 to-blue-400" },
-            { icon: "🖥️", label: "在线设备", value: onlineDevices, unit: `/${totalDevices}`, color: "from-green-600 to-green-400" },
-            { icon: "🔔", label: "安全告警", value: totalAlerts, unit: "条", color: "from-orange-600 to-orange-400" },
-            { icon: "🔴", label: "严重威胁", value: criticalAlerts, unit: "条", color: "from-red-600 to-red-400" },
-            { icon: "📋", label: "处置工单", value: totalTickets, unit: "条", color: "from-purple-600 to-purple-400" },
-            { icon: "✅", label: "已解决", value: resolvedTickets, unit: "条", color: "from-emerald-600 to-emerald-400" },
+            { icon: "briefcase", label: "托管客户", value: totalClients, unit: "家", color: "from-blue-600 to-blue-400" },
+            { icon: "server", label: "在线设备", value: onlineDevices, unit: `/${totalDevices}`, color: "from-green-600 to-green-400" },
+            { icon: "alert", label: "安全告警", value: totalAlerts, unit: "条", color: "from-orange-600 to-orange-400" },
+            { icon: "target", label: "严重威胁", value: criticalAlerts, unit: "条", color: "from-red-600 to-red-400" },
+            { icon: "case", label: "处置工单", value: totalTickets, unit: "条", color: "from-purple-600 to-purple-400" },
+            { icon: "check", label: "已解决", value: resolvedTickets, unit: "条", color: "from-emerald-600 to-emerald-400" },
           ].map((kpi) => (
             <div key={kpi.label} className="mdr-board-card relative rounded-xl p-4 overflow-hidden">
               <div className={`absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r ${kpi.color}`} />
               <div className="flex items-center justify-between">
-                <span className="text-xl">{kpi.icon}</span>
+                <span className="system-icon-badge h-9 min-w-9 w-9">
+                  <SystemIcon className="system-icon" name={kpi.icon as SystemIconName} size={17} />
+                </span>
                 <div className="text-right">
                   <div className="text-2xl font-bold font-mono text-slate-950">
                     <AnimatedNumber value={kpi.value} />
@@ -253,7 +277,10 @@ export default function DashboardPage() {
 
         {/* Threat Distribution */}
         <div className="mdr-board-card col-span-3 rounded-xl p-4 relative scan-line">
-          <div className="text-xs text-slate-600 font-medium mb-3">🎯 威胁等级分布</div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
+            <SystemIcon className="system-icon" name="target" size={14} />
+            威胁等级分布
+          </div>
           <div className="flex items-center justify-center">
             <RingChart data={sevData} size={140} />
           </div>
@@ -271,7 +298,10 @@ export default function DashboardPage() {
         {/* Real-time Alert Feed */}
         <div className="mdr-board-card col-span-5 rounded-xl p-4 overflow-hidden">
           <div className="flex items-center justify-between mb-3">
-            <div className="text-xs text-slate-600 font-medium">⚡ 实时安全事件</div>
+            <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+              <SystemIcon className="system-icon" name="activity" size={14} />
+              实时安全事件
+            </div>
           <div className="flex items-center gap-1">
             <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${mdrConnectionDotClass("error")}`} />
             <span className="text-[10px] text-red-700">LIVE</span>
@@ -282,10 +312,16 @@ export default function DashboardPage() {
 
         {/* Alert Source + Device Status */}
         <div className="mdr-board-card col-span-4 rounded-xl p-4">
-          <div className="text-xs text-slate-600 font-medium mb-3">📡 告警来源分布</div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
+            <SystemIcon className="system-icon" name="radar" size={14} />
+            告警来源分布
+          </div>
           <BarChart data={sourceData} maxH={70} />
           <div className="mt-3 border-t border-slate-200 pt-3">
-            <div className="text-xs text-slate-600 font-medium mb-2">🖥️ 设备状态</div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-600">
+              <SystemIcon className="system-icon" name="server" size={14} />
+              设备状态
+            </div>
             <div className="flex justify-center gap-4">
               {deviceStatusData.map((d) => (
                 <div key={d.label} className="text-center">
@@ -299,7 +335,10 @@ export default function DashboardPage() {
 
         {/* Client Health Ranking */}
         <div className="mdr-board-card col-span-4 rounded-xl p-4">
-          <div className="text-xs text-slate-600 font-medium mb-3">🏆 客户安全健康排名</div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
+            <SystemIcon className="system-icon" name="chart" size={14} />
+            客户安全健康排名
+          </div>
           <div className="space-y-2">
             {clientRanking.map((c, i) => {
               const scoreColor = mdrHealthScoreHex(c.networkScore);
@@ -324,18 +363,23 @@ export default function DashboardPage() {
 
         {/* Protection Stats */}
         <div className="mdr-board-card glow-blue col-span-4 rounded-xl p-4">
-          <div className="text-xs text-slate-600 font-medium mb-3">🛡️ 安全防护能力</div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
+            <SystemIcon className="system-icon" name="shield" size={14} />
+            安全防护能力
+          </div>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: "威胁检出率", value: "99.7%", icon: "🎯", desc: "AI + 规则双引擎" },
-              { label: "平均响应时间", value: "< 8min", icon: "⚡", desc: "7×24 SOC 值守" },
-              { label: "工单解决率", value: `${Math.round((resolvedTickets / Math.max(totalTickets, 1)) * 100)}%`, icon: "✅", desc: "闭环处置" },
-              { label: "SLA 达标率", value: "98.5%", icon: "📊", desc: "严格时效管控" },
-              { label: "覆盖攻击面", value: "5 维", icon: "🔍", desc: "EDR/NDR/SIEM/Cloud/ID" },
-              { label: "MITRE 覆盖", value: "87%", icon: "⚔️", desc: "ATT&CK 战术覆盖" },
+              { label: "威胁检出率", value: "99.7%", icon: "target", desc: "AI + 规则双引擎" },
+              { label: "平均响应时间", value: "< 8min", icon: "clock", desc: "7×24 SOC 值守" },
+              { label: "工单解决率", value: `${Math.round((resolvedTickets / Math.max(totalTickets, 1)) * 100)}%`, icon: "check", desc: "闭环处置" },
+              { label: "SLA 达标率", value: "98.5%", icon: "chart", desc: "严格时效管控" },
+              { label: "覆盖攻击面", value: "5 维", icon: "search", desc: "EDR/NDR/SIEM/Cloud/ID" },
+              { label: "MITRE 覆盖", value: "87%", icon: "workflow", desc: "ATT&CK 战术覆盖" },
             ].map((s) => (
               <div key={s.label} className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-center">
-                <div className="text-lg mb-0.5">{s.icon}</div>
+                <div className="mx-auto mb-1 flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-blue-700">
+                  <SystemIcon className="system-icon" name={s.icon as SystemIconName} size={14} />
+                </div>
                 <div className="text-base font-bold text-blue-700 font-mono">{s.value}</div>
                 <div className="text-[10px] text-slate-700 mt-0.5">{s.label}</div>
                 <div className="text-[9px] text-slate-500">{s.desc}</div>
@@ -346,10 +390,16 @@ export default function DashboardPage() {
 
         {/* Analyst Workload */}
         <div className="mdr-board-card col-span-4 rounded-xl p-4">
-          <div className="text-xs text-slate-600 font-medium mb-3">👥 分析师工作负载</div>
+          <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
+            <SystemIcon className="system-icon" name="users" size={14} />
+            分析师工作负载
+          </div>
           <BarChart data={analystData} maxH={60} />
           <div className="mt-3 border-t border-slate-200 pt-3">
-            <div className="text-xs text-slate-600 font-medium mb-2">📋 工单状态分布</div>
+            <div className="mb-2 flex items-center gap-2 text-xs font-medium text-slate-600">
+              <SystemIcon className="system-icon" name="case" size={14} />
+              工单状态分布
+            </div>
             <div className="flex justify-center gap-3">
               {[
                 { label: "待处理", count: MOCK_TICKETS.filter((t) => t.status === "pending").length, color: mdrTicketStatusHex("pending") },

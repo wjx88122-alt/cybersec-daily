@@ -37,11 +37,12 @@
 }
 
 .public-display {
-  font-size: clamp(2.45rem, 5.2vw, 5.2rem);
-  line-height: 0.98;
-  letter-spacing: -0.06em;
+  font-size: clamp(2.3rem, 4.4vw, 4.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   font-weight: 640;
   color: var(--system-text);
+  overflow-wrap: anywhere;
 }
 
 .public-lead {
@@ -134,6 +135,8 @@
 .public-empty {
   max-width: 34rem;
   margin: 0 auto;
+  border-radius: 1.5rem;
+  color: var(--system-text);
 }
 
 @media (max-width: 640px) {

@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import MdrShell from "@/components/shells/MdrShell";
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 import {
   mdrActionToneClass,
   mdrConnectionDotClass,
@@ -133,7 +134,10 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
   return (
     <div className="space-y-6">
       <div className="glass rounded-xl p-5">
-        <div className="text-sm font-medium text-[#1a1a2e] mb-4">🔌 Splunk 连接配置</div>
+        <div className="mb-4 flex items-center gap-2 text-sm font-medium text-[#1a1a2e]">
+          <SystemIcon className="system-icon" name="plug" size={15} />
+          Splunk 连接配置
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Splunk 地址" hint="Splunk Enterprise/Cloud 管理地址">
             <input className={inputCls} placeholder="splunk.example.com" value={config.host} onChange={(e) => upd("host", e.target.value)} />
@@ -191,9 +195,13 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
       {/* Test Connection */}
       <div className="glass rounded-xl p-5">
         <div className="flex items-center justify-between mb-3">
-          <div className="text-sm font-medium text-[#1a1a2e]">🧪 连接测试</div>
+          <div className="flex items-center gap-2 text-sm font-medium text-[#1a1a2e]">
+            <SystemIcon className="system-icon" name="activity" size={15} />
+            连接测试
+          </div>
           <button onClick={onTest} disabled={testResult.status === "testing"}
-            className={`px-4 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 transition-all ${mdrActionToneClass("primary")}`}>
+            className={`inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 transition-all ${mdrActionToneClass("primary")}`}>
+            <SystemIcon className="system-icon" name="refresh" size={13} />
             {testResult.status === "testing" ? "测试中..." : "测试连接"}
           </button>
         </div>
@@ -207,12 +215,18 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
             )}
             {testResult.status === "success" && (
               <div className="space-y-1">
-                <div className="font-medium text-emerald-700">✅ 连接成功</div>
+                <div className="flex items-center gap-1.5 font-medium text-emerald-700">
+                  <SystemIcon className="system-icon" name="check" size={13} />
+                  连接成功
+                </div>
                 <div className="text-[#64748b]">服务器: {testResult.serverName} · 版本: {testResult.version} · 延迟: {testResult.latency}ms</div>
               </div>
             )}
             {testResult.status === "error" && (
-              <div className="text-red-700">❌ {testResult.message}</div>
+              <div className="flex items-center gap-1.5 text-red-700">
+                <SystemIcon className="system-icon" name="alert" size={13} />
+                {testResult.message}
+              </div>
             )}
           </div>
         )}
@@ -234,12 +248,15 @@ function ConnectionPanel({ config, setConfig, testResult, onTest }: {
 /* ── Sources Panel ── */
 function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSources: (s: DataSource[]) => void }) {
   const typeLabels: Record<string, string> = { index: "索引查询", saved_search: "Saved Search", notable: "Notable Events", alert: "Fired Alerts" };
-  const typeIcons: Record<string, string> = { index: "🗄️", saved_search: "🔖", notable: "⚡", alert: "🔔" };
+  const typeIcons: Record<string, SystemIconName> = { index: "database", saved_search: "file", notable: "activity", alert: "alert" };
   const toggle = (id: string) => setSources(sources.map((s) => s.id === id ? { ...s, enabled: !s.enabled } : s));
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-[#1a1a2e]">📡 数据源配置</div>
+        <div className="flex items-center gap-2 text-sm font-medium text-[#1a1a2e]">
+          <SystemIcon className="system-icon" name="radar" size={15} />
+          数据源配置
+        </div>
         <div className="text-[10px] text-[#94a3b8]">配置 Splunk 告警拉取方式</div>
       </div>
       {sources.map((src) => (
@@ -247,7 +264,7 @@ function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSourc
           <div className="flex items-start justify-between gap-3">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
-                <span>{typeIcons[src.type]}</span>
+                <SystemIcon className="system-icon text-[#64748b]" name={typeIcons[src.type]} size={14} />
                 <span className="text-sm font-medium text-[#1a1a2e]">{src.name}</span>
                 <span className="text-[10px] px-1.5 py-0.5 rounded bg-black/[0.04] text-[#64748b]">{typeLabels[src.type]}</span>
               </div>
@@ -255,7 +272,10 @@ function SourcesPanel({ sources, setSources }: { sources: DataSource[]; setSourc
                 {src.query}
               </div>
               <div className="flex gap-4 mt-2 text-[10px] text-[#94a3b8]">
-                <span>⏱ 每 {src.interval}s 拉取</span>
+                <span className="inline-flex items-center gap-1">
+                  <SystemIcon className="system-icon" name="clock" size={12} />
+                  每 {src.interval}s 拉取
+                </span>
                 <span>severity: {src.severity_field}</span>
                 <span>host: {src.host_field}</span>
                 <span>desc: {src.description_field}</span>
@@ -280,7 +300,10 @@ function MappingPanel({ mappings }: { mappings: FieldMapping[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-[#1a1a2e]">🔀 字段映射规则</div>
+        <div className="flex items-center gap-2 text-sm font-medium text-[#1a1a2e]">
+          <SystemIcon className="system-icon" name="workflow" size={15} />
+          字段映射规则
+        </div>
         <div className="text-[10px] text-[#94a3b8]">Splunk 字段 → MDR 工单字段</div>
       </div>
       <div className="glass rounded-xl overflow-hidden">
@@ -298,7 +321,10 @@ function MappingPanel({ mappings }: { mappings: FieldMapping[] }) {
         ))}
       </div>
       <div className="glass rounded-xl p-4">
-        <div className="text-xs text-[#64748b] font-medium mb-2">📊 严重等级映射</div>
+        <div className="mb-2 flex items-center gap-2 text-xs font-medium text-[#64748b]">
+          <SystemIcon className="system-icon" name="chart" size={14} />
+          严重等级映射
+        </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
           {[
             { splunk: "critical / urgent", mdr: "critical" },
@@ -326,10 +352,14 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-sm font-medium text-[#1a1a2e]">👁 告警拉取预览</div>
+        <div className="flex items-center gap-2 text-sm font-medium text-[#1a1a2e]">
+          <SystemIcon className="system-icon" name="eye" size={15} />
+          告警拉取预览
+        </div>
         <button onClick={handleSync} disabled={syncing}
-          className={`px-3 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 transition-all ${mdrActionToneClass("preview")}`}>
-          {syncing ? "同步中..." : "🔄 模拟拉取"}
+          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 transition-all ${mdrActionToneClass("preview")}`}>
+          <SystemIcon className="system-icon" name="refresh" size={13} />
+          {syncing ? "同步中..." : "模拟拉取"}
         </button>
       </div>
       {syncing && (
@@ -351,7 +381,10 @@ function PreviewPanel({ alerts }: { alerts: PreviewAlert[] }) {
               <span className="text-[10px] text-[#94a3b8] ml-auto">{a._time.slice(11, 19)}</span>
             </div>
             <div className="text-sm text-[#1a1a2e] font-medium">{a.description}</div>
-            <div className="text-xs text-[#94a3b8] mt-0.5">🖥 {a.host}</div>
+            <div className="mt-0.5 flex items-center gap-1.5 text-xs text-[#94a3b8]">
+              <SystemIcon className="system-icon" name="server" size={13} />
+              {a.host}
+            </div>
             <div className="font-mono text-[10px] text-[#78859b] bg-black/[0.02] rounded-lg p-2 mt-2 overflow-x-auto">
               {a.raw}
             </div>
@@ -386,11 +419,11 @@ export default function SplunkPage() {
     }, 1500);
   }, [config.host]);
 
-  const tabs: { key: SplunkTab; label: string; icon: string }[] = [
-    { key: "connection", label: "连接配置", icon: "🔌" },
-    { key: "sources", label: "数据源", icon: "📡" },
-    { key: "mapping", label: "字段映射", icon: "🔀" },
-    { key: "preview", label: "拉取预览", icon: "👁" },
+  const tabs: { key: SplunkTab; label: string; icon: SystemIconName }[] = [
+    { key: "connection", label: "连接配置", icon: "plug" },
+    { key: "sources", label: "数据源", icon: "radar" },
+    { key: "mapping", label: "字段映射", icon: "workflow" },
+    { key: "preview", label: "拉取预览", icon: "eye" },
   ];
 
   return (
@@ -427,10 +460,11 @@ export default function SplunkPage() {
         <div className="flex gap-1 mb-6 overflow-x-auto pb-1">
           {tabs.map((t) => (
             <button key={t.key} onClick={() => setTab(t.key)}
-              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                 tab === t.key ? "text-[#1a1a2e] bg-black/[0.05] border border-black/[0.08]" : "text-[#64748b] hover:text-[#1a1a2e] hover:bg-black/[0.04]"
               }`}>
-              {t.icon} {t.label}
+              <SystemIcon className="system-icon" name={t.icon} size={14} />
+              {t.label}
             </button>
           ))}
         </div>

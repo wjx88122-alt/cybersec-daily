@@ -2,10 +2,11 @@
 
 import { useState, useMemo } from "react";
 import MdrShell from "@/components/shells/MdrShell";
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 import NetworkTopology from "@/components/NetworkTopology";
 import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
-  DEVICE_TYPE_LABELS, DEVICE_TYPE_ICONS, TIER_LABELS,
+  DEVICE_TYPE_LABELS, TIER_LABELS,
   type Client, type NetworkDevice,
   type DeviceStatus,
 } from "@/lib/network-mock";
@@ -22,7 +23,18 @@ import {
 } from "../theme";
 const opsStatusLabel: Record<string, string> = { open: "待处理", in_progress: "处理中", pending: "挂起", resolved: "已解决" };
 const opsTypeLabel: Record<string, string> = { incident: "故障", change: "变更", maintenance: "维护", request: "需求" };
-const opsTypeIcon: Record<string, string> = { incident: "🔥", change: "🔄", maintenance: "🔧", request: "📝" };
+const opsTypeIcon: Record<string, SystemIconName> = { incident: "alert", change: "refresh", maintenance: "workflow", request: "file" };
+const deviceTypeIcon: Record<string, SystemIconName> = {
+  firewall: "shield",
+  switch: "network",
+  router: "network",
+  server: "server",
+  workstation: "server",
+  database: "database",
+  vpn: "lock",
+  ids: "radar",
+  waf: "shield",
+};
 
 function timeAgo(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
@@ -60,9 +72,18 @@ function ClientCard({ client, selected, onClick, alertCount }: { client: Client;
         <span className={`text-[10px] px-2 py-0.5 rounded-full border ${mdrClientTierToneClass(client.tier)}`}>{TIER_LABELS[client.tier]}</span>
       </div>
       <div className="flex items-center gap-3 text-[10px] text-[#94a3b8]">
-        <span>🏢 {client.industry}</span>
-        <span>📍 {client.region}</span>
-        <span>🖥 {client.deviceCount} 台</span>
+        <span className="inline-flex items-center gap-1">
+          <SystemIcon className="system-icon" name="briefcase" size={12} />
+          {client.industry}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <SystemIcon className="system-icon" name="map" size={12} />
+          {client.region}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <SystemIcon className="system-icon" name="server" size={12} />
+          {client.deviceCount} 台
+        </span>
       </div>
       <div className="flex items-center justify-between mt-2">
         <div className="flex items-center gap-1">
@@ -83,7 +104,9 @@ function DeviceCard({ device }: { device: NetworkDevice }) {
     <div className="glass rounded-xl p-3 hover:border-black/[0.1] transition-all">
       <div className="flex items-center gap-2 mb-2">
         <span className={`w-2 h-2 rounded-full ${mdrDeviceStatusDotClass(device.status)} ${device.status === "critical" ? "animate-pulse" : ""}`} />
-        <span className="text-lg">{DEVICE_TYPE_ICONS[device.type]}</span>
+        <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#64748b]">
+          <SystemIcon className="system-icon" name={deviceTypeIcon[device.type] ?? "server"} size={14} />
+        </span>
         <div className="flex-1 min-w-0">
           <div className="text-xs font-medium text-[#1a1a2e] truncate">{device.name}</div>
           <div className="text-[10px] text-[#94a3b8]">{device.ip} · {DEVICE_TYPE_LABELS[device.type]}</div>
@@ -95,8 +118,14 @@ function DeviceCard({ device }: { device: NetworkDevice }) {
         <UsageBar value={device.memory} label="内存" />
       </div>
       <div className="flex justify-between mt-2 text-[10px] text-[#94a3b8]">
-        <span>⏱ {device.uptime}</span>
-        <span>📦 {device.firmware}</span>
+        <span className="inline-flex items-center gap-1">
+          <SystemIcon className="system-icon" name="clock" size={12} />
+          {device.uptime}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <SystemIcon className="system-icon" name="file" size={12} />
+          {device.firmware}
+        </span>
       </div>
     </div>
   );
@@ -128,11 +157,11 @@ export default function NetworkPage() {
   const criticalAlerts = MOCK_NET_ALERTS.filter((a) => a.severity === "critical" && !a.acknowledged).length;
   const openTickets = MOCK_OPS_TICKETS.filter((t) => t.status !== "resolved").length;
 
-  const tabs: { key: NetTab; label: string; icon: string }[] = [
-    { key: "overview", label: "总览", icon: "📊" },
-    { key: "devices", label: "设备", icon: "🖥️" },
-    { key: "alerts", label: "告警", icon: "🔔" },
-    { key: "ops", label: "运维工单", icon: "🔧" },
+  const tabs: { key: NetTab; label: string; icon: SystemIconName }[] = [
+    { key: "overview", label: "总览", icon: "chart" },
+    { key: "devices", label: "设备", icon: "server" },
+    { key: "alerts", label: "告警", icon: "alert" },
+    { key: "ops", label: "运维工单", icon: "workflow" },
   ];
 
   const statusCounts: Record<DeviceStatus, number> = {
@@ -155,13 +184,15 @@ export default function NetworkPage() {
         {/* Global stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
-            { icon: "🏢", label: "托管客户", value: MOCK_CLIENTS.length, color: mdrStatToneClass("intake") },
-            { icon: "🖥️", label: "在线设备", value: `${onlineDevices}/${totalDevices}`, color: mdrStatToneClass("healthy") },
-            { icon: "🔴", label: "严重告警", value: criticalAlerts, color: criticalAlerts > 0 ? mdrStatToneClass("critical") : mdrStatToneClass("healthy") },
-            { icon: "🔧", label: "活跃工单", value: openTickets, color: mdrStatToneClass("intake") },
+            { icon: "briefcase", label: "托管客户", value: MOCK_CLIENTS.length, color: mdrStatToneClass("intake") },
+            { icon: "server", label: "在线设备", value: `${onlineDevices}/${totalDevices}`, color: mdrStatToneClass("healthy") },
+            { icon: "alert", label: "严重告警", value: criticalAlerts, color: criticalAlerts > 0 ? mdrStatToneClass("critical") : mdrStatToneClass("healthy") },
+            { icon: "workflow", label: "活跃工单", value: openTickets, color: mdrStatToneClass("intake") },
           ].map((s) => (
             <div key={s.label} className="glass rounded-xl p-3 text-center">
-              <div className="text-xl mb-0.5">{s.icon}</div>
+              <div className="mx-auto mb-1 flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 bg-white text-[#64748b]">
+                <SystemIcon className="system-icon" name={s.icon as SystemIconName} size={15} />
+              </div>
               <div className={`text-xl font-bold ${s.color}`}>{s.value}</div>
               <div className="text-[10px] text-[#94a3b8] mt-0.5">{s.label}</div>
             </div>
@@ -189,10 +220,22 @@ export default function NetworkPage() {
                     <span className={`text-[10px] px-2 py-0.5 rounded-full border ${mdrClientTierToneClass(client.tier)}`}>{TIER_LABELS[client.tier]}</span>
                   </div>
                   <div className="flex gap-3 mt-1 text-[10px] text-[#94a3b8]">
-                    <span>🏢 {client.industry}</span>
-                    <span>📍 {client.region}</span>
-                    <span>👤 {client.contactName} ({client.contactPhone})</span>
-                    <span>📋 合同至 {client.contract}</span>
+                    <span className="inline-flex items-center gap-1">
+                      <SystemIcon className="system-icon" name="briefcase" size={12} />
+                      {client.industry}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <SystemIcon className="system-icon" name="map" size={12} />
+                      {client.region}
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <SystemIcon className="system-icon" name="user" size={12} />
+                      {client.contactName} ({client.contactPhone})
+                    </span>
+                    <span className="inline-flex items-center gap-1">
+                      <SystemIcon className="system-icon" name="case" size={12} />
+                      合同至 {client.contract}
+                    </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -208,10 +251,11 @@ export default function NetworkPage() {
             <div className="flex gap-1 mb-4 overflow-x-auto pb-1">
               {tabs.map((t) => (
                 <button key={t.key} onClick={() => setTab(t.key)}
-                  className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
                     tab === t.key ? "text-[#1a1a2e] bg-black/[0.05] border border-black/[0.08]" : "text-[#64748b] hover:text-[#1a1a2e] hover:bg-black/[0.04]"
                   }`}>
-                  {t.icon} {t.label}
+                  <SystemIcon className="system-icon" name={t.icon} size={14} />
+                  {t.label}
                 </button>
               ))}
             </div>
@@ -239,7 +283,10 @@ export default function NetworkPage() {
                 {/* Recent alerts */}
                 {alerts.filter((a) => !a.acknowledged).length > 0 && (
                   <div>
-                    <div className="text-xs text-[#64748b] font-medium mb-2">🔴 未确认告警</div>
+                    <div className="mb-2 flex items-center gap-2 text-xs font-medium text-[#64748b]">
+                      <SystemIcon className="system-icon" name="alert" size={14} />
+                      未确认告警
+                    </div>
                     <div className="space-y-2">
                       {alerts.filter((a) => !a.acknowledged).slice(0, 3).map((a) => (
                         <div key={a.id} className="glass rounded-xl p-3 flex items-center gap-3">
@@ -286,7 +333,12 @@ export default function NetworkPage() {
                     <div className="flex-1 min-w-0">
                       <div className="text-xs text-[#1a1a2e]">{a.title}</div>
                       <div className="text-[10px] text-[#94a3b8]">
-                        🖥 {a.deviceName} · <span suppressHydrationWarning>{timeAgo(a.timestamp)}</span>
+                        <span className="inline-flex items-center gap-1">
+                          <SystemIcon className="system-icon" name="server" size={12} />
+                          {a.deviceName}
+                        </span>
+                        {" · "}
+                        <span suppressHydrationWarning>{timeAgo(a.timestamp)}</span>
                       </div>
                     </div>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded border ${mdrConnectionToneClass(a.acknowledged ? "success" : "idle")}`}>
@@ -294,7 +346,7 @@ export default function NetworkPage() {
                     </span>
                   </div>
                 ))}
-                {alerts.length === 0 && <div className="text-xs text-[#94a3b8] text-center py-8">暂无告警 ✅</div>}
+                {alerts.length === 0 && <div className="text-xs text-[#94a3b8] text-center py-8">暂无告警</div>}
               </div>
             )}
 
@@ -308,13 +360,25 @@ export default function NetworkPage() {
                       <span className="text-[10px] text-[#94a3b8] font-mono">{t.id}</span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded ${mdrPriorityToneClass(t.priority)}`}>{t.priority}</span>
                       <span className={`text-[10px] px-1.5 py-0.5 rounded ${mdrOpsStatusToneClass(t.status)}`}>{opsStatusLabel[t.status]}</span>
-                      <span className="text-[10px] text-[#94a3b8]">{opsTypeIcon[t.type]} {opsTypeLabel[t.type]}</span>
+                      <span className="inline-flex items-center gap-1 text-[10px] text-[#94a3b8]">
+                        <SystemIcon className="system-icon" name={opsTypeIcon[t.type]} size={12} />
+                        {opsTypeLabel[t.type]}
+                      </span>
                     </div>
                     <div className="text-sm text-[#1a1a2e] font-medium">{t.title}</div>
                     <div className="flex gap-3 mt-1.5 text-[10px] text-[#94a3b8]">
-                      <span>👤 {t.assignee}</span>
-                      <span>📅 <span suppressHydrationWarning>{timeAgo(t.createdAt)}</span></span>
-                      <span>🔄 <span suppressHydrationWarning>{timeAgo(t.updatedAt)}</span></span>
+                      <span className="inline-flex items-center gap-1">
+                        <SystemIcon className="system-icon" name="user" size={12} />
+                        {t.assignee}
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <SystemIcon className="system-icon" name="clock" size={12} />
+                        <span suppressHydrationWarning>{timeAgo(t.createdAt)}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1">
+                        <SystemIcon className="system-icon" name="refresh" size={12} />
+                        <span suppressHydrationWarning>{timeAgo(t.updatedAt)}</span>
+                      </span>
                     </div>
                   </div>
                 ))}

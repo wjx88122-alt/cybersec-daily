@@ -11,18 +11,15 @@
   --system-text-secondary: #4b5563;
   --system-text-muted: #6b7280;
   --system-text-inverse: #eef2f7;
-  --system-radius: 24px;
-  --system-radius-sm: 18px;
-  --system-shadow: 0 18px 50px rgba(15, 23, 42, 0.08);
-  --system-shadow-soft: 0 10px 30px rgba(15, 23, 42, 0.05);
+  --system-radius: 18px;
+  --system-radius-sm: 12px;
+  --system-shadow: 0 14px 36px rgba(15, 23, 42, 0.07);
+  --system-shadow-soft: 0 8px 20px rgba(15, 23, 42, 0.05);
   --system-shadow-dark: 0 22px 60px rgba(0, 0, 0, 0.22);
 }
 
 body {
-  background:
-    radial-gradient(circle at top left, rgba(255, 255, 255, 0.86), transparent 24%),
-    radial-gradient(circle at top right, rgba(191, 219, 254, 0.36), transparent 26%),
-    linear-gradient(180deg, #eef1f5 0%, #e7ebf1 100%);
+  background: linear-gradient(180deg, #eef1f5 0%, #e7ebf1 100%);
   color: var(--system-text);
   font-family:
     -apple-system,

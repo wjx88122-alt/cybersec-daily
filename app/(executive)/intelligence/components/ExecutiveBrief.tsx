@@ -1,11 +1,26 @@
 import type { HeroData, KpiData } from "@/app/(executive)/intelligence/data";
+import { SystemIcon } from "@/components/ui/SystemIcon";
 
 function Chip({ label, tone }: { label: string; tone?: string }) {
-  return <div className={`chip${tone ? ` ${tone}` : ""}`}>{label}</div>;
+  return (
+    <div className={`chip intel-icon-label${tone ? ` ${tone}` : ""}`}>
+      <SystemIcon className="system-icon" name={tone === "alert" ? "alert" : "target"} size={13} />
+      {label}
+    </div>
+  );
 }
 
 function StatusPill({ label, tone }: { label: string; tone?: string }) {
-  return <div className={`status-pill${tone ? ` ${tone}` : ""}`}>{label}</div>;
+  return (
+    <div className={`status-pill intel-icon-label${tone ? ` ${tone}` : ""}`}>
+      <SystemIcon
+        className="system-icon"
+        name={tone === "critical" ? "alert" : tone === "warning" ? "clock" : "activity"}
+        size={13}
+      />
+      {label}
+    </div>
+  );
 }
 
 export default function ExecutiveBrief({
@@ -51,7 +66,10 @@ export default function ExecutiveBrief({
           <section className="panel verdict-panel">
             <div className="panel-header">
               <div>
-                <div className="meta-label">Unified verdict</div>
+                <div className="meta-label intel-icon-label">
+                  <SystemIcon className="system-icon" name="chart" size={13} />
+                  Unified verdict
+                </div>
                 <h3>统一结论分</h3>
               </div>
               <StatusPill
@@ -72,7 +90,10 @@ export default function ExecutiveBrief({
             <div className="verdict-factors">
               {effectiveVerdict.factors.map((factor) => (
                 <div key={factor.label} className="verdict-factor">
-                  <span>{factor.label}</span>
+                  <span className="intel-icon-label">
+                    <SystemIcon className="system-icon" name="target" size={13} />
+                    {factor.label}
+                  </span>
                   <strong>{factor.score}</strong>
                 </div>
               ))}
@@ -82,7 +103,10 @@ export default function ExecutiveBrief({
           <section className="panel decision-panel">
             <div className="panel-header">
               <div>
-                <div className="meta-label">Decision rail</div>
+                <div className="meta-label intel-icon-label">
+                  <SystemIcon className="system-icon" name="workflow" size={13} />
+                  Decision rail
+                </div>
                 <h3>{hero.decisions.title}</h3>
               </div>
               <StatusPill label={hero.decisions.badge} tone="warning" />
@@ -93,9 +117,18 @@ export default function ExecutiveBrief({
                   <strong>{item.title}</strong>
                   <p>{item.description}</p>
                   <div className="decision-meta">
-                    <span>{`Owner: ${item.owner ?? "N/A"}`}</span>
-                    <span>{`SLA: ${item.sla ?? "N/A"}`}</span>
-                    <span>{`Action: ${item.recommendedAction ?? "N/A"}`}</span>
+                    <span className="intel-icon-label">
+                      <SystemIcon className="system-icon" name="user" size={13} />
+                      {`Owner: ${item.owner ?? "N/A"}`}
+                    </span>
+                    <span className="intel-icon-label">
+                      <SystemIcon className="system-icon" name="clock" size={13} />
+                      {`SLA: ${item.sla ?? "N/A"}`}
+                    </span>
+                    <span className="intel-icon-label">
+                      <SystemIcon className="system-icon" name="arrowRight" size={13} />
+                      {`Action: ${item.recommendedAction ?? "N/A"}`}
+                    </span>
                   </div>
                 </article>
               ))}
@@ -105,7 +138,10 @@ export default function ExecutiveBrief({
           <section className="panel priority-sequence">
             <div className="panel-header">
               <div>
-                <div className="meta-label">Decision support</div>
+                <div className="meta-label intel-icon-label">
+                  <SystemIcon className="system-icon" name="timeline" size={13} />
+                  Decision support
+                </div>
                 <h3>{hero.actionMatrix.title}</h3>
               </div>
             </div>
@@ -132,8 +168,11 @@ export default function ExecutiveBrief({
       <section className="posture-snapshot" aria-label="Posture Snapshot">
         <div className="kpis">
           {kpis.map((kpi) => (
-            <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: `var(--${kpi.tone})` }}>
-              <h4>{kpi.label}</h4>
+          <article key={kpi.label} className="kpi-card" style={{ ["--accent" as string]: `var(--${kpi.tone})` }}>
+              <h4 className="intel-icon-label">
+                <SystemIcon className="system-icon" name="activity" size={13} />
+                {kpi.label}
+              </h4>
               <div className="kpi-value">
                 <strong>{kpi.value}</strong>
                 <span>{kpi.delta}</span>
@@ -148,7 +187,10 @@ export default function ExecutiveBrief({
         <article className="panel change-drivers">
           <div className="panel-header">
             <div>
-              <div className="meta-label">Why this matters</div>
+              <div className="meta-label intel-icon-label">
+                <SystemIcon className="system-icon" name="eye" size={13} />
+                Why this matters
+              </div>
               <h3>{hero.signal.title}</h3>
             </div>
             <StatusPill label="Live" tone="info" />
@@ -157,7 +199,10 @@ export default function ExecutiveBrief({
           <div className="signal-grid">
             {hero.signal.items.map((item) => (
               <div key={item.label} className="signal-item" style={{ ["--tone" as string]: `var(--${item.tone})` }}>
-                <span>{item.label}</span>
+                <span className="intel-icon-label">
+                  <SystemIcon className="system-icon" name="target" size={13} />
+                  {item.label}
+                </span>
                 <strong>{item.value}</strong>
               </div>
             ))}
@@ -167,7 +212,10 @@ export default function ExecutiveBrief({
         <article className="panel action-sequence">
           <div className="panel-header">
             <div>
-              <div className="meta-label">Recommended sequence</div>
+              <div className="meta-label intel-icon-label">
+                <SystemIcon className="system-icon" name="list" size={13} />
+                Recommended sequence
+              </div>
               <h3>建议动作顺序</h3>
             </div>
           </div>

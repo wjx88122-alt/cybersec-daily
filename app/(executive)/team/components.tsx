@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 import { ARCHIVE_STATUS_LABELS, ROLE_NAME_MAP } from "./data";
 import {
   teamBadgeToneClass,
@@ -18,6 +19,17 @@ import type {
 } from "./data";
 import type { TeamStatTone } from "./theme";
 
+const TEAM_STAT_ICON: Record<TeamStatTone, SystemIconName> = {
+  chief: "shield",
+  market: "chart",
+  intel: "radar",
+  product: "target",
+  pmo: "timeline",
+  field: "server",
+  studio: "file",
+  neutral: "users",
+};
+
 export function SectionTitle({
   eyebrow,
   title,
@@ -31,7 +43,8 @@ export function SectionTitle({
     <div className="mb-6">
       <div className="flex items-center gap-3">
         <span className="h-px w-12 bg-gradient-to-r from-slate-400 to-transparent" />
-        <p className="team-eyebrow">
+        <p className="team-eyebrow inline-flex items-center gap-2">
+          <SystemIcon className="system-icon" name="workflow" size={13} />
           {eyebrow}
         </p>
       </div>
@@ -45,9 +58,9 @@ export function SectionTitle({
 
 export function TeamTabs({ active }: { active: "overview" | "evolution" | "decisions" }) {
   const items = [
-    { id: "overview", href: "/team", label: "团队总览", note: "Roster / Dispatch" },
-    { id: "evolution", href: "/team/history", label: "进化历程", note: "Timeline / Milestones" },
-    { id: "decisions", href: "/team/decisions", label: "决策档案", note: "Questions / Results" },
+    { id: "overview", href: "/team", label: "团队总览", note: "Roster / Dispatch", icon: "users" },
+    { id: "evolution", href: "/team/history", label: "进化历程", note: "Timeline / Milestones", icon: "timeline" },
+    { id: "decisions", href: "/team/decisions", label: "决策档案", note: "Questions / Results", icon: "database" },
   ] as const;
 
   return (
@@ -69,7 +82,10 @@ export function TeamTabs({ active }: { active: "overview" | "evolution" | "decis
                 : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white/70 hover:text-slate-900"
             }`}
           >
-            <div className="text-sm font-semibold">{item.label}</div>
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <SystemIcon className="system-icon" name={item.icon} size={15} />
+              {item.label}
+            </div>
             <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">
               {item.note}
             </div>
@@ -91,9 +107,14 @@ export function StatCard({
 }) {
   return (
     <div className="team-deep-surface rounded-[20px] p-4">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-        {label}
-      </p>
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+          {label}
+        </p>
+        <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-600">
+          <SystemIcon className="system-icon" name={TEAM_STAT_ICON[tone]} size={15} />
+        </span>
+      </div>
       <p className={`mt-3 text-3xl font-semibold tracking-tight ${teamStatToneClass(tone)}`}>{value}</p>
     </div>
   );
@@ -108,7 +129,7 @@ function RoleListBlock({ title, items }: { title: string; items: string[] }) {
       <ul className="mt-3 space-y-2.5 text-sm leading-7 text-slate-700">
         {items.map((item) => (
           <li key={item} className="flex gap-2.5">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#2563eb]" />
+            <SystemIcon className="system-icon mt-1.5 shrink-0 text-[#2563eb]" name="check" size={14} />
             <span>{item}</span>
           </li>
         ))}
@@ -141,7 +162,10 @@ export function RoleCard({ role }: { role: Role }) {
               {role.code}
             </span>
             <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
+              <span className="inline-flex items-center gap-1.5">
+                <SystemIcon className="system-icon" name="list" size={12} />
               推荐顺序 {role.order}
+              </span>
             </span>
             {isChief && (
               <span className="rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-semibold text-amber-700">
@@ -158,7 +182,10 @@ export function RoleCard({ role }: { role: Role }) {
         </div>
         <div className="flex flex-col items-end gap-3 sm:gap-4">
           <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
+            <span className="inline-flex items-center gap-1.5">
+              <SystemIcon className="system-icon" name="timeline" size={12} />
             {role.phase}
+            </span>
           </span>
           <div className="rounded-[32px] border border-slate-200 bg-[linear-gradient(145deg,rgba(255,255,255,0.95),rgba(237,242,247,0.95))] p-1.5 shadow-[0_20px_48px_rgba(15,23,42,0.08)]">
             <Image
@@ -271,7 +298,7 @@ export function DispatchCardView({ card }: { card: DispatchCard }) {
       <ul className="mt-4 space-y-2.5 text-sm leading-7 text-slate-700">
         {card.combos.map((item) => (
           <li key={item} className="team-deep-surface flex gap-2.5 rounded-[18px] p-3">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-900" />
+            <SystemIcon className="system-icon mt-1.5 shrink-0 text-slate-700" name="workflow" size={14} />
             <span>{item}</span>
           </li>
         ))}
@@ -299,11 +326,15 @@ export function TimelineCard({ milestone }: { milestone: HistoryMilestone }) {
     <article className="team-card rounded-[24px] p-5 transition-all hover:-translate-y-1">
       <div className="flex items-start justify-between gap-3">
         <span
-          className={`inline-flex rounded-full border px-2.5 py-1 text-[11px] font-semibold ${teamTimelineToneClass(milestone.category)}`}
+          className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold ${teamTimelineToneClass(milestone.category)}`}
         >
+          <SystemIcon className="system-icon" name="timeline" size={12} />
           {teamTimelineToneLabel(milestone.category)}
         </span>
-        <span className="text-xs text-slate-500">{milestone.date}</span>
+        <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+          <SystemIcon className="system-icon" name="clock" size={12} />
+          {milestone.date}
+        </span>
       </div>
       <h3 className="mt-3 text-lg font-semibold text-slate-950">{milestone.title}</h3>
       <p className="mt-2 text-sm leading-7 text-slate-600">{milestone.description}</p>
@@ -357,14 +388,17 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={`/team/decisions/${entry.archiveNo}`}
-              className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500 transition hover:border-slate-300 hover:text-slate-900"
+              className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500 transition hover:border-slate-300 hover:text-slate-900"
             >
+              <SystemIcon className="system-icon" name="file" size={12} />
               {entry.archiveNo}
             </Link>
-            <span className="rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] text-slate-500">
+              <SystemIcon className="system-icon" name="clock" size={12} />
               {entry.date}
             </span>
-            <span className="team-accent-surface rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+            <span className="team-accent-surface inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold text-slate-900">
+              <SystemIcon className="system-icon" name="check" size={12} />
               {ARCHIVE_STATUS_LABELS[entry.status]}
             </span>
           </div>
@@ -412,7 +446,7 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
           <ul className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
             {entry.publicProcess.map((step) => (
               <li key={step} className="flex gap-2.5">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-slate-900" />
+                <SystemIcon className="system-icon mt-1.5 shrink-0 text-slate-700" name="arrowRight" size={14} />
                 <span>{step}</span>
               </li>
             ))}
@@ -529,9 +563,10 @@ export function DecisionArchiveCard({ entry }: { entry: DecisionArchiveEntry }) 
       <div className="mt-5 flex justify-end">
         <Link
           href={`/team/decisions/${entry.archiveNo}`}
-          className="text-sm font-semibold text-slate-900 transition hover:text-slate-700"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-slate-900 transition hover:text-slate-700"
         >
-          查看详情 →
+          查看详情
+          <SystemIcon className="system-icon" name="arrowRight" size={14} />
         </Link>
       </div>
     </article>

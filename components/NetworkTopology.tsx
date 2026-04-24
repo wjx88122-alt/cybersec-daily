@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { SystemIcon } from "@/components/ui/SystemIcon";
 import {
-  DEVICE_TYPE_ICONS, DEVICE_TYPE_LABELS,
+  DEVICE_TYPE_LABELS,
   type NetworkDevice, type NetworkAlert, type DeviceStatus,
 } from "@/lib/network-mock";
 import {
@@ -40,6 +41,18 @@ interface TopoLink {
   to: string;
   label?: string;
 }
+
+const DEVICE_TYPE_SHORT: Record<string, string> = {
+  firewall: "FW",
+  switch: "SW",
+  router: "RT",
+  server: "SV",
+  workstation: "WS",
+  database: "DB",
+  vpn: "VPN",
+  ids: "IDS",
+  waf: "WAF",
+};
 
 // Build topology layout per client
 function buildTopology(devices: NetworkDevice[]): { nodes: TopoNode[]; links: TopoLink[]; zones: { name: string; x: number; y: number; w: number; h: number }[] } {
@@ -129,7 +142,10 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
 
   return (
     <div className="glass rounded-xl p-4 overflow-x-auto">
-      <div className="text-xs text-[#64748b] font-medium mb-3">🗺️ 网络拓扑图</div>
+      <div className="mb-3 flex items-center gap-2 text-xs font-medium text-[#64748b]">
+        <SystemIcon className="system-icon" name="map" size={14} />
+        网络拓扑图
+      </div>
       <svg width={svgW} height={svgH} viewBox={`0 0 ${svgW} ${svgH}`} className="mx-auto">
         {/* Zone backgrounds */}
         {zones.map((z) => (
@@ -210,8 +226,10 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
                   <text x={n.x - 18} y={n.y - 10} textAnchor="middle" fontSize={8} fill="#fff" fontWeight={700}>{unacked.length}</text>
                 </g>
               )}
-              {/* Icon text */}
-              <text x={n.x} y={n.y + 5} textAnchor="middle" fontSize={18}>{DEVICE_TYPE_ICONS[n.device.type]}</text>
+              {/* Device type short label */}
+              <text x={n.x} y={n.y + 5} textAnchor="middle" fontSize={10} fill="#334155" fontWeight={700}>
+                {DEVICE_TYPE_SHORT[n.device.type] ?? "DEV"}
+              </text>
               {/* Vendor logo */}
               {vendor && (
                 <g>
@@ -233,7 +251,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
                     {n.device.name} ({DEVICE_TYPE_LABELS[n.device.type]})
                   </text>
                   <text x={n.x} y={n.y - tipH + 8} textAnchor="middle" fontSize={9} fill="#94a3b8">
-                    CPU: {n.device.cpu}% · 内存: {n.device.memory}% · ⏱ {n.device.uptime}
+                    CPU: {n.device.cpu}% · 内存: {n.device.memory}% · 运行 {n.device.uptime}
                   </text>
                   <text x={n.x} y={n.y - tipH + 20} textAnchor="middle" fontSize={8} fill="#78859b">
                     {vendor ? `${vendor.name} · ` : ""}{n.device.firmware}
@@ -243,7 +261,7 @@ export default function NetworkTopology({ devices, alerts = [] }: { devices: Net
                     <g>
                       <line x1={n.x - tipW / 2 + 10} y1={n.y - tipH + 28} x2={n.x + tipW / 2 - 10} y2={n.y - tipH + 28} stroke="#334155" strokeWidth={0.5} />
                       <text x={n.x - tipW / 2 + 12} y={n.y - tipH + 40} fontSize={8} fill={mdrSeverityHex((worstSev as "critical" | "high" | "medium" | "low") || "medium")} fontWeight={600}>
-                        ⚠ {unacked.length} 条安全事件:
+                        {unacked.length} 条安全事件:
                       </text>
                       {unacked.slice(0, 3).map((a, ai) => (
                         <g key={a.id}>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import MdrShell from "@/components/shells/MdrShell";
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 import {
   MOCK_ALERTS,
   MOCK_TICKETS,
@@ -37,13 +38,13 @@ const severityPriority: Record<Severity, number> = {
 };
 
 const WORKFLOW_STEPS = [
-  { label: "告警采集", sub: "EDR / NDR / SIEM / Cloud" },
-  { label: "AI 分诊", sub: "严重等级评定" },
-  { label: "创建工单", sub: "SLA 计时启动" },
-  { label: "智能派发", sub: "技能与负载匹配" },
-  { label: "调查处置", sub: "分析师执行" },
-  { label: "客户反馈", sub: "双向更新" },
-  { label: "解决关闭", sub: "闭环归档" },
+  { label: "告警采集", sub: "EDR / NDR / SIEM / Cloud", icon: "radar" },
+  { label: "AI 分诊", sub: "严重等级评定", icon: "spark" },
+  { label: "创建工单", sub: "SLA 计时启动", icon: "case" },
+  { label: "智能派发", sub: "技能与负载匹配", icon: "workflow" },
+  { label: "调查处置", sub: "分析师执行", icon: "search" },
+  { label: "客户反馈", sub: "双向更新", icon: "users" },
+  { label: "解决关闭", sub: "闭环归档", icon: "check" },
 ] as const;
 
 function timeAgo(iso: string) {
@@ -125,22 +126,27 @@ function StatsBar({
   );
 
   const stats = [
-    { label: "待分诊告警", value: alerts.length, hint: "待进入工单系统", tone: "intake" },
-    { label: "活跃工单", value: open, hint: "当前班次在看", tone: "neutral" },
-    { label: "严重工单", value: critical, hint: "需优先关注", tone: "critical" },
-    { label: "SLA 风险", value: breached, hint: breached > 0 ? "已有超时项" : "当前可控", tone: breached > 0 ? "critical" : "healthy" },
-    { label: "可用席位", value: availableSeats, hint: "分析师剩余容量", tone: availableSeats > 0 ? "healthy" : "warning" },
-    { label: "待派发", value: unassigned, hint: unassigned > 0 ? "需要立即接手" : "无人滞留", tone: unassigned > 0 ? "warning" : "healthy" },
-  ] satisfies Array<{ label: string; value: number; hint: string; tone: MdrStatTone }>;
+    { label: "待分诊告警", value: alerts.length, hint: "待进入工单系统", tone: "intake", icon: "alert" },
+    { label: "活跃工单", value: open, hint: "当前班次在看", tone: "neutral", icon: "case" },
+    { label: "严重工单", value: critical, hint: "需优先关注", tone: "critical", icon: "target" },
+    { label: "SLA 风险", value: breached, hint: breached > 0 ? "已有超时项" : "当前可控", tone: breached > 0 ? "critical" : "healthy", icon: "clock" },
+    { label: "可用席位", value: availableSeats, hint: "分析师剩余容量", tone: availableSeats > 0 ? "healthy" : "warning", icon: "users" },
+    { label: "待派发", value: unassigned, hint: unassigned > 0 ? "需要立即接手" : "无人滞留", tone: unassigned > 0 ? "warning" : "healthy", icon: "workflow" },
+  ] satisfies Array<{ label: string; value: number; hint: string; tone: MdrStatTone; icon: SystemIconName }>;
 
   return (
     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-6">
       {stats.map((stat) => (
         <div key={stat.label} className="mdr-board-card rounded-2xl p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-            {stat.label}
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+              {stat.label}
+            </div>
+            <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-600">
+              <SystemIcon className="system-icon" name={stat.icon} size={15} />
+            </span>
           </div>
-          <div className={`mt-3 text-3xl font-semibold tracking-[-0.04em] ${mdrStatToneClass(stat.tone)}`}>
+          <div suppressHydrationWarning className={`mt-3 text-3xl font-semibold tracking-[-0.04em] ${mdrStatToneClass(stat.tone)}`}>
             {stat.value}
           </div>
           <div className="mt-2 text-xs text-slate-500">{stat.hint}</div>
@@ -172,7 +178,7 @@ function PriorityQueueRow({ ticket }: { ticket: Ticket }) {
           </p>
         </div>
         <div className="text-right">
-          <div className={`text-xs font-mono ${mdrSlaToneClass(sla.urgent)}`}>
+          <div suppressHydrationWarning className={`text-xs font-mono ${mdrSlaToneClass(sla.urgent)}`}>
             SLA {sla.text}
           </div>
           <div className="mt-1 text-xs text-slate-500">
@@ -181,7 +187,10 @@ function PriorityQueueRow({ ticket }: { ticket: Ticket }) {
         </div>
       </div>
       <div className="mt-3 rounded-xl border border-slate-200 bg-white/70 px-3 py-2 text-xs text-slate-600">
-        下一步动作：{ticket.actions[0]}
+        <span className="inline-flex items-center gap-1.5">
+          <SystemIcon className="system-icon" name="arrowRight" size={13} />
+          下一步动作：{ticket.actions[0]}
+        </span>
       </div>
     </div>
   );
@@ -264,8 +273,9 @@ function AlertRow({ alert, onCreateTicket }: { alert: Alert; onCreateTicket: (al
         </div>
         <button
           onClick={() => onCreateTicket(alert)}
-          className={`shrink-0 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all ${mdrActionToneClass("dashboard")}`}
+          className={`system-control inline-flex shrink-0 items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-medium transition-all ${mdrActionToneClass("dashboard")}`}
         >
+          <SystemIcon className="system-icon" name="case" size={13} />
           创建工单
         </button>
       </div>
@@ -338,15 +348,17 @@ function TicketCard({
         {nextStatus[ticket.status] ? (
           <button
             onClick={() => onStatusChange(ticket.id, nextStatus[ticket.status]!)}
-            className={`rounded-xl border px-3 py-1 text-[11px] font-medium transition-all ${mdrActionToneClass("progress")}`}
+            className={`system-control inline-flex items-center gap-1.5 rounded-xl border px-3 py-1 text-[11px] font-medium transition-all ${mdrActionToneClass("progress")}`}
           >
+            <SystemIcon className="system-icon" name="workflow" size={13} />
             {nextLabel[ticket.status]}
           </button>
         ) : null}
         <button
           onClick={() => setExpanded(!expanded)}
-          className="rounded-xl border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-500 transition-all hover:bg-slate-50"
+          className="system-control inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1 text-[11px] text-slate-500 transition-all hover:bg-slate-50"
         >
+          <SystemIcon className="system-icon" name={expanded ? "x" : "eye"} size={13} />
           {expanded ? "收起详情" : "查看详情"}
         </button>
       </div>
@@ -545,11 +557,11 @@ export default function MDRPage() {
     [tickets],
   );
 
-  const tabs: { key: Tab; label: string; note: string }[] = [
-    { key: "dashboard", label: "总览", note: "Workbench" },
-    { key: "alerts", label: "告警", note: "Incoming" },
-    { key: "tickets", label: "工单", note: "Cases" },
-    { key: "analysts", label: "分析师", note: "Capacity" },
+  const tabs: { key: Tab; label: string; note: string; icon: SystemIconName }[] = [
+    { key: "dashboard", label: "总览", note: "Workbench", icon: "chart" },
+    { key: "alerts", label: "告警", note: "Incoming", icon: "alert" },
+    { key: "tickets", label: "工单", note: "Cases", icon: "case" },
+    { key: "analysts", label: "分析师", note: "Capacity", icon: "users" },
   ];
 
   const openTickets = tickets.filter((ticket) => ticket.status !== "closed" && ticket.status !== "resolved");
@@ -584,11 +596,11 @@ export default function MDRPage() {
   ).length;
   const activeSources = sourceSummary.filter((item) => item.pendingAlerts > 0).map((item) => item.source);
   const heroStats = [
-    { label: "活跃工单", value: openTickets.length, tone: "neutral" },
-    { label: "待分诊告警", value: alerts.length, tone: "intake" },
-    { label: "SLA 风险", value: atRiskCount, tone: atRiskCount > 0 ? "critical" : "healthy" },
-    { label: "可用席位", value: availableSeats, tone: availableSeats > 0 ? "healthy" : "warning" },
-  ] satisfies Array<{ label: string; value: number; tone: MdrStatTone }>;
+    { label: "活跃工单", value: openTickets.length, tone: "neutral", icon: "case" },
+    { label: "待分诊告警", value: alerts.length, tone: "intake", icon: "alert" },
+    { label: "SLA 风险", value: atRiskCount, tone: atRiskCount > 0 ? "critical" : "healthy", icon: "clock" },
+    { label: "可用席位", value: availableSeats, tone: availableSeats > 0 ? "healthy" : "warning", icon: "users" },
+  ] satisfies Array<{ label: string; value: number; tone: MdrStatTone; icon: SystemIconName }>;
 
   return (
     <MdrShell>
@@ -616,26 +628,30 @@ export default function MDRPage() {
             <div className="mt-6 flex flex-wrap gap-2">
               <Link
                 href="/mdr/splunk"
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("splunk")}`}
+                className={`system-control inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("splunk")}`}
               >
+                <SystemIcon className="system-icon" name="plug" size={14} />
                 Splunk 对接配置
               </Link>
               <Link
                 href="/mdr/network"
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("network")}`}
+                className={`system-control inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("network")}`}
               >
+                <SystemIcon className="system-icon" name="network" size={14} />
                 客户网络运维
               </Link>
               <Link
                 href="/intelligence"
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("intel")}`}
+                className={`system-control inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("intel")}`}
               >
+                <SystemIcon className="system-icon" name="radar" size={14} />
                 情报中心
               </Link>
               <Link
                 href="/mdr/dashboard"
-                className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("dashboard")}`}
+                className={`system-control inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${mdrActionToneClass("dashboard")}`}
               >
+                <SystemIcon className="system-icon" name="chart" size={14} />
                 运营大屏
               </Link>
             </div>
@@ -643,10 +659,15 @@ export default function MDRPage() {
             <div className="mt-6 grid gap-3 sm:grid-cols-4">
               {heroStats.map((item) => (
                 <div key={item.label} className="mdr-board-card rounded-2xl p-4">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
-                    {item.label}
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                      {item.label}
+                    </div>
+                    <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-600">
+                      <SystemIcon className="system-icon" name={item.icon} size={15} />
+                    </span>
                   </div>
-                  <div className={`mt-3 text-3xl font-semibold tracking-[-0.04em] ${mdrStatToneClass(item.tone)}`}>
+                  <div suppressHydrationWarning className={`mt-3 text-3xl font-semibold tracking-[-0.04em] ${mdrStatToneClass(item.tone)}`}>
                     {item.value}
                   </div>
                 </div>
@@ -669,9 +690,13 @@ export default function MDRPage() {
                     : "当前班次没有需要优先升级的工单"}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  {nextTicket
-                    ? `${nextTicket.titleZh} 目前处于 ${STATUS_LABELS[nextTicket.status]}，SLA 剩余 ${slaRemaining(nextTicket.slaDeadline).text}。值班台会优先把严重、待派发、逼近时限的事项推到队首。`
-                    : "当前班次没有活跃工单，工作台会在新告警进入时自动把最需要接手的事项推到顶部。"}
+                  {nextTicket ? (
+                    <>
+                      {nextTicket.titleZh} 目前处于 {STATUS_LABELS[nextTicket.status]}，SLA 剩余 <span suppressHydrationWarning>{slaRemaining(nextTicket.slaDeadline).text}</span>。值班台会优先把严重、待派发、逼近时限的事项推到队首。
+                    </>
+                  ) : (
+                    "当前班次没有活跃工单，工作台会在新告警进入时自动把最需要接手的事项推到顶部。"
+                  )}
                 </p>
                 <div className="mt-4 space-y-3">
                   <div className="rounded-2xl border border-slate-200 bg-white/80 px-4 py-3">
@@ -789,7 +814,10 @@ export default function MDRPage() {
                     : "border-transparent bg-transparent text-slate-500 hover:border-slate-200 hover:bg-white/70 hover:text-slate-900"
                 }`}
               >
-                <div className="text-sm font-semibold">{item.label}</div>
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <SystemIcon className="system-icon" name={item.icon} size={15} />
+                  {item.label}
+                </div>
                 <div className="mt-1 text-[11px] uppercase tracking-[0.18em] text-slate-500">
                   {item.note}
                 </div>
@@ -847,7 +875,10 @@ export default function MDRPage() {
                         <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">
                           Step {index + 1}
                         </span>
-                        <span className="mt-2 text-sm font-semibold text-slate-950">{step.label}</span>
+                        <span className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-slate-950">
+                          <SystemIcon className="system-icon" name={step.icon} size={14} />
+                          {step.label}
+                        </span>
                         <span className="mt-1 text-[10px] leading-5 text-slate-500">{step.sub}</span>
                       </div>
                       {index < WORKFLOW_STEPS.length - 1 ? <span className="text-slate-400">→</span> : null}

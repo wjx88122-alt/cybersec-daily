@@ -1,5 +1,4 @@
 import { Fragment } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import TeamShell from "@/components/shells/TeamShell";
@@ -9,7 +8,6 @@ import {
   WEEKLY_FLOW,
   PHASES,
   PROMPTS,
-  HISTORY_TIMELINE,
   DECISION_ARCHIVE,
 } from "./data";
 import {

@@ -1,5 +1,6 @@
 "use client";
 
+import { SystemIcon } from "@/components/ui/SystemIcon";
 import { FeedItem } from "@/lib/feeds";
 import { pickDisplayTitle, pickLocalizedField } from "@/lib/translation-detection";
 import { resolveSafeExternalHref, resolveSafeImageUrl } from "@/lib/remote-url";
@@ -235,12 +236,14 @@ export default function NewsCard({
           <div className="flex flex-col justify-between p-7 sm:p-9 lg:p-11">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="system-pill rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                <span className="system-pill inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <SystemIcon className="system-icon" name="radar" size={12} />
                   今日焦点
                 </span>
                 <span
-                  className={`system-pill rounded-full border px-3 py-1 text-[10px] font-semibold ${catAccent}`}
+                  className={`system-pill inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-semibold ${catAccent}`}
                 >
+                  <SystemIcon className="system-icon" name="filter" size={12} />
                   {item.category}
                 </span>
               </div>
@@ -255,21 +258,21 @@ export default function NewsCard({
             </div>
 
             <div className="mt-8 flex items-center gap-3 text-[11px] text-slate-500">
-              <span className="system-pill inline-flex h-8 items-center rounded-full border border-slate-200 bg-white px-3 font-medium text-slate-700">
+              <span className="system-pill inline-flex h-8 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-3 font-medium text-slate-700">
+                <SystemIcon className="system-icon" name="globe" size={13} />
                 {item.source}
               </span>
-              <span>{timeAgo}</span>
+              <span className="inline-flex items-center gap-1.5">
+                <SystemIcon className="system-icon" name="clock" size={13} />
+                {timeAgo}
+              </span>
               <span className="ml-auto inline-flex items-center gap-2 font-medium text-slate-900">
                 阅读详情
-                <svg
-                  className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M17 7H8M17 7v9" />
-                </svg>
+                <SystemIcon
+                  className="system-icon transition-transform duration-300 group-hover:translate-x-1"
+                  name="external"
+                  size={14}
+                />
               </span>
             </div>
           </div>
@@ -321,8 +324,9 @@ export default function NewsCard({
             </div>
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
               <span
-                className={`system-pill rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${catAccent}`}
+                className={`system-pill inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${catAccent}`}
               >
+                <SystemIcon className="system-icon" name="filter" size={12} />
                 {item.category}
               </span>
             </div>
@@ -338,9 +342,12 @@ export default function NewsCard({
               </p>
             )}
             <div className="mt-5 flex items-center gap-2 border-t border-slate-200/80 pt-4 text-[11px] text-slate-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-400/70 shrink-0" />
+              <SystemIcon className="system-icon shrink-0 text-slate-400" name="globe" size={13} />
               <span className="truncate font-medium text-slate-700">{item.source}</span>
-              <span className="ml-auto shrink-0">{timeAgo}</span>
+              <span className="ml-auto inline-flex shrink-0 items-center gap-1.5">
+                <SystemIcon className="system-icon" name="clock" size={13} />
+                {timeAgo}
+              </span>
             </div>
           </div>
         </>

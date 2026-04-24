@@ -1,5 +1,7 @@
 "use client";
 
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
+
 const SEC_CATEGORIES = ["全部", "综合资讯", "深度分析", "漏洞预警", "威胁情报", "恶意软件", "政府/监管"];
 const AI_CATEGORIES = ["全部", "AI 产品", "AI 研究", "AI 商业", "AI 开发", "AI 政策", "AI 洞察"];
 
@@ -17,6 +19,22 @@ const CATEGORY_ACTIVE: Record<string, string> = {
   "AI 开发": "bg-teal-50 text-teal-700 border-teal-100",
   "AI 政策": "bg-slate-100 text-slate-700 border-slate-200",
   "AI 洞察": "bg-yellow-50 text-yellow-700 border-yellow-100",
+};
+
+const CATEGORY_ICON: Record<string, SystemIconName> = {
+  全部: "list",
+  综合资讯: "globe",
+  深度分析: "search",
+  漏洞预警: "alert",
+  威胁情报: "target",
+  恶意软件: "shield",
+  "政府/监管": "briefcase",
+  "AI 产品": "spark",
+  "AI 研究": "radar",
+  "AI 商业": "chart",
+  "AI 开发": "workflow",
+  "AI 政策": "file",
+  "AI 洞察": "eye",
 };
 
 export { SEC_CATEGORIES, AI_CATEGORIES };
@@ -37,12 +55,13 @@ export default function CategoryFilter({
         <button
           key={cat}
           onClick={() => onChange(cat)}
-          className={`px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all duration-200 ${
+          className={`system-control inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-[12px] font-medium border transition-all duration-200 ${
             active === cat
               ? CATEGORY_ACTIVE[cat] ?? "bg-[#2563eb]/10 text-[#2563eb] border-[#2563eb]/30"
               : `system-pill bg-white/78 text-slate-500 border-slate-200 hover:bg-white hover:text-slate-900 hover:border-slate-300 hover:shadow-[0_8px_20px_rgba(15,23,42,0.05)]`
           }`}
         >
+          <SystemIcon className="system-icon" name={CATEGORY_ICON[cat] ?? "filter"} size={13} />
           {cat}
         </button>
       ))}
