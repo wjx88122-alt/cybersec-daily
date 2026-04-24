@@ -122,6 +122,47 @@ test("feed landing hero summary uses cached digest overview when available", () 
   );
 });
 
+test("feed landing hero summary keeps long digest sentences out of the display title", () => {
+  const now = Date.parse("2026-04-23T12:00:00.000Z");
+  const state = buildFeedLandingState(
+    [
+      {
+        id: "fresh-security-1",
+        title: "Fresh story",
+        titleZh: "CISA 批量标记已利用漏洞",
+        summary: "Fresh summary",
+        summaryZh: "CISA 标记多项已被利用的企业产品漏洞。",
+        summaryAi: "",
+        pubDate: "2026-04-23T09:00:00.000Z",
+        category: "漏洞预警",
+        source: "Example",
+        link: "https://example.com/fresh",
+      },
+    ],
+    {
+      category: "全部",
+      search: "",
+      now,
+      digestOverview:
+        "近72小时安全威胁态势急剧升温，CISA批量标记8个已利用漏洞，涵盖思科、Fortinet、PaperCut等核心企业产品，供应链攻击成为焦点，axios npm库遭朝鲜关联组织入侵，Vercel员工AI工具权限泄露引发连锁反应。",
+    },
+  );
+
+  assert.equal(state.heroSummary.title, "近72小时安全威胁态势急剧升温。");
+  assert.equal(
+    state.heroSummary.body,
+    "近72小时安全威胁态势急剧升温，CISA批量标记8个已利用漏洞，涵盖思科、Fortinet、PaperCut等核心企业产品，供应链攻击成为焦点，axios npm库遭朝鲜关联组织入侵，Vercel员工AI工具权限泄露引发连锁反应。",
+  );
+});
+
+test("content summary hero uses compact title styling instead of display typography", () => {
+  const source = load("components/feed/FeedLandingClient.tsx");
+  const stylesheet = load("app/styles/public.css");
+
+  assert.equal(source.includes("public-summary-title"), true);
+  assert.equal(stylesheet.includes(".public-summary-title"), true);
+});
+
 test("feed landing hero summary falls back to current filtered items", () => {
   const now = Date.parse("2026-04-23T12:00:00.000Z");
   const state = buildFeedLandingState(
