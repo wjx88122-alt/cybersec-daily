@@ -1,34 +1,109 @@
 # cybersec-daily
 
-一个面向中文读者的网络安全与 AI 日报站点，内置资讯聚合、自动翻译、摘要生成、情报中心和 MDR 演示模块。
+一个面向中文读者的网络安全与 AI 日报产品套件，既包含真实可部署的资讯聚合链路，也包含面向演示和产品化探索的情报、MDR、团队工作台。
 
 - 线上地址: [cybersec-daily.vercel.app](https://cybersec-daily.vercel.app)
-- 仓库: [wjx88122-alt/cybersec-daily](https://github.com/wjx88122-alt/cybersec-daily)
-- 技术栈: Next.js 16, React 19, TypeScript, Tailwind CSS 4, Vercel Cron, Upstash Redis, OpenAI-compatible LLM providers
+- 仓库地址: [wjx88122-alt/cybersec-daily](https://github.com/wjx88122-alt/cybersec-daily)
+- 技术栈: Next.js 16、React 19、TypeScript、Tailwind CSS 4、Vercel Cron、Upstash Redis、OpenAI-compatible LLM providers
 
-## Design References
+## 当前状态
 
-这个项目已经引入仓库级设计说明文件 [`DESIGN.md`](./DESIGN.md)，用于约束 AI agent 和人工协作时的视觉输出。
+这个仓库已经不是单一资讯站，而是 5 个入口组成的一套安全产品体验：
 
-它的写法参考了：
+- `/` 安全资讯首页
+- `/ai` AI 资讯页
+- `/intelligence` 情报中心
+- `/mdr` MDR 工作台及其子页
+- `/team` Executive Team 工作台及其子页
 
-- [VoltAgent/awesome-design-md](https://github.com/VoltAgent/awesome-design-md)
+最近一轮重构把重点放在两件事上：
 
-但实际内容已经针对 `cybersec-daily` 的 5 个产品模式做了本地化适配，而不是直接照搬上游示例。
+- 把公共页、情报页、MDR、Team 收回到同一套系统层和 route-group 架构里
+- 把 `MDR` 和 `Team` 从“展示页”继续推进到更像真实产品工作台的交互语言
 
-第三方设计参考归属见 [`docs/third-party.md`](./docs/third-party.md)。
+对应说明见：
 
-## 项目概览
+- [DESIGN.md](./DESIGN.md)
+- [docs/2026-04-workbench-ui-refactor.md](./docs/2026-04-workbench-ui-refactor.md)
+- [docs/third-party.md](./docs/third-party.md)
 
-这个项目不是单纯的资讯列表页，而是一个围绕“安全资讯聚合 -> 翻译与修复 -> 摘要生成 -> 情报与运营展示”串起来的站点。
+## 产品结构
 
-当前包含 5 个顶层入口：
+### Public surfaces
 
-- `/` 安全资讯首页，聚合近 24 小时网络安全资讯
-- `/ai` AI 资讯页，聚合 AI 产品、研究、政策与工程动态
-- `/team` 总裁辅助团队页面，展示多角色 AI 幕僚编制
-- `/intelligence` 情报中心，采用 briefing-first 的 Threat Intelligence Command Center 布局
-- `/mdr` MDR 演示页，包含工单派发、SOC 仪表板和关联子页
+- `/` 聚合近 24 小时网络安全资讯
+- `/ai` 聚合 AI 产品、研究、政策与工程动态
+- 支持分类筛选、搜索、中文翻译、图片修复和“最近可用”回退视图
+
+### Intelligence
+
+- `/intelligence`
+- 采用 briefing-first 的 Threat Intelligence Command Center 布局
+- 更偏 analyst workspace，而不是内容门户
+
+### MDR
+
+- `/mdr`
+- `/mdr/dashboard`
+- `/mdr/network`
+- `/mdr/splunk`
+- 现在是统一语义主题层下的运营工作台，而不是几块彼此独立的 demo 页面
+
+### Team
+
+- `/team`
+- `/team/history`
+- `/team/decisions`
+- `/team/decisions/[slug]`
+- 现在是统一的 Executive workbench 语言，围绕 command deck、decision lanes、archive workbench 展开
+
+## 架构概览
+
+### Route groups
+
+顶层路由已经按产品职责拆到不同 route group：
+
+- `app/(public)`：公开资讯页
+- `app/(executive)`：`/intelligence` 和 `/team`
+- `app/(ops)`：`/mdr*`
+- `app/api`：feed、cron、translate、digest 等内部接口
+
+### Shared shells
+
+主要页面不再依赖各自手写外壳，而是通过共享 shell 约束页面骨架：
+
+- `components/shells/PublicShell.tsx`
+- `components/shells/MdrShell.tsx`
+- `components/shells/TeamShell.tsx`
+- `components/shells/ProductSectionShell.tsx`
+
+### Style layers
+
+全局样式已经拆成按职责分层，而不是把所有视觉规则塞进同一份文件：
+
+- `app/styles/tokens.css`
+- `app/styles/system.css`
+- `app/styles/public.css`
+- `app/styles/intelligence.css`
+- `app/styles/mdr.css`
+- `app/styles/team.css`
+
+### Semantic themes
+
+`MDR` 和 `Team` 的强调色、badge、状态色、统计色不再分散在页面里，而是集中到主题 helper：
+
+- `app/(ops)/mdr/theme.ts`
+- `app/(executive)/team/theme.ts`
+
+这一步的目的不是“抽常量”，而是让各个页面在改视觉语义时只动一个中心层。
+
+### Feed view model
+
+公共资讯页的筛选与时间窗状态由独立 view model 管理：
+
+- `lib/feed-view-model.js`
+
+它现在会在“过去 24 小时没有命中内容”时自动回退到“最近可用”结果，避免首页看起来像站点失效。
 
 ## 主要能力
 
@@ -41,20 +116,27 @@
 - `/api/feed-ai`
 - `/api/feed`
 
-前端页面使用统一的 feed client 读取这些结果，并在客户端完成排序、筛选和搜索。
+核心实现主要在：
 
-### 2. 自动翻译与自愈
+- `lib/feed-client.ts`
+- `lib/feed-page-data.ts`
+- `lib/feed-pipeline.ts`
+- `lib/feed-refresh.ts`
+
+### 2. 自动翻译、自检和修复
 
 项目会把英文资讯翻译成中文，并在最近内容缺少中文字段时自动触发修复。
 
-相关能力包括：
+核心接口和模块：
 
 - `/api/translate`
 - `/api/translation-health`
 - `lib/translate.ts`
 - `lib/translation-health.ts`
+- `lib/translation-repair.ts`
+- `scripts/repair-translations.mjs`
 
-支持的 LLM 优先级是：
+支持的 LLM 优先级：
 
 1. `DEEPSEEK_API_KEY`
 2. `KIMI_API_KEY`
@@ -64,73 +146,82 @@
 
 站点会基于近期内容生成摘要和每日快照，供首页和后续展示消费。
 
-相关能力包括：
+相关实现：
 
 - `/api/digest`
 - `lib/digest.ts`
+- `lib/digest-inputs.ts`
 - `lib/snapshot.ts`
 
 ### 4. 云端定时刷新
 
-Vercel 上只保留了一个 cron 入口：
+Vercel 上只保留一个 cron 入口：
 
 - `/api/cron`
 
-这个入口会负责：
+这个入口负责：
 
 - 刷新 feed 缓存
 - 触发图片抓取
 - 触发翻译修复
 - 更新每日快照
 
-相关配置见 [`vercel.json`](./vercel.json)。
+相关配置见 [vercel.json](./vercel.json)。
 
-### 5. 情报中心与运营演示模块
+## 项目目录
 
-除了资讯站点本身，这个仓库还内置两个偏产品演示 / 工作台性质的模块：
+```text
+app/
+  (public)/
+    page.tsx                  安全资讯首页
+    ai/page.tsx               AI 资讯页
+  (executive)/
+    intelligence/page.tsx     情报中心
+    team/                     Executive Team 工作台
+    layout.tsx
+  (ops)/
+    mdr/                      MDR 工作台与子页
+    layout.tsx
+  api/                        Feed / cron / translate / digest 接口
+  styles/                     tokens / system / public / intelligence / mdr / team
 
-- `/intelligence`
-  现在是新的 Threat Intelligence Command Center，强调态势、重点活动、暴露面和 analyst drilldown
-- `/mdr`
-  展示 MDR 工单派发、运营中心、网络侧视图与 Splunk 映射页面
+components/
+  feed/FeedLandingClient.tsx
+  shells/
+  CategoryFilter.tsx
+  NewsCard.tsx
+  ThreatMap.tsx
+  NetworkTopology.tsx
 
-## 路由结构
+lib/
+  feed-view-model.js          公共资讯页筛选与时间窗状态
+  feed-*.ts                   feed 拉取、合并、缓存、刷新
+  translate.ts
+  digest.ts
+  snapshot.ts
+  mdr-mock.ts
+  network-mock.ts
+  app-url.ts
 
-### 页面路由
+tests/
+  *.test.mjs                  架构、UI 契约、回归测试
 
-- `/`
-- `/ai`
-- `/team`
-- `/team/decisions`
-- `/team/decisions/[slug]`
-- `/intelligence`
-- `/mdr`
-- `/mdr/dashboard`
-- `/mdr/network`
-- `/mdr/splunk`
-
-### API 路由
-
-- `/api/cron`
-- `/api/digest`
-- `/api/feed`
-- `/api/feed-a`
-- `/api/feed-ai`
-- `/api/feed-b`
-- `/api/images`
-- `/api/summarize`
-- `/api/translate`
-- `/api/translation-health`
+docs/
+  third-party.md
+  2026-04-workbench-ui-refactor.md
+  superpowers/specs/
+  superpowers/plans/
+```
 
 ## 本地开发
 
-### 依赖安装
+安装依赖：
 
 ```bash
 npm install
 ```
 
-### 启动开发环境
+启动开发环境：
 
 ```bash
 npm run dev
@@ -140,27 +231,22 @@ npm run dev
 
 - [http://localhost:3000](http://localhost:3000)
 
-### 运行测试
+常用命令：
 
 ```bash
 npm test
-```
-
-### 生产构建
-
-```bash
 npm run build
+npm run lint
+npm run repair:translations
+npm run repair:translations:all
 ```
 
 ## 环境变量
 
 ### 必需
 
-这些变量至少应该在部署环境中配置：
-
 - `CRON_SECRET`
-  用于保护 `/api/cron`、`/api/translate`、`/api/images`、`/api/summarize` 等内部触发接口
-
+  用于保护 `/api/cron`、`/api/translate`、`/api/images`、`/api/summarize` 等内部接口
 - `KV_REST_API_URL`
 - `KV_REST_API_TOKEN`
   用于 Upstash Redis / KV 缓存
@@ -169,7 +255,7 @@ npm run build
 
 至少配置一个：
 
-- `DEEPSEEK_API_KEY`，推荐
+- `DEEPSEEK_API_KEY`
 - `KIMI_API_KEY`
 - `OPENAI_API_KEY`
 
@@ -185,134 +271,58 @@ npm run build
 - `NEXT_PUBLIC_APP_URL`
 - `VERCEL_URL`
 
-项目会通过 `lib/app-url.ts` 优先解析云端可达地址，保证 cron 和后续链路尽量走云端而不是本地回环地址。
-
-## 目录说明
-
-```text
-DESIGN.md                   仓库级设计系统说明，供 AI agent / 贡献者读取
-
-app/
-  page.tsx                  安全资讯首页
-  ai/page.tsx               AI 资讯页
-  intelligence/             新情报中心
-  mdr/                      MDR 演示模块
-  team/                     多角色团队页
-  api/                      Feed / cron / translate / digest 等接口
-
-components/
-  NavBar.tsx
-  NewsCard.tsx
-  CategoryFilter.tsx
-  ThreatMap.tsx
-  NetworkTopology.tsx
-
-lib/
-  feed-client.ts
-  feed-refresh.ts
-  translate.ts
-  digest.ts
-  snapshot.ts
-  app-url.ts
-  kv.ts
-  deepseek.ts
-
-tests/
-  *.test.mjs                关键回归测试
-
-docs/
-  third-party.md            第三方设计参考与归属说明
-```
-
-## 设计与内容定位
-
-这个项目目前同时承担两类职责：
-
-- 一个真实可部署的安全 / AI 内容站点
-- 一个可持续演进的安全产品界面实验场
-
-因此仓库里既有：
-
-- 面向资讯消费的首页与 AI 页
-- 面向情报和安全运营演示的 `/intelligence` 与 `/mdr`
-- 面向角色化协同展示的 `/team`
-
-如果你只关心资讯聚合能力，从首页、AI 页和 `/api/*` 路由看即可；如果你关心安全产品 UI，重点看 `/intelligence`、`/mdr` 和 `app/globals.css`。
+项目会通过 `lib/app-url.ts` 优先解析云端可达地址，尽量避免内部任务退回到本地回环地址。
 
 ## 测试与质量
 
-当前测试覆盖重点放在以下几类回归：
+当前测试覆盖重点包括：
 
-- feed client 合并与排序
+- feed 合并、排序、回退和搜索逻辑
 - cron 配置与刷新策略
-- 时间与摘要输入逻辑
+- 翻译修复与检测逻辑
 - URL 安全性与应用基地址解析
-- intelligence 路由结构契约
-- 历史功能移除回归（如 Huawei 相关页面）
+- route group 与共享 shell 契约
+- public、intelligence、team、mdr 的 UI 回归约束
+- 历史功能移除回归
 
-测试命令：
-
-```bash
-npm test
-```
-
-## 部署
-
-项目设计为优先部署到 Vercel。
-
-当前 `vercel.json` 中配置了：
-
-- 单一 cron 入口
-- 不同 API 路由的 `maxDuration`
-
-推荐部署方式：
-
-1. 在 Vercel 导入仓库
-2. 配置上面的环境变量
-3. 确认 cron 已启用
-4. 用生产域名配置 `APP_BASE_URL`
-
-### 正确提交到 Vercel 的推荐流程
-
-1. 在提交前先本地自检（你本地路径不是固定路径，所以先执行）：
+验证命令：
 
 ```bash
 npm test
 npm run build
 ```
 
-2. 确认本地仓库已正确关联到 GitHub 仓库（不是本地路径）：
+## 部署
+
+项目设计为优先部署到 Vercel。
+
+推荐流程：
+
+1. 在 Vercel 导入仓库
+2. 配置上面的环境变量
+3. 确认 cron 已启用
+4. 用生产域名配置 `APP_BASE_URL`
+5. 推送 `main` 触发生产部署
+
+本地提交前建议先跑：
+
+```bash
+npm test
+npm run build
+```
+
+如果需要确认远端：
 
 ```bash
 git remote -v
-# 若不是 https://github.com/wjx88122-alt/cybersec-daily.git，请先设置
-git remote set-url origin https://github.com/wjx88122-alt/cybersec-daily.git
-```
-
-3. 提交到远端（Vercel 推荐监听 `main` 分支）：
-
-```bash
-git add .
-git commit -m "chore: fix for Vercel submission"
 git push origin main
 ```
 
-4. 在 Vercel 项目里确认 `Production Branch` 指向 `main`，推送后会自动触发生产部署。
+## 后续建议
 
-5. 仅在需要手工触发时，使用 Vercel CLI：
+如果接着往下做，最值当的方向通常是：
 
-```bash
-npm i -g vercel
-vercel link
-vercel --prod
-```
-
-如果你只希望生成预览版，可先跑 `vercel --prebuilt` 或在链接到仓库后创建 PR 触发预览部署。
-
-## 后续可扩展方向
-
-- 增加更多安全 / AI 内容源
-- 为 digest 增加更稳定的人工校验或审阅机制
-- 将 `/intelligence` 从演示数据逐步切回真实情报源
-- 将 `/mdr` 接入更真实的工单和告警模型
-- 增加更完整的观测、缓存和失败重试面板
+- 把 `MDR` 和 `Intelligence` 从 mock 数据逐步换成真实数据源
+- 给 digest 增加更明确的人工审阅流程
+- 为工作台增加更细的观测、失败重试和任务状态面板
+- 继续收紧页面级 copy 和状态文案，让不同产品面的语言也统一起来
