@@ -75,3 +75,15 @@ test("intelligence stylesheet includes mobile safeguards for command chips and h
   assert.equal(intelligence.includes("overflow-wrap: anywhere"), true);
   assert.equal(intelligence.includes("@media (max-width: 760px)"), true);
 });
+
+test("intelligence center uses the shared light shell and keeps tabs in document flow", () => {
+  const page = load("app/(executive)/intelligence/page.tsx");
+  const intelligence = load("app/styles/intelligence.css");
+  const topbarBlock = intelligence.match(/\.intelligence-command-center \.topbar \{[\s\S]*?\n\}/)?.[0] ?? "";
+
+  assert.equal(page.includes('systemTone="system-shell-light"'), true);
+  assert.equal(intelligence.includes("--intel-bg: #f8fafc"), true);
+  assert.equal(intelligence.includes("linear-gradient(180deg, #ffffff 0%, #f6f8fb 100%)"), true);
+  assert.equal(topbarBlock.includes("position: sticky"), false);
+  assert.equal(topbarBlock.includes("top:"), false);
+});

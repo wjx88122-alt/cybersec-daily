@@ -34,7 +34,7 @@ export default function IntelligencePage() {
   return (
     <ProductSectionShell
       shellClassName="intelligence-command-center"
-      systemTone="system-shell-dark"
+      systemTone="system-shell-light"
     >
       <div className="homepage-shell">
         <Topbar
