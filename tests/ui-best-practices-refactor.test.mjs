@@ -302,6 +302,32 @@ test("content summary hero uses a dedicated expert brief board", () => {
   }
 });
 
+test("security industry summary uses a hierarchy board instead of equal columns", () => {
+  const source = load("components/feed/FeedLandingClient.tsx");
+  const stylesheet = load("app/styles/public.css");
+
+  for (const phrase of [
+    "public-summary-focus",
+    "public-summary-focus-chip",
+    "public-summary-sections-heading",
+    "is-primary",
+    "产业雷达",
+    "产业样本",
+  ]) {
+    assert.equal(source.includes(phrase), true, `expected component to render ${phrase}`);
+  }
+
+  for (const selector of [
+    ".public-summary-focus",
+    ".public-summary-focus-chip",
+    ".public-summary-sections-heading",
+    ".public-summary-card.is-primary",
+    ".public-summary-card.is-primary ol",
+  ]) {
+    assert.equal(stylesheet.includes(selector), true, `expected stylesheet for ${selector}`);
+  }
+});
+
 test("daily digest prompt asks for security industry judgment instead of threat intel", () => {
   const source = load("lib/digest.ts");
 

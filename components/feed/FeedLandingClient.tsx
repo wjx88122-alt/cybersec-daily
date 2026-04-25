@@ -66,6 +66,7 @@ export default function FeedLandingClient({
   const heroTitle = usesContentSummary ? heroSummary.title : headline;
   const heroLead = usesContentSummary ? heroSummary.body || lead : lead;
   const heroSections: SummarySection[] = usesContentSummary ? heroSummary.sections ?? [] : [];
+  const summaryHighlights = heroSections.slice(0, 3);
   const judgmentLabel = usesContentSummary ? heroSummary.judgmentLabel ?? "产业判断" : "";
   const heroTitleClass = usesContentSummary
     ? "public-summary-title mt-4"
@@ -86,11 +87,17 @@ export default function FeedLandingClient({
         minute: "2-digit",
       })
     : "";
-  const overviewStats = [
-    { label: "资讯数量", value: String(filtered.length), icon: "list" as const },
-    { label: "信息来源", value: String(sourceCount), icon: "globe" as const },
-    { label: "分类覆盖", value: String(categoryCount), icon: "filter" as const },
-  ];
+  const overviewStats = usesContentSummary
+    ? [
+        { label: "产业样本", value: String(filtered.length), icon: "list" as const },
+        { label: "信源覆盖", value: String(sourceCount), icon: "globe" as const },
+        { label: "赛道覆盖", value: String(categoryCount), icon: "filter" as const },
+      ]
+    : [
+        { label: "资讯数量", value: String(filtered.length), icon: "list" as const },
+        { label: "信息来源", value: String(sourceCount), icon: "globe" as const },
+        { label: "分类覆盖", value: String(categoryCount), icon: "filter" as const },
+      ];
 
   return (
     <main className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">
@@ -111,14 +118,46 @@ export default function FeedLandingClient({
                 </div>
                 <h1 className={heroTitleClass}>{heroTitle}</h1>
                 {heroLead && <p className={heroLeadClass}>{heroLead}</p>}
+                {summaryHighlights.length > 0 && (
+                  <div className="public-summary-focus">
+                    {summaryHighlights.map((section) => (
+                      <span
+                        key={section.label}
+                        className={`public-summary-focus-chip is-${section.intent ?? "context"}`}
+                      >
+                        <SystemIcon
+                          className="system-icon"
+                          name={section.icon ?? "list"}
+                          size={14}
+                        />
+                        <span>{section.label}</span>
+                        <strong>{section.items.length}</strong>
+                      </span>
+                    ))}
+                  </div>
+                )}
               </section>
 
               {heroSections.length > 0 && (
-                <div className="public-summary-sections">
-                  {heroSections.map((section) => (
+                <div>
+                  <div className="public-summary-sections-heading">
+                    <div>
+                      <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-700">
+                        <SystemIcon className="system-icon" name="radar" size={15} />
+                      </span>
+                      <div>
+                        <span>产业雷达</span>
+                        <strong>从信号、影响和观察方向拆解今天的产业主线</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="public-summary-sections">
+                  {heroSections.map((section, index) => (
                     <section
                       key={section.label}
-                      className={`public-summary-card is-${section.intent ?? "context"}`}
+                      className={`public-summary-card is-${section.intent ?? "context"} ${
+                        index === 0 ? "is-primary" : ""
+                      }`}
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-center gap-3">
@@ -148,6 +187,7 @@ export default function FeedLandingClient({
                       </ol>
                     </section>
                   ))}
+                  </div>
                 </div>
               )}
             </div>
