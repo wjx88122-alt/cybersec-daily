@@ -183,3 +183,30 @@ test("executive brief avoids a two-column height trap around decisions", () => {
   assert.equal(stylesheet.includes(".intelligence-command-center .briefing-row"), false);
   assert.equal(stylesheet.includes(".intelligence-command-center .decision-list {\n  display: grid;\n  grid-template-columns: repeat(3"), true);
 });
+
+test("executive brief compacts the decision area into an action workbench", () => {
+  const componentSource = readFileSync(
+    join(root, "app/(executive)/intelligence/components/ExecutiveBrief.tsx"),
+    "utf8",
+  );
+  const stylesheet = readFileSync(join(root, "app/styles/intelligence.css"), "utf8");
+
+  for (const phrase of [
+    "decision-workbench",
+    "decision-queue",
+    "decision-followthrough",
+    "decision-summary-card",
+  ]) {
+    assert.equal(
+      `${componentSource}\n${stylesheet}`.includes(phrase),
+      true,
+      `expected compact decision workbench affordance ${phrase}`,
+    );
+  }
+
+  const decisionWorkbenchBlock =
+    stylesheet.match(/\.intelligence-command-center \.decision-workbench \{[\s\S]*?\n\}/)?.[0] ?? "";
+
+  assert.equal(decisionWorkbenchBlock.includes("grid-template-columns"), true);
+  assert.equal(decisionWorkbenchBlock.includes("align-items: stretch"), true);
+});

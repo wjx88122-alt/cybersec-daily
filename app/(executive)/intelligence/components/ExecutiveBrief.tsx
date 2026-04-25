@@ -205,27 +205,84 @@ export default function ExecutiveBrief({
               </div>
               <StatusPill label={hero.decisions.badge} tone="warning" />
             </div>
-            <div className="decision-list">
-              {hero.decisions.items.map((item) => (
-                <article key={item.title} className="decision-item">
-                  <strong>{item.title}</strong>
-                  <p>{item.description}</p>
-                  <div className="decision-meta">
-                    <span className="intel-icon-label">
-                      <SystemIcon className="system-icon" name="user" size={13} />
-                      {`Owner: ${item.owner ?? "N/A"}`}
+            <div className="decision-workbench">
+              <div className="decision-queue">
+                <div className="decision-queue-header">
+                  <div>
+                    <div className="meta-label intel-icon-label">
+                      <SystemIcon className="system-icon" name="list" size={13} />
+                      Decision queue
+                    </div>
+                    <h4>按响应顺序处理</h4>
+                  </div>
+                  <span>{hero.decisions.items.length} items</span>
+                </div>
+                <div className="decision-list">
+                  {hero.decisions.items.map((item, index) => (
+                    <article key={item.title} className="decision-item">
+                      <div className="decision-index">{String(index + 1).padStart(2, "0")}</div>
+                      <div>
+                        <strong>{item.title}</strong>
+                        <p>{item.description}</p>
+                        <div className="decision-meta">
+                          <span className="intel-icon-label">
+                            <SystemIcon className="system-icon" name="user" size={13} />
+                            {`Owner: ${item.owner ?? "N/A"}`}
+                          </span>
+                          <span className="intel-icon-label">
+                            <SystemIcon className="system-icon" name="clock" size={13} />
+                            {`SLA: ${item.sla ?? "N/A"}`}
+                          </span>
+                          <span className="intel-icon-label">
+                            <SystemIcon className="system-icon" name="arrowRight" size={13} />
+                            {`Action: ${item.recommendedAction ?? "N/A"}`}
+                          </span>
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </div>
+
+              <aside className="decision-followthrough" aria-label="决策后续动作">
+                <article className="decision-summary-card">
+                  <div className="meta-label intel-icon-label">
+                    <SystemIcon className="system-icon" name="target" size={13} />
+                    Execution focus
+                  </div>
+                  <h4>把情报转成可执行动作</h4>
+                  <p>
+                    先处理具备本地命中、资产可达性和自动化条件的事项，再把观察项绑定到 Campaign Watchlist。
+                  </p>
+                  <div className="decision-summary-metrics">
+                    <span>
+                      <strong>{hero.actionMatrix.rows.length}</strong>
+                      执行路径
                     </span>
-                    <span className="intel-icon-label">
-                      <SystemIcon className="system-icon" name="clock" size={13} />
-                      {`SLA: ${item.sla ?? "N/A"}`}
-                    </span>
-                    <span className="intel-icon-label">
-                      <SystemIcon className="system-icon" name="arrowRight" size={13} />
-                      {`Action: ${item.recommendedAction ?? "N/A"}`}
+                    <span>
+                      <strong>{hero.decisions.items.length}</strong>
+                      待决策
                     </span>
                   </div>
                 </article>
-              ))}
+
+                <div className="decision-action-stack">
+                  {hero.actionMatrix.rows.map((row) => (
+                    <div key={row.title} className="decision-action-step">
+                      <StatusPill
+                        label={
+                          row.tone === "critical" ? "Now" : row.tone === "warning" ? "Next" : "Watch"
+                        }
+                        tone={row.tone}
+                      />
+                      <div>
+                        <strong>{row.title}</strong>
+                        <p>{row.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </aside>
             </div>
           </section>
         </section>
