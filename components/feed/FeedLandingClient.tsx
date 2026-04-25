@@ -57,6 +57,7 @@ export default function FeedLandingClient({
   const usesContentSummary = heroMode === "contentSummary";
   const heroTitle = usesContentSummary ? heroSummary.title : headline;
   const heroLead = usesContentSummary ? heroSummary.body || lead : lead;
+  const heroSections = usesContentSummary ? heroSummary.sections ?? [] : [];
   const heroTitleClass = usesContentSummary
     ? "public-summary-title mt-4"
     : "public-display mt-4 max-w-[11ch]";
@@ -89,6 +90,20 @@ export default function FeedLandingClient({
           <div className="public-eyebrow">{eyebrow}</div>
           <h1 className={heroTitleClass}>{heroTitle}</h1>
           {heroLead && <p className={heroLeadClass}>{heroLead}</p>}
+          {heroSections.length > 0 && (
+            <div className="public-summary-sections mt-6">
+              {heroSections.map((section) => (
+                <section key={section.label} className="public-summary-section">
+                  <h2>{section.label}</h2>
+                  <ol>
+                    {section.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ol>
+                </section>
+              ))}
+            </div>
+          )}
           <div className="mt-8 flex flex-wrap gap-3 text-[12px] text-slate-600">
             {displayChips.map((chip) => (
               <span

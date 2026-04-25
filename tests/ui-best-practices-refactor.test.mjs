@@ -155,12 +155,67 @@ test("feed landing hero summary keeps long digest sentences out of the display t
   );
 });
 
+test("feed landing hero summary renders structured expert brief points", () => {
+  const now = Date.parse("2026-04-23T12:00:00.000Z");
+  const state = buildFeedLandingState(
+    [
+      {
+        id: "fresh-security-1",
+        title: "Fresh story",
+        titleZh: "供应链攻击扩大",
+        summary: "Fresh summary",
+        summaryZh: "供应链风险正在扩大。",
+        summaryAi: "",
+        pubDate: "2026-04-23T09:00:00.000Z",
+        category: "威胁情报",
+        source: "Example",
+        link: "https://example.com/fresh",
+      },
+    ],
+    {
+      category: "全部",
+      search: "",
+      now,
+      digestOverview:
+        "专家判断：今天的主线是供应链与身份风险同步升温，AI 工具权限暴露正在扩大企业攻击面。\n重点变化：\n1. CISA 新增已利用漏洞，边界产品仍是攻击入口。\n2. npm 依赖与 OAuth 权限事件说明开发链路风险上升。\n进一步关注：\n- 远程访问资产是否暴露在公网。\n- AI 工具是否拿到了过宽令牌。\n行动建议：\n- 先修 KEV 漏洞，再隔离受影响依赖。\n- 对 MCP 与 OAuth 集成做权限复核。",
+    },
+  );
+
+  assert.equal(state.heroSummary.title, "今天的主线是供应链与身份风险同步升温。");
+  assert.equal(
+    state.heroSummary.body,
+    "AI 工具权限暴露正在扩大企业攻击面。",
+  );
+  assert.deepEqual(
+    state.heroSummary.sections.map((section) => section.label),
+    ["重点变化", "进一步关注", "行动建议"],
+  );
+  assert.equal(state.heroSummary.sections[0].items[0].startsWith("CISA 新增"), true);
+});
+
 test("content summary hero uses compact title styling instead of display typography", () => {
   const source = load("components/feed/FeedLandingClient.tsx");
   const stylesheet = load("app/styles/public.css");
 
   assert.equal(source.includes("public-summary-title"), true);
   assert.equal(stylesheet.includes(".public-summary-title"), true);
+  assert.equal(source.includes("public-summary-sections"), true);
+  assert.equal(stylesheet.includes(".public-summary-sections"), true);
+});
+
+test("daily digest prompt asks for expert judgment instead of a flat roundup", () => {
+  const source = load("lib/digest.ts");
+
+  for (const phrase of [
+    "专家判断",
+    "重点变化",
+    "进一步关注",
+    "行动建议",
+    "不是逐条资讯汇总",
+    "必须给出自己的优先级判断",
+  ]) {
+    assert.equal(source.includes(phrase), true, `expected digest prompt phrase ${phrase}`);
+  }
 });
 
 test("feed landing hero summary falls back to current filtered items", () => {
