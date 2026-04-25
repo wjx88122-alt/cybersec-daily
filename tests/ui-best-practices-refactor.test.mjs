@@ -328,6 +328,32 @@ test("security industry summary uses a hierarchy board instead of equal columns"
   }
 });
 
+test("public overview rail is compact and does not stretch beside the brief", () => {
+  const source = load("components/feed/FeedLandingClient.tsx");
+  const stylesheet = load("app/styles/public.css");
+
+  for (const phrase of [
+    "lg:items-start",
+    "public-overview-rail",
+    "public-overview-grid",
+    "public-overview-guide",
+    "public-overview-entry",
+    "产业导航",
+  ]) {
+    assert.equal(source.includes(phrase), true, `expected compact overview rail ${phrase}`);
+  }
+
+  for (const selector of [
+    ".public-overview-rail",
+    ".public-overview-grid",
+    ".public-overview-stat",
+    ".public-overview-guide",
+    ".public-overview-entry",
+  ]) {
+    assert.equal(stylesheet.includes(selector), true, `expected stylesheet for ${selector}`);
+  }
+});
+
 test("daily digest prompt asks for security industry judgment instead of threat intel", () => {
   const source = load("lib/digest.ts");
 

@@ -101,7 +101,7 @@ export default function FeedLandingClient({
 
   return (
     <main className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:px-8">
-      <section className="grid gap-6 pb-10 pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pb-14 lg:pt-16">
+      <section className="grid gap-6 pb-10 pt-8 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start lg:gap-8 lg:pb-14 lg:pt-16 xl:grid-cols-[minmax(0,1fr)_390px]">
         <div className="reveal-rise">
           <div className="public-eyebrow">{eyebrow}</div>
           {usesContentSummary ? (
@@ -152,41 +152,41 @@ export default function FeedLandingClient({
                     </div>
                   </div>
                   <div className="public-summary-sections">
-                  {heroSections.map((section, index) => (
-                    <section
-                      key={section.label}
-                      className={`public-summary-card is-${section.intent ?? "context"} ${
-                        index === 0 ? "is-primary" : ""
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-3">
-                          <span className="system-icon-badge h-9 min-w-9 w-9">
-                            <SystemIcon
-                              className="system-icon"
-                              name={section.icon ?? "list"}
-                              size={16}
-                            />
-                          </span>
-                          <div className="public-summary-card-meta">
-                            <span>{section.priority ?? "INFO"}</span>
-                            <h2>{section.label}</h2>
+                    {heroSections.map((section, index) => (
+                      <section
+                        key={section.label}
+                        className={`public-summary-card is-${section.intent ?? "context"} ${
+                          index === 0 ? "is-primary" : ""
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex items-center gap-3">
+                            <span className="system-icon-badge h-9 min-w-9 w-9">
+                              <SystemIcon
+                                className="system-icon"
+                                name={section.icon ?? "list"}
+                                size={16}
+                              />
+                            </span>
+                            <div className="public-summary-card-meta">
+                              <span>{section.priority ?? "INFO"}</span>
+                              <h2>{section.label}</h2>
+                            </div>
                           </div>
+                          <span className="public-summary-count">
+                            {section.items.length} 条
+                          </span>
                         </div>
-                        <span className="public-summary-count">
-                          {section.items.length} 条
-                        </span>
-                      </div>
-                      <ol>
-                        {section.items.map((item, index) => (
-                          <li key={item}>
-                            <span>{index + 1}</span>
-                            <p>{item}</p>
-                          </li>
-                        ))}
-                      </ol>
-                    </section>
-                  ))}
+                        <ol>
+                          {section.items.map((item, index) => (
+                            <li key={item}>
+                              <span>{index + 1}</span>
+                              <p>{item}</p>
+                            </li>
+                          ))}
+                        </ol>
+                      </section>
+                    ))}
                   </div>
                 </div>
               )}
@@ -209,29 +209,34 @@ export default function FeedLandingClient({
           </div>
         </div>
 
-        <div className="public-panel-strong reveal-rise delay-1 rounded-[32px] p-6 sm:p-7">
+        <aside className="public-overview-rail reveal-rise delay-1">
+          <div className="public-overview-card">
           <div className="public-section-label">{overviewTitle}</div>
-          <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          <div className="public-overview-grid">
             {overviewStats.map((stat) => (
               <div
                 key={stat.label}
-                className="rounded-2xl border border-slate-200 bg-white/80 p-4"
+                className="public-overview-stat"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  <div>
+                    <div className="public-overview-stat-label">
                     {stat.label}
+                    </div>
+                    <div className="public-overview-stat-value">
+                      {stat.value}
+                    </div>
                   </div>
                   <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-600">
                     <SystemIcon className="system-icon" name={stat.icon} size={15} />
                   </span>
                 </div>
-                <div className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-slate-950">
-                  {stat.value}
-                </div>
               </div>
             ))}
           </div>
-          <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/90 p-4">
+          </div>
+
+          <div className="public-overview-guide">
             <div className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
               <SystemIcon className="system-icon text-slate-500" name="workflow" size={14} />
               浏览方式
@@ -244,7 +249,39 @@ export default function FeedLandingClient({
               </p>
             )}
           </div>
-        </div>
+
+          {usesContentSummary && summaryHighlights.length > 0 && (
+            <div className="public-overview-card">
+              <div className="flex items-center gap-2">
+                <span className="system-icon-badge h-8 min-w-8 w-8 text-slate-700">
+                  <SystemIcon className="system-icon" name="map" size={15} />
+                </span>
+                <div>
+                  <div className="public-section-label">产业导航</div>
+                  <p className="mt-1 text-[12px] leading-5 text-slate-500">
+                    先看主信号，再判断市场影响与后续变量。
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 grid gap-2">
+                {summaryHighlights.map((section) => (
+                  <div
+                    key={section.label}
+                    className={`public-overview-entry is-${section.intent ?? "context"}`}
+                  >
+                    <SystemIcon
+                      className="system-icon"
+                      name={section.icon ?? "list"}
+                      size={14}
+                    />
+                    <span>{section.label}</span>
+                    <strong>{section.items.length} 条</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </aside>
       </section>
 
       <section className="public-panel reveal-rise delay-2 rounded-[30px] p-4 sm:p-5">
