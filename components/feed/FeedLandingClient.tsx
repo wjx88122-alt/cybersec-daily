@@ -3,9 +3,17 @@
 import { useState } from "react";
 import CategoryFilter from "@/components/CategoryFilter";
 import NewsCard from "@/components/NewsCard";
-import { SystemIcon } from "@/components/ui/SystemIcon";
+import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 import { type FeedItem } from "@/lib/feeds";
 import { buildFeedLandingState } from "@/lib/feed-view-model.js";
+
+type SummarySection = {
+  label: string;
+  items: string[];
+  intent?: string;
+  icon?: SystemIconName;
+  priority?: string;
+};
 
 type FeedLandingClientProps = {
   items: FeedItem[];
@@ -57,7 +65,8 @@ export default function FeedLandingClient({
   const usesContentSummary = heroMode === "contentSummary";
   const heroTitle = usesContentSummary ? heroSummary.title : headline;
   const heroLead = usesContentSummary ? heroSummary.body || lead : lead;
-  const heroSections = usesContentSummary ? heroSummary.sections ?? [] : [];
+  const heroSections: SummarySection[] = usesContentSummary ? heroSummary.sections ?? [] : [];
+  const judgmentLabel = usesContentSummary ? heroSummary.judgmentLabel ?? "专家判断" : "";
   const heroTitleClass = usesContentSummary
     ? "public-summary-title mt-4"
     : "public-display mt-4 max-w-[11ch]";
@@ -88,21 +97,65 @@ export default function FeedLandingClient({
       <section className="grid gap-6 pb-10 pt-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-8 lg:pb-14 lg:pt-16">
         <div className="reveal-rise">
           <div className="public-eyebrow">{eyebrow}</div>
-          <h1 className={heroTitleClass}>{heroTitle}</h1>
-          {heroLead && <p className={heroLeadClass}>{heroLead}</p>}
-          {heroSections.length > 0 && (
-            <div className="public-summary-sections mt-6">
-              {heroSections.map((section) => (
-                <section key={section.label} className="public-summary-section">
-                  <h2>{section.label}</h2>
-                  <ol>
-                    {section.items.map((item) => (
-                      <li key={item}>{item}</li>
-                    ))}
-                  </ol>
-                </section>
-              ))}
+          {usesContentSummary ? (
+            <div className="public-summary-brief mt-5">
+              <section className="public-summary-judgment">
+                <div className="flex items-center gap-3">
+                  <span className="system-icon-badge h-10 min-w-10 w-10 text-blue-700">
+                    <SystemIcon className="system-icon" name="spark" size={17} />
+                  </span>
+                  <div className="public-summary-card-meta">
+                    <span>{judgmentLabel}</span>
+                    <strong>{heroSummary.sourceLabel}</strong>
+                  </div>
+                </div>
+                <h1 className={heroTitleClass}>{heroTitle}</h1>
+                {heroLead && <p className={heroLeadClass}>{heroLead}</p>}
+              </section>
+
+              {heroSections.length > 0 && (
+                <div className="public-summary-sections">
+                  {heroSections.map((section) => (
+                    <section
+                      key={section.label}
+                      className={`public-summary-card is-${section.intent ?? "context"}`}
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="system-icon-badge h-9 min-w-9 w-9">
+                            <SystemIcon
+                              className="system-icon"
+                              name={section.icon ?? "list"}
+                              size={16}
+                            />
+                          </span>
+                          <div className="public-summary-card-meta">
+                            <span>{section.priority ?? "INFO"}</span>
+                            <h2>{section.label}</h2>
+                          </div>
+                        </div>
+                        <span className="public-summary-count">
+                          {section.items.length} 条
+                        </span>
+                      </div>
+                      <ol>
+                        {section.items.map((item, index) => (
+                          <li key={item}>
+                            <span>{index + 1}</span>
+                            <p>{item}</p>
+                          </li>
+                        ))}
+                      </ol>
+                    </section>
+                  ))}
+                </div>
+              )}
             </div>
+          ) : (
+            <>
+              <h1 className={heroTitleClass}>{heroTitle}</h1>
+              {heroLead && <p className={heroLeadClass}>{heroLead}</p>}
+            </>
           )}
           <div className="mt-8 flex flex-wrap gap-3 text-[12px] text-slate-600">
             {displayChips.map((chip) => (

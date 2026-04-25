@@ -193,6 +193,48 @@ test("feed landing hero summary renders structured expert brief points", () => {
   assert.equal(state.heroSummary.sections[0].items[0].startsWith("CISA 新增"), true);
 });
 
+test("structured expert brief exposes section intent for visual hierarchy", () => {
+  const now = Date.parse("2026-04-23T12:00:00.000Z");
+  const state = buildFeedLandingState(
+    [
+      {
+        id: "fresh-security-1",
+        title: "Fresh story",
+        titleZh: "AI 供应链风险升温",
+        summary: "Fresh summary",
+        summaryZh: "AI 供应链风险正在扩大。",
+        summaryAi: "",
+        pubDate: "2026-04-23T09:00:00.000Z",
+        category: "威胁情报",
+        source: "Example",
+        link: "https://example.com/fresh",
+      },
+    ],
+    {
+      category: "全部",
+      search: "",
+      now,
+      digestOverview:
+        "专家判断：AI 供应链已经从潜在风险变成现实攻击面，今天最该优先看身份权限和外部暴露。\n重点变化：\n1. 已利用漏洞数量继续增加，边界设备风险抬升。\n进一步关注：\n- AI 工具令牌是否越权。\n行动建议：\n- 立即收敛公网暴露资产并复核 OAuth 权限。",
+    },
+  );
+
+  assert.equal(state.heroSummary.judgmentLabel, "专家判断");
+  assert.deepEqual(
+    state.heroSummary.sections.map(({ label, intent, icon, priority }) => ({
+      label,
+      intent,
+      icon,
+      priority,
+    })),
+    [
+      { label: "重点变化", intent: "change", icon: "radar", priority: "P1" },
+      { label: "进一步关注", intent: "watch", icon: "target", priority: "P2" },
+      { label: "行动建议", intent: "action", icon: "check", priority: "NEXT" },
+    ],
+  );
+});
+
 test("content summary hero uses compact title styling instead of display typography", () => {
   const source = load("components/feed/FeedLandingClient.tsx");
   const stylesheet = load("app/styles/public.css");
@@ -201,6 +243,21 @@ test("content summary hero uses compact title styling instead of display typogra
   assert.equal(stylesheet.includes(".public-summary-title"), true);
   assert.equal(source.includes("public-summary-sections"), true);
   assert.equal(stylesheet.includes(".public-summary-sections"), true);
+});
+
+test("content summary hero uses a dedicated expert brief board", () => {
+  const source = load("components/feed/FeedLandingClient.tsx");
+  const stylesheet = load("app/styles/public.css");
+
+  for (const phrase of [
+    "public-summary-brief",
+    "public-summary-judgment",
+    "public-summary-card",
+    "public-summary-card-meta",
+  ]) {
+    assert.equal(source.includes(phrase), true, `expected component to render ${phrase}`);
+    assert.equal(stylesheet.includes(`.${phrase}`), true, `expected stylesheet for ${phrase}`);
+  }
 });
 
 test("daily digest prompt asks for expert judgment instead of a flat roundup", () => {
