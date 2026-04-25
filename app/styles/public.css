@@ -101,15 +101,32 @@
   border-color: rgba(14, 165, 233, 0.22);
 }
 
+.public-summary-card.is-signal {
+  border-color: rgba(14, 165, 233, 0.22);
+}
+
 .public-summary-card.is-watch {
   border-color: rgba(245, 158, 11, 0.26);
+}
+
+.public-summary-card.is-impact {
+  border-color: rgba(99, 102, 241, 0.24);
 }
 
 .public-summary-card.is-action {
   border-color: rgba(16, 185, 129, 0.25);
 }
 
+.public-summary-card.is-opportunity {
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
 .public-summary-card.is-change .system-icon-badge {
+  color: #0369a1;
+  background: rgba(14, 165, 233, 0.1);
+}
+
+.public-summary-card.is-signal .system-icon-badge {
   color: #0369a1;
   background: rgba(14, 165, 233, 0.1);
 }
@@ -119,7 +136,17 @@
   background: rgba(245, 158, 11, 0.1);
 }
 
+.public-summary-card.is-impact .system-icon-badge {
+  color: #4338ca;
+  background: rgba(99, 102, 241, 0.1);
+}
+
 .public-summary-card.is-action .system-icon-badge {
+  color: #047857;
+  background: rgba(16, 185, 129, 0.11);
+}
+
+.public-summary-card.is-opportunity .system-icon-badge {
   color: #047857;
   background: rgba(16, 185, 129, 0.11);
 }

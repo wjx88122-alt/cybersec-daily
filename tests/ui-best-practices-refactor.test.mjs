@@ -111,7 +111,7 @@ test("feed landing hero summary uses cached digest overview when available", () 
     },
   );
 
-  assert.equal(state.heroSummary.sourceLabel, "LLM 基于当前日报生成");
+  assert.equal(state.heroSummary.sourceLabel, "LLM 安全产业观察生成");
   assert.equal(
     state.heroSummary.title,
     "今日重点是边界漏洞、凭据风险和勒索活动的连续升温。",
@@ -235,6 +235,48 @@ test("structured expert brief exposes section intent for visual hierarchy", () =
   );
 });
 
+test("structured brief accepts security industry perspective labels", () => {
+  const now = Date.parse("2026-04-23T12:00:00.000Z");
+  const state = buildFeedLandingState(
+    [
+      {
+        id: "fresh-security-1",
+        title: "Fresh story",
+        titleZh: "AI 安全平台需求升温",
+        summary: "Fresh summary",
+        summaryZh: "AI 安全治理需求正在扩大。",
+        summaryAi: "",
+        pubDate: "2026-04-23T09:00:00.000Z",
+        category: "AI 安全",
+        source: "Example",
+        link: "https://example.com/fresh",
+      },
+    ],
+    {
+      category: "全部",
+      search: "",
+      now,
+      digestOverview:
+        "产业判断：今天最重要的变化不是单个漏洞升温，而是 AI 与边界资产治理正在推动安全预算从被动响应转向平台化能力建设。\n产业信号：\n1. 边界设备和 AI 开发工具事件共同指向暴露面管理需求上升。\n市场影响：\n- 客户会更关注 ASM、AI-SPM 和身份权限治理的一体化能力。\n关注方向：\n- 继续观察安全厂商如何把 AI 治理能力产品化，而不是只发布检测规则。",
+    },
+  );
+
+  assert.equal(state.heroSummary.judgmentLabel, "产业判断");
+  assert.deepEqual(
+    state.heroSummary.sections.map(({ label, intent, icon, priority }) => ({
+      label,
+      intent,
+      icon,
+      priority,
+    })),
+    [
+      { label: "产业信号", intent: "signal", icon: "chart", priority: "SIGNAL" },
+      { label: "市场影响", intent: "impact", icon: "network", priority: "IMPACT" },
+      { label: "关注方向", intent: "opportunity", icon: "spark", priority: "WATCH" },
+    ],
+  );
+});
+
 test("content summary hero uses compact title styling instead of display typography", () => {
   const source = load("components/feed/FeedLandingClient.tsx");
   const stylesheet = load("app/styles/public.css");
@@ -260,16 +302,19 @@ test("content summary hero uses a dedicated expert brief board", () => {
   }
 });
 
-test("daily digest prompt asks for expert judgment instead of a flat roundup", () => {
+test("daily digest prompt asks for security industry judgment instead of threat intel", () => {
   const source = load("lib/digest.ts");
 
   for (const phrase of [
-    "专家判断",
-    "重点变化",
-    "进一步关注",
-    "行动建议",
-    "不是逐条资讯汇总",
-    "必须给出自己的优先级判断",
+    "安全产业视角",
+    "不是安全情报简报",
+    "产业判断",
+    "产业信号",
+    "市场影响",
+    "关注方向",
+    "不要围绕漏洞技术细节、IOC、修补动作展开",
+    "客户预算",
+    "厂商格局",
   ]) {
     assert.equal(source.includes(phrase), true, `expected digest prompt phrase ${phrase}`);
   }

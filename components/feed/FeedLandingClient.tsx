@@ -66,7 +66,7 @@ export default function FeedLandingClient({
   const heroTitle = usesContentSummary ? heroSummary.title : headline;
   const heroLead = usesContentSummary ? heroSummary.body || lead : lead;
   const heroSections: SummarySection[] = usesContentSummary ? heroSummary.sections ?? [] : [];
-  const judgmentLabel = usesContentSummary ? heroSummary.judgmentLabel ?? "专家判断" : "";
+  const judgmentLabel = usesContentSummary ? heroSummary.judgmentLabel ?? "产业判断" : "";
   const heroTitleClass = usesContentSummary
     ? "public-summary-title mt-4"
     : "public-display mt-4 max-w-[11ch]";
