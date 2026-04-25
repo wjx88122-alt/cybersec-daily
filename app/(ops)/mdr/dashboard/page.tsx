@@ -7,6 +7,11 @@ import { formatShanghaiDateTime } from "@/lib/threat-map";
 import {
   MOCK_ALERTS, MOCK_TICKETS, MOCK_ANALYSTS,
 } from "@/lib/mdr-mock";
+import type {
+  AttackOperationsSnapshot,
+  AttackPortPressure,
+  AttackSourceStatus,
+} from "@/lib/attack-data-source";
 import {
   MOCK_CLIENTS, MOCK_DEVICES, MOCK_NET_ALERTS, MOCK_OPS_TICKETS,
 } from "@/lib/network-mock";
@@ -130,11 +135,297 @@ function AlertTicker({ items }: { items: { text: string; severity: string; time:
   );
 }
 
+function formatCompactNumber(value: number) {
+  return new Intl.NumberFormat("zh-CN", {
+    notation: value >= 10_000 ? "compact" : "standard",
+    maximumFractionDigits: 1,
+  }).format(value);
+}
+
+function formatFeedTime(value?: string) {
+  if (!value) return "等待同步";
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return "等待同步";
+
+  return new Date(parsed).toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function sourceStatusText(status?: AttackSourceStatus) {
+  if (status === "online") return "在线";
+  if (status === "degraded") return "降级";
+  return "离线";
+}
+
+function sourceStatusClass(status?: AttackSourceStatus) {
+  if (status === "online") return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (status === "degraded") return "border-amber-200 bg-amber-50 text-amber-700";
+  return "border-slate-200 bg-slate-50 text-slate-500";
+}
+
+function AttackSourceBadge({
+  label,
+  status,
+  icon,
+}: {
+  label: string;
+  status?: AttackSourceStatus;
+  icon: SystemIconName;
+}) {
+  return (
+    <div className={`flex items-center justify-between gap-2 rounded-xl border px-3 py-2 ${sourceStatusClass(status)}`}>
+      <span className="flex min-w-0 items-center gap-2 text-xs font-semibold">
+        <SystemIcon className="system-icon shrink-0" name={icon} size={14} />
+        <span className="truncate">{label}</span>
+      </span>
+      <span className="shrink-0 text-[10px] font-bold">{sourceStatusText(status)}</span>
+    </div>
+  );
+}
+
+function EmptyLiveFeed({ label }: { label: string }) {
+  return (
+    <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-3 py-4 text-xs text-slate-500">
+      {label}
+    </div>
+  );
+}
+
+function AttackRadarPanel({
+  snapshot,
+  loading,
+  error,
+}: {
+  snapshot: AttackOperationsSnapshot | null;
+  loading: boolean;
+  error: string;
+}) {
+  const topAttackers = snapshot?.topAttackers.slice(0, 6) ?? [];
+  const topPorts = snapshot?.topPorts.slice(0, 6) ?? [];
+  const kevHighlights = snapshot?.kevHighlights.slice(0, 2) ?? [];
+  const maxPortRecords = Math.max(...topPorts.map((port) => port.records), 1);
+
+  return (
+    <section className="mdr-board-card col-span-12 overflow-hidden rounded-2xl p-4">
+      <div className="grid grid-cols-12 items-start gap-4">
+        <div className="col-span-12 rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-cyan-50 p-4 xl:col-span-3">
+          <div className="flex items-start gap-3">
+            <span className="system-icon-badge h-11 min-w-11 w-11 border-blue-200 bg-white text-blue-700">
+              <SystemIcon className="system-icon" name="radar" size={20} />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-blue-700">真实攻击数据源</p>
+              <h2 className="mt-1 text-2xl font-black text-slate-950">攻击雷达</h2>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                基于 DShield 全球攻击遥测刷新攻击源、端口热度，并用 CISA KEV 标注正在被利用的漏洞压力。
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-4 grid gap-2">
+            <AttackSourceBadge
+              icon="globe"
+              label="DShield 攻击遥测"
+              status={snapshot?.sourceStatus.dshield ?? (loading ? "degraded" : "offline")}
+            />
+            <AttackSourceBadge
+              icon="shield"
+              label="CISA KEV 在野利用"
+              status={snapshot?.sourceStatus.cisaKev ?? (loading ? "degraded" : "offline")}
+            />
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                <SystemIcon className="system-icon" name="activity" size={12} />
+                InfoCon
+              </div>
+              <div className="mt-2 text-xl font-black text-emerald-700">{snapshot?.infocon ?? "..."}</div>
+            </div>
+            <div className="rounded-xl border border-slate-200 bg-white p-3">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-slate-500">
+                <SystemIcon className="system-icon" name="clock" size={12} />
+                Last Sync
+              </div>
+              <div className="mt-2 text-sm font-bold text-slate-900">{formatFeedTime(snapshot?.updatedAt)}</div>
+            </div>
+          </div>
+
+          {(error || snapshot?.degraded) && (
+            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              {error || "部分攻击源暂时降级，已保留可用源继续刷新。"}
+            </div>
+          )}
+
+          <div className="mt-4 rounded-xl border border-blue-100 bg-white/80 p-3">
+            <div className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">
+              <SystemIcon className="system-icon" name="workflow" size={12} />
+              Ops Action
+            </div>
+            <div className="space-y-2 text-xs leading-5 text-slate-600">
+              <div className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-red-500" />
+                <span>优先核查 Top IP 是否命中客户边界、VPN、邮件网关或蜜罐。</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-500" />
+                <span>对端口热区同步生成防火墙、NDR、SIEM 规则观察项。</span>
+              </div>
+              <div className="flex gap-2">
+                <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-violet-500" />
+                <span>KEV 高亮用于校准补丁优先级和客户暴露面巡检。</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="col-span-12 rounded-xl border border-slate-200 bg-white p-4 xl:col-span-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="system-icon-badge h-9 min-w-9 w-9 border-blue-100 bg-blue-50 text-blue-700">
+                <SystemIcon className="system-icon" name="target" size={16} />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">Top Offensive IPs</p>
+                <h3 className="text-base font-black text-slate-950">全球攻击源排行</h3>
+              </div>
+            </div>
+            <span className="rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+              DShield
+            </span>
+          </div>
+
+          <div className="grid gap-2">
+            {topAttackers.length > 0 ? topAttackers.map((attacker) => (
+              <div key={attacker.id} className="grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+                <span
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-xs font-black text-white"
+                  style={{ background: mdrSeverityHex(attacker.severity) }}
+                >
+                  {attacker.rank}
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate font-mono text-sm font-black text-slate-950">{attacker.indicator}</div>
+                  <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[10px] text-slate-500">
+                    <span>{attacker.mitreId}</span>
+                    <span>Targets {formatCompactNumber(attacker.targets ?? 0)}</span>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-mono text-sm font-black text-slate-950">{formatCompactNumber(attacker.reports ?? 0)}</div>
+                  <div className="text-[10px] text-slate-500">reports</div>
+                </div>
+              </div>
+            )) : (
+              <EmptyLiveFeed label={loading ? "正在同步 DShield 攻击源..." : "暂无可用攻击源数据"} />
+            )}
+          </div>
+        </div>
+
+        <div className="col-span-12 grid gap-4 xl:col-span-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="system-icon-badge h-9 min-w-9 w-9 border-cyan-100 bg-cyan-50 text-cyan-700">
+                  <SystemIcon className="system-icon" name="network" size={16} />
+                </span>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">Port Pressure</p>
+                  <h3 className="text-base font-black text-slate-950">被扫端口热区</h3>
+                </div>
+              </div>
+              <span className="text-[10px] font-bold text-slate-500">{topPorts.length} ports</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {topPorts.length > 0 ? topPorts.map((port) => (
+                <PortPressureCard key={port.port} port={port} maxRecords={maxPortRecords} />
+              )) : (
+                <div className="col-span-2">
+                  <EmptyLiveFeed label={loading ? "正在同步端口热区..." : "暂无端口压力数据"} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-xl border border-slate-200 bg-white p-4">
+            <div className="mb-3 flex items-center gap-2">
+              <span className="system-icon-badge h-9 min-w-9 w-9 border-rose-100 bg-rose-50 text-rose-700">
+                <SystemIcon className="system-icon" name="alert" size={16} />
+              </span>
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-slate-500">Exploited CVEs</p>
+                <h3 className="text-base font-black text-slate-950">最新在野利用</h3>
+              </div>
+            </div>
+
+            <div className="grid gap-2">
+              {kevHighlights.length > 0 ? kevHighlights.map((item) => (
+                <div key={item.id} className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-black text-slate-950">{item.indicator}</div>
+                      <div className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600">{item.titleZh}</div>
+                    </div>
+                    <span
+                      className="mt-0.5 h-2.5 w-2.5 shrink-0 rounded-full"
+                      style={{ background: mdrSeverityHex(item.severity) }}
+                    />
+                  </div>
+                </div>
+              )) : (
+                <EmptyLiveFeed label={loading ? "正在同步 CISA KEV..." : "暂无 KEV 高亮信息"} />
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PortPressureCard({ port, maxRecords }: { port: AttackPortPressure; maxRecords: number }) {
+  const ratio = Math.max(8, Math.min(100, (port.records / maxRecords) * 100));
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="font-mono text-lg font-black text-slate-950">:{port.port}</div>
+        <span
+          className="h-2.5 w-2.5 rounded-full"
+          style={{ background: mdrSeverityHex(port.severity) }}
+        />
+      </div>
+      <div className="mt-1 truncate text-xs font-bold text-slate-600">{port.labelZh}</div>
+      <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-200">
+        <div
+          className="h-full rounded-full bg-cyan-500 transition-all duration-700"
+          style={{ width: `${ratio}%` }}
+        />
+      </div>
+      <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+        <span>{formatCompactNumber(port.sources)} sources</span>
+        <span>{formatCompactNumber(port.records)} records</span>
+      </div>
+    </div>
+  );
+}
+
 /* ══════════════════════════════════════════════
    Dashboard Main
    ══════════════════════════════════════════════ */
 export default function DashboardPage() {
   const [clock, setClock] = useState("");
+  const [attackSnapshot, setAttackSnapshot] = useState<AttackOperationsSnapshot | null>(null);
+  const [attackLoading, setAttackLoading] = useState(true);
+  const [attackError, setAttackError] = useState("");
+
   useEffect(() => {
     const updateClock = () => setClock(formatShanghaiDateTime());
     const frame = requestAnimationFrame(updateClock);
@@ -146,32 +437,65 @@ export default function DashboardPage() {
     };
   }, []);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadAttackFeed = async () => {
+      try {
+        setAttackError("");
+        const response = await fetch("/api/attack-feed", { cache: "no-store" });
+        if (!response.ok) {
+          throw new Error(`Attack feed responded ${response.status}`);
+        }
+        const snapshot = (await response.json()) as AttackOperationsSnapshot;
+        if (!cancelled) {
+          setAttackSnapshot(snapshot);
+          setAttackLoading(false);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAttackError(error instanceof Error ? error.message : "真实攻击源暂时不可用");
+          setAttackLoading(false);
+        }
+      }
+    };
+
+    loadAttackFeed();
+    const interval = setInterval(loadAttackFeed, 5 * 60 * 1000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, []);
+
+  const liveAlerts = attackSnapshot?.alerts.length ? attackSnapshot.alerts : MOCK_ALERTS;
+  const allAlerts = useMemo(() => [...liveAlerts, ...MOCK_NET_ALERTS], [liveAlerts]);
   const totalClients = MOCK_CLIENTS.length;
   const totalDevices = MOCK_DEVICES.length;
   const onlineDevices = MOCK_DEVICES.filter((d) => d.status === "online").length;
-  const totalAlerts = MOCK_ALERTS.length + MOCK_NET_ALERTS.length;
-  const criticalAlerts = [...MOCK_ALERTS, ...MOCK_NET_ALERTS].filter((a) => a.severity === "critical").length;
+  const attackReportTotal = attackSnapshot?.topAttackers.reduce((sum, attacker) => sum + (attacker.reports ?? 0), 0) ?? 0;
   const totalTickets = MOCK_TICKETS.length + MOCK_OPS_TICKETS.length;
   const resolvedTickets = [...MOCK_TICKETS, ...MOCK_OPS_TICKETS].filter((t) => "status" in t && (t.status === "resolved" || t.status === "closed")).length;
 
   const sevData = useMemo(() => {
     const counts: Record<string, number> = { critical: 0, high: 0, medium: 0, low: 0 };
-    [...MOCK_ALERTS, ...MOCK_NET_ALERTS].forEach((a) => counts[a.severity]++);
+    allAlerts.forEach((a) => counts[a.severity]++);
     return [
       { label: "严重", value: counts.critical, color: mdrSeverityHex("critical") },
       { label: "高危", value: counts.high, color: mdrSeverityHex("high") },
       { label: "中危", value: counts.medium, color: mdrSeverityHex("medium") },
       { label: "低危", value: counts.low, color: mdrSeverityHex("low") },
     ];
-  }, []);
+  }, [allAlerts]);
 
   const sourceData = useMemo(() => {
     const counts: Record<string, number> = {};
-    MOCK_ALERTS.forEach((a) => { counts[a.source] = (counts[a.source] || 0) + 1; });
+    liveAlerts.forEach((a) => { counts[a.source] = (counts[a.source] || 0) + 1; });
     return Object.entries(counts).map(([k, v]) => ({
       label: k, value: v, color: mdrSourceHex(k as AlertSource),
     }));
-  }, []);
+  }, [liveAlerts]);
 
   const deviceStatusData = useMemo(() => {
     const counts: Record<string, number> = { online: 0, warning: 0, critical: 0, offline: 0 };
@@ -186,11 +510,11 @@ export default function DashboardPage() {
 
   const tickerItems = useMemo(() => {
     const all = [
-      ...MOCK_ALERTS.map((a) => ({ text: a.titleZh, severity: a.severity, time: new Date(a.timestamp).toLocaleTimeString("zh-CN", { hour12: false }).slice(0, 5) })),
+      ...liveAlerts.map((a) => ({ text: a.titleZh, severity: a.severity, time: new Date(a.timestamp).toLocaleTimeString("zh-CN", { hour12: false }).slice(0, 5) })),
       ...MOCK_NET_ALERTS.map((a) => ({ text: a.title, severity: a.severity, time: new Date(a.timestamp).toLocaleTimeString("zh-CN", { hour12: false }).slice(0, 5) })),
     ];
     return all.sort((a, b) => b.time.localeCompare(a.time));
-  }, []);
+  }, [liveAlerts]);
 
   const clientRanking = useMemo(() =>
     [...MOCK_CLIENTS].sort((a, b) => a.networkScore - b.networkScore), []);
@@ -247,10 +571,10 @@ export default function DashboardPage() {
           {[
             { icon: "briefcase", label: "托管客户", value: totalClients, unit: "家", color: "from-blue-600 to-blue-400" },
             { icon: "server", label: "在线设备", value: onlineDevices, unit: `/${totalDevices}`, color: "from-green-600 to-green-400" },
-            { icon: "alert", label: "安全告警", value: totalAlerts, unit: "条", color: "from-orange-600 to-orange-400" },
-            { icon: "target", label: "严重威胁", value: criticalAlerts, unit: "条", color: "from-red-600 to-red-400" },
-            { icon: "case", label: "处置工单", value: totalTickets, unit: "条", color: "from-purple-600 to-purple-400" },
-            { icon: "check", label: "已解决", value: resolvedTickets, unit: "条", color: "from-emerald-600 to-emerald-400" },
+            { icon: "target", label: "攻击源", value: attackSnapshot?.topAttackers.length ?? 0, unit: "个", color: "from-orange-600 to-orange-400" },
+            { icon: "activity", label: "扫描报告", value: attackReportTotal, unit: "次", color: "from-red-600 to-red-400" },
+            { icon: "network", label: "高压端口", value: attackSnapshot?.topPorts.length ?? 0, unit: "个", color: "from-cyan-600 to-cyan-400" },
+            { icon: "alert", label: "在野漏洞", value: attackSnapshot?.kevHighlights.length ?? 0, unit: "项", color: "from-purple-600 to-purple-400" },
           ].map((kpi) => (
             <div key={kpi.label} className="mdr-board-card relative rounded-xl p-4 overflow-hidden">
               <div className={`absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r ${kpi.color}`} />
@@ -270,9 +594,26 @@ export default function DashboardPage() {
           ))}
         </div>
 
+        <AttackRadarPanel snapshot={attackSnapshot} loading={attackLoading} error={attackError} />
+
         {/* Global Threat Map */}
-        <div className="col-span-12">
+        <div className="col-span-12 xl:col-span-7">
           <ThreatMap />
+        </div>
+
+        {/* Real-time Alert Feed */}
+        <div className="mdr-board-card col-span-12 rounded-xl p-4 overflow-hidden xl:col-span-5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
+              <SystemIcon className="system-icon" name="activity" size={14} />
+              实时安全事件
+            </div>
+            <div className="flex items-center gap-1">
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${mdrConnectionDotClass(attackError ? "error" : "success")}`} />
+              <span className={`text-[10px] ${attackError ? "text-red-700" : "text-emerald-700"}`}>LIVE</span>
+            </div>
+          </div>
+          <AlertTicker items={tickerItems} />
         </div>
 
         {/* Threat Distribution */}
@@ -295,23 +636,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Real-time Alert Feed */}
-        <div className="mdr-board-card col-span-5 rounded-xl p-4 overflow-hidden">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-              <SystemIcon className="system-icon" name="activity" size={14} />
-              实时安全事件
-            </div>
-          <div className="flex items-center gap-1">
-            <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${mdrConnectionDotClass("error")}`} />
-            <span className="text-[10px] text-red-700">LIVE</span>
-          </div>
-          </div>
-          <AlertTicker items={tickerItems} />
-        </div>
-
         {/* Alert Source + Device Status */}
-        <div className="mdr-board-card col-span-4 rounded-xl p-4">
+        <div className="mdr-board-card col-span-5 rounded-xl p-4">
           <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
             <SystemIcon className="system-icon" name="radar" size={14} />
             告警来源分布
@@ -362,7 +688,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Protection Stats */}
-        <div className="mdr-board-card glow-blue col-span-4 rounded-xl p-4">
+        <div className="mdr-board-card glow-blue col-span-6 rounded-xl p-4">
           <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
             <SystemIcon className="system-icon" name="shield" size={14} />
             安全防护能力
@@ -389,7 +715,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Analyst Workload */}
-        <div className="mdr-board-card col-span-4 rounded-xl p-4">
+        <div className="mdr-board-card col-span-6 rounded-xl p-4">
           <div className="mb-3 flex items-center gap-2 text-xs font-medium text-slate-600">
             <SystemIcon className="system-icon" name="users" size={14} />
             分析师工作负载

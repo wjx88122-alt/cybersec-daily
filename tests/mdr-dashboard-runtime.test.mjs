@@ -61,6 +61,29 @@ test("mdr dashboard alert ticker renders dynamic rows after hydration", () => {
   assert.equal(dashboard.includes("tickerReady ? [...items, ...items] : []"), true);
 });
 
+test("mdr dashboard uses the real attack feed API as its operations data source", () => {
+  const dashboard = readFileSync(
+    join(root, "app/(ops)/mdr/dashboard/page.tsx"),
+    "utf8",
+  );
+  const route = readFileSync(
+    join(root, "app/api/attack-feed/route.ts"),
+    "utf8",
+  );
+  const source = readFileSync(
+    join(root, "lib/attack-data-source.ts"),
+    "utf8",
+  );
+
+  assert.equal(dashboard.includes("/api/attack-feed"), true);
+  assert.equal(dashboard.includes("真实攻击数据源"), true);
+  assert.equal(dashboard.includes("攻击雷达"), true);
+  assert.equal(route.includes("fetchAttackOperationsSnapshot"), true);
+  assert.equal(source.includes("https://isc.sans.edu/api/topips/records/8?json"), true);
+  assert.equal(source.includes("https://isc.sans.edu/api/topports/records/8?json"), true);
+  assert.equal(source.includes("known_exploited_vulnerabilities.json"), true);
+});
+
 test("mdr command deck isolates live SLA text from server hydration", () => {
   const mdr = readFileSync(
     join(root, "app/(ops)/mdr/page.tsx"),
