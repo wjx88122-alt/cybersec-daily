@@ -140,20 +140,27 @@ test("mdr ticket creation feedback uses a staged dispatch animation", () => {
 test("threat map does not seed random arcs during server render", () => {
   const source = readFileSync(join(root, "components/ThreatMap.tsx"), "utf8");
 
-  assert.equal(
-    source.includes("useState<AttackArc[]>(() =>"),
-    false,
-  );
-  assert.equal(
-    source.includes("createInitialArcs(INITIAL_ARC_COUNT)"),
-    true,
-  );
+  assert.equal(source.includes("Math.random"), false);
+  assert.equal(source.includes("mapEvents"), true);
+  assert.equal(source.includes("buildVisiblePathSegments"), true);
   assert.equal(
     source.includes("function svgCoord"),
     true,
   );
   assert.equal(
     source.includes("cx={svgCoord("),
+    true,
+  );
+});
+
+test("mdr dashboard passes live attack snapshot into the global threat map", () => {
+  const dashboard = readFileSync(
+    join(root, "app/(ops)/mdr/dashboard/page.tsx"),
+    "utf8",
+  );
+
+  assert.equal(
+    dashboard.includes("<ThreatMap snapshot={attackSnapshot} loading={attackLoading} error={attackError} />"),
     true,
   );
 });

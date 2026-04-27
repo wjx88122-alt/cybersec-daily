@@ -598,7 +598,7 @@ export default function DashboardPage() {
 
         {/* Global Threat Map */}
         <div className="col-span-12 xl:col-span-7">
-          <ThreatMap />
+          <ThreatMap snapshot={attackSnapshot} loading={attackLoading} error={attackError} />
         </div>
 
         {/* Real-time Alert Feed */}

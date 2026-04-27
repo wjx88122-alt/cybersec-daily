@@ -4,6 +4,11 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { SystemIcon } from "@/components/ui/SystemIcon";
 import { getArcLiftFactor } from "@/lib/threat-map";
 import { mdrDeviceStatusHex, mdrSeverityHex } from "@/app/(ops)/mdr/theme";
+import type {
+  AttackOperationsSnapshot,
+  ThreatMapEvent,
+  ThreatMapLocation,
+} from "@/lib/attack-data-source";
 
 /* ── Orthographic projection helpers ── */
 function toRadians(deg: number) { return (deg * Math.PI) / 180; }
@@ -45,74 +50,73 @@ const LAND_POLYGONS: { name: string; coords: [number, number][] }[] = [
   { name: "UK", coords: [[50,-5],[51,-3],[52,-1],[53,0],[54,0],[55,-2],[56,-3],[57,-5],[58,-5],[59,-3],[58,-2],[56,0],[55,1],[54,1],[53,0],[52,-1],[51,-2],[50,-5]] },
 ];
 
-/* ── City data with lat/lon ── */
-const CITIES: Record<string, { lat: number; lon: number; label: string }> = {
-  beijing: { lat: 39.9, lon: 116.4, label: "北京" },
-  shanghai: { lat: 31.2, lon: 121.5, label: "上海" },
-  nanjing: { lat: 32.1, lon: 118.8, label: "南京" },
-  shenzhen: { lat: 22.5, lon: 114.1, label: "深圳" },
-  moscow: { lat: 55.8, lon: 37.6, label: "莫斯科" },
-  tokyo: { lat: 35.7, lon: 139.7, label: "东京" },
-  seoul: { lat: 37.6, lon: 127.0, label: "首尔" },
-  mumbai: { lat: 19.1, lon: 72.9, label: "孟买" },
-  singapore: { lat: 1.3, lon: 103.8, label: "新加坡" },
-  sydney: { lat: -33.9, lon: 151.2, label: "悉尼" },
-  london: { lat: 51.5, lon: -0.1, label: "伦敦" },
-  berlin: { lat: 52.5, lon: 13.4, label: "柏林" },
-  paris: { lat: 48.9, lon: 2.3, label: "巴黎" },
-  newYork: { lat: 40.7, lon: -74.0, label: "纽约" },
-  washington: { lat: 38.9, lon: -77.0, label: "华盛顿" },
-  losAngeles: { lat: 34.1, lon: -118.2, label: "洛杉矶" },
-  saoPaulo: { lat: -23.6, lon: -46.6, label: "圣保罗" },
-  dubai: { lat: 25.2, lon: 55.3, label: "迪拜" },
-  cairo: { lat: 30.0, lon: 31.2, label: "开罗" },
-  lagos: { lat: 6.5, lon: 3.4, label: "拉各斯" },
-  tehran: { lat: 35.7, lon: 51.4, label: "德黑兰" },
-  pyongyang: { lat: 39.0, lon: 125.8, label: "平壤" },
-  taipei: { lat: 25.0, lon: 121.5, label: "台北" },
-  jakarta: { lat: -6.2, lon: 106.8, label: "雅加达" },
-};
-
-const DEFENDED = ["nanjing", "shanghai", "beijing", "shenzhen", "singapore"];
-
-const ATTACK_TYPES = [
-  "DDoS 攻击", "APT 渗透", "勒索软件", "钓鱼攻击", "暴力破解",
-  "C2 通信", "数据窃取", "漏洞利用", "供应链攻击", "零日攻击",
-];
-
-interface AttackArc {
-  id: number;
-  fromKey: string;
-  toKey: string;
-  severity: "critical" | "high" | "medium";
-  type: string;
+type VisualArc = ThreatMapEvent & {
   progress: number;
   speed: number;
+};
+
+const PROTECTED_FALLBACK_LOCATIONS: ThreatMapLocation[] = [
+  { city: "Nanjing", countryCode: "CN", countryName: "China", lat: 32.1, lon: 118.8 },
+  { city: "Shanghai", countryCode: "CN", countryName: "China", lat: 31.2, lon: 121.5 },
+  { city: "Singapore", countryCode: "SG", countryName: "Singapore", lat: 1.3, lon: 103.8 },
+  { city: "Tokyo", countryCode: "JP", countryName: "Japan", lat: 35.7, lon: 139.7 },
+  { city: "Sydney", countryCode: "AU", countryName: "Australia", lat: -33.9, lon: 151.2 },
+];
+const EMPTY_MAP_EVENTS: ThreatMapEvent[] = [];
+
+function speedForSeverity(severity: ThreatMapEvent["severity"]) {
+  if (severity === "critical") return 0.006;
+  if (severity === "high") return 0.0048;
+  return 0.0038;
 }
 
-const INITIAL_ARC_COUNT = 6;
-
-function randomAttack(id: number): AttackArc {
-  const sources = Object.keys(CITIES).filter((c) => !DEFENDED.includes(c));
-  const fromKey = sources[Math.floor(Math.random() * sources.length)];
-  const toKey = DEFENDED[Math.floor(Math.random() * DEFENDED.length)];
-  const sevs: ("critical" | "high" | "medium")[] = ["critical", "high", "medium", "medium", "high"];
-  return {
-    id, fromKey, toKey,
-    severity: sevs[Math.floor(Math.random() * sevs.length)],
-    type: ATTACK_TYPES[Math.floor(Math.random() * ATTACK_TYPES.length)],
-    progress: 0, speed: 0.004 + Math.random() * 0.006,
-  };
+function formatCompact(value: number) {
+  return new Intl.NumberFormat("zh-CN", {
+    notation: value >= 10_000 ? "compact" : "standard",
+    maximumFractionDigits: 1,
+  }).format(value);
 }
 
-function createInitialArcs(count: number): AttackArc[] {
-  const initial: AttackArc[] = [];
-  for (let i = 0; i < count; i++) {
-    const arc = randomAttack(i);
-    arc.progress = Math.random() * 0.7;
-    initial.push(arc);
+function formatSyncTime(value?: string) {
+  if (!value) return "同步中";
+  const parsed = Date.parse(value);
+  if (!Number.isFinite(parsed)) return "同步中";
+
+  return new Date(parsed).toLocaleString("zh-CN", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+function uniqueLocations(locations: ThreatMapLocation[]) {
+  const seen = new Set<string>();
+  return locations.filter((location) => {
+    const key = `${location.city}-${location.countryCode}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+export function buildVisiblePathSegments(points: { x: number; y: number; visible: boolean }[]) {
+  const segments: string[] = [];
+  let current: string[] = [];
+
+  for (const point of points) {
+    if (!point.visible) {
+      if (current.length > 1) segments.push(current.join(" "));
+      current = [];
+      continue;
+    }
+
+    current.push(`${current.length === 0 ? "M" : "L"} ${point.x.toFixed(1)} ${point.y.toFixed(1)}`);
   }
-  return initial;
+
+  if (current.length > 1) segments.push(current.join(" "));
+  return segments;
 }
 
 // Great circle interpolation
@@ -133,53 +137,73 @@ const GLOBE_R = 175;
 const GLOBE_CX = 400;
 const GLOBE_CY = 210;
 
-export default function ThreatMap() {
-  const [arcs, setArcs] = useState<AttackArc[]>([]);
-  const [stats, setStats] = useState({
-    blocked: 47283,
-    active: 0,
-  });
-  const [latestAttack, setLatestAttack] = useState<AttackArc | null>(null);
+export default function ThreatMap({
+  snapshot,
+  loading = false,
+  error = "",
+}: {
+  snapshot?: AttackOperationsSnapshot | null;
+  loading?: boolean;
+  error?: string;
+}) {
+  const [arcs, setArcs] = useState<VisualArc[]>([]);
+  const [latestAttack, setLatestAttack] = useState<ThreatMapEvent | null>(null);
   const [rotation, setRotation] = useState(80); // center longitude
-  const idRef = useRef(INITIAL_ARC_COUNT);
   const frameRef = useRef<number>(0);
-  const blockedRef = useRef(47283);
+  const events = snapshot?.mapEvents ?? EMPTY_MAP_EVENTS;
+  const totalReports = events.reduce((sum, event) => sum + event.reports, 0);
+  const protectedLocations = uniqueLocations(
+    events.length > 0
+      ? events.map((event) => event.destination)
+      : PROTECTED_FALLBACK_LOCATIONS,
+  );
+  const sourceLocations = uniqueLocations(events.map((event) => event.source));
 
   const proj = useCallback((lat: number, lon: number) => {
     return orthoProject(lat, lon, 20, rotation, GLOBE_R, GLOBE_CX, GLOBE_CY);
   }, [rotation]);
 
   useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      const visualArcs = events.map((event, index) => ({
+        ...event,
+        progress: (index * 0.17) % 0.82,
+        speed: speedForSeverity(event.severity),
+      }));
+
+      setArcs(visualArcs);
+      setLatestAttack(visualArcs[0] ?? null);
+    });
+
+    return () => cancelAnimationFrame(frame);
+  }, [events]);
+
+  useEffect(() => {
     const animate = () => {
       setArcs((prev) => {
-        let newArcs = prev.map((a) => ({ ...a, progress: a.progress + a.speed }));
-        const done = newArcs.filter((a) => a.progress >= 1);
-        if (done.length > 0) blockedRef.current += done.length;
-        newArcs = newArcs.filter((a) => a.progress < 1);
-        if (Math.random() < 0.035 && newArcs.length < 12) {
-          const na = randomAttack(idRef.current++);
-          newArcs.push(na);
-          setLatestAttack(na);
+        const completed: ThreatMapEvent[] = [];
+        const next = prev.map((arc) => {
+          const progress = arc.progress + arc.speed;
+          if (progress >= 1) {
+            completed.push(arc);
+            return { ...arc, progress: 0 };
+          }
+          return { ...arc, progress };
+        });
+
+        if (completed.length > 0) {
+          setLatestAttack(completed[0]);
         }
-        setStats({ blocked: blockedRef.current, active: newArcs.length });
-        return newArcs;
+
+        return next;
       });
       setRotation((r) => (r + 0.08) % 360);
       frameRef.current = requestAnimationFrame(animate);
     };
 
-    const startFrame = requestAnimationFrame(() => {
-      const initialArcs = createInitialArcs(INITIAL_ARC_COUNT);
-      setArcs(initialArcs);
-      setStats({
-        blocked: blockedRef.current,
-        active: initialArcs.length,
-      });
-      frameRef.current = requestAnimationFrame(animate);
-    });
+    frameRef.current = requestAnimationFrame(animate);
 
     return () => {
-      cancelAnimationFrame(startFrame);
       cancelAnimationFrame(frameRef.current);
     };
   }, []);
@@ -193,8 +217,6 @@ export default function ThreatMap() {
 
   // Project attack arcs as great circle segments
   const projectedArcs = arcs.map((arc) => {
-    const from = CITIES[arc.fromKey];
-    const to = CITIES[arc.toKey];
     const colors = {
       stroke: mdrSeverityHex(arc.severity),
       particle: mdrSeverityHex(arc.severity),
@@ -204,14 +226,14 @@ export default function ThreatMap() {
     const steps = 30;
     for (let i = 0; i <= steps; i++) {
       const t = (i / steps) * arc.progress;
-      const geo = geoInterp(from, to, t);
+      const geo = geoInterp(arc.source, arc.destination, t);
       // Lift above surface
       const liftT = getArcLiftFactor(arc.progress, t);
       const p = orthoProject(geo.lat, geo.lon, 20, rotation, GLOBE_R * (1 + liftT), GLOBE_CX, GLOBE_CY);
       pts.push(p);
     }
     const visiblePts = pts.filter((p) => p.visible);
-    const headGeo = geoInterp(from, to, arc.progress);
+    const headGeo = geoInterp(arc.source, arc.destination, arc.progress);
     const head = orthoProject(
       headGeo.lat,
       headGeo.lon,
@@ -221,10 +243,10 @@ export default function ThreatMap() {
       GLOBE_CX,
       GLOBE_CY,
     );
-    const pathD = visiblePts.length > 1 ? visiblePts.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(" ") : null;
+    const pathSegments = buildVisiblePathSegments(pts);
     // Impact point (on surface)
-    const toProj = proj(to.lat, to.lon);
-    return { arc, from, to, colors, pathD, head, toProj, visiblePts };
+    const toProj = proj(arc.destination.lat, arc.destination.lon);
+    return { arc, colors, pathSegments, head, toProj, visiblePts };
   });
 
   return (
@@ -247,9 +269,9 @@ export default function ThreatMap() {
           </span>
         </div>
         <div className="flex items-center gap-5 text-[11px]">
-          <div className="text-center"><div className="font-mono font-bold text-base" style={{ color: mdrDeviceStatusHex("online") }}>{stats.blocked.toLocaleString()}</div><div className="text-slate-500 text-[9px]">累计拦截</div></div>
-          <div className="text-center"><div className="font-mono font-bold text-base" style={{ color: mdrSeverityHex("critical") }}>{stats.active}</div><div className="text-slate-500 text-[9px]">活跃攻击</div></div>
-          <div className="text-center"><div className="text-blue-600 font-mono font-bold text-base">{DEFENDED.length}</div><div className="text-slate-500 text-[9px]">防护节点</div></div>
+          <div className="text-center"><div className="font-mono font-bold text-base" style={{ color: mdrDeviceStatusHex("online") }}>{formatCompact(totalReports)}</div><div className="text-slate-500 text-[9px]">DShield reports</div></div>
+          <div className="text-center"><div className="font-mono font-bold text-base" style={{ color: mdrSeverityHex("critical") }}>{events.length}</div><div className="text-slate-500 text-[9px]">真实事件</div></div>
+          <div className="text-center"><div className="text-blue-600 font-mono font-bold text-base">{protectedLocations.length}</div><div className="text-slate-500 text-[9px]">防护节点</div></div>
         </div>
       </div>
 
@@ -276,22 +298,22 @@ export default function ThreatMap() {
 
         {/* Graticule (lat/lon grid on sphere) */}
         {[-60, -30, 0, 30, 60].map((lat) => {
-          const pts: string[] = [];
+          const pts: { x: number; y: number; visible: boolean }[] = [];
           for (let lon = -180; lon <= 180; lon += 5) {
-            const p = proj(lat, lon);
-            if (p.visible) pts.push(`${pts.length === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`);
-            else if (pts.length > 0) pts.push("M 0 0"); // break
+            pts.push(proj(lat, lon));
           }
-          return <path key={`lat${lat}`} d={pts.join(" ")} fill="none" stroke="#1e3a5f" strokeWidth="0.3" opacity="0.5" />;
+          return buildVisiblePathSegments(pts).map((pathD, index) => (
+            <path key={`lat${lat}-${index}`} d={pathD} fill="none" stroke="#1e3a5f" strokeWidth="0.3" opacity="0.5" />
+          ));
         })}
         {Array.from({ length: 12 }, (_, i) => (i * 30) - 180).map((lon) => {
-          const pts: string[] = [];
+          const pts: { x: number; y: number; visible: boolean }[] = [];
           for (let lat = -80; lat <= 80; lat += 5) {
-            const p = proj(lat, lon);
-            if (p.visible) pts.push(`${pts.length === 0 ? "M" : "L"} ${p.x.toFixed(1)} ${p.y.toFixed(1)}`);
-            else if (pts.length > 0) pts.push("M 0 0");
+            pts.push(proj(lat, lon));
           }
-          return <path key={`lon${lon}`} d={pts.join(" ")} fill="none" stroke="#1e3a5f" strokeWidth="0.3" opacity="0.5" />;
+          return buildVisiblePathSegments(pts).map((pathD, index) => (
+            <path key={`lon${lon}-${index}`} d={pathD} fill="none" stroke="#1e3a5f" strokeWidth="0.3" opacity="0.5" />
+          ));
         })}
 
         {/* Land masses */}
@@ -303,12 +325,14 @@ export default function ThreatMap() {
         <circle cx={GLOBE_CX} cy={GLOBE_CY} r={GLOBE_R} fill="url(#globe-atmo)" />
 
         {/* Attack arcs */}
-        {projectedArcs.map(({ arc, colors, pathD, head, toProj, visiblePts }) => (
+        {projectedArcs.map(({ arc, colors, pathSegments, head, toProj, visiblePts }) => (
           <g key={arc.id}>
-            {pathD && <>
-              <path d={pathD} fill="none" stroke={colors.stroke} strokeWidth="1.5" opacity={0.5} />
-              <path d={pathD} fill="none" stroke={colors.stroke} strokeWidth="4" opacity={0.08} filter="url(#g-glow)" />
-            </>}
+            {pathSegments.map((pathD, index) => (
+              <g key={`${arc.id}-path-${index}`}>
+                <path d={pathD} fill="none" stroke={colors.stroke} strokeWidth="1.5" opacity={0.55} />
+                <path d={pathD} fill="none" stroke={colors.stroke} strokeWidth="4" opacity={0.08} filter="url(#g-glow)" />
+              </g>
+            ))}
             {head.visible && <>
               <circle cx={svgCoord(head.x)} cy={svgCoord(head.y)} r={3} fill={colors.particle} filter="url(#g-glow-sm)">
                 <animate attributeName="r" values="2;4;2" dur="0.4s" repeatCount="indefinite" />
@@ -325,25 +349,24 @@ export default function ThreatMap() {
           </g>
         ))}
 
-        {/* Source cities */}
-        {Object.entries(CITIES).filter(([k]) => !DEFENDED.includes(k)).map(([key, city]) => {
-          const p = proj(city.lat, city.lon);
+        {/* Source locations */}
+        {sourceLocations.map((location) => {
+          const p = proj(location.lat, location.lon);
           if (!p.visible) return null;
           return (
-            <g key={key}>
-              <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={1.5} fill="#475569" opacity={0.6} />
-              <text x={svgCoord(p.x)} y={svgCoord(p.y - 5)} textAnchor="middle" fontSize={6} fill="#475569" opacity={0.5}>{city.label}</text>
+            <g key={`${location.city}-${location.countryCode}`}>
+              <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={2.4} fill="#ef4444" opacity={0.8} filter="url(#g-glow-sm)" />
+              <text x={svgCoord(p.x)} y={svgCoord(p.y - 6)} textAnchor="middle" fontSize={6.4} fill="#64748b" opacity={0.75}>{location.city}</text>
             </g>
           );
         })}
 
-        {/* Defended cities */}
-        {DEFENDED.map((key) => {
-          const city = CITIES[key];
-          const p = proj(city.lat, city.lon);
+        {/* Defended locations */}
+        {protectedLocations.map((location) => {
+          const p = proj(location.lat, location.lon);
           if (!p.visible) return null;
           return (
-            <g key={key}>
+            <g key={`${location.city}-${location.countryCode}`}>
               <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={16} fill="url(#def-glow)" />
               <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={7} fill="none" stroke="#3b82f6" strokeWidth="0.5" opacity="0.3">
                 <animate attributeName="r" values="7;14;7" dur="3s" repeatCount="indefinite" />
@@ -352,7 +375,7 @@ export default function ThreatMap() {
               <polygon points={`${svgPoint(p.x, p.y - 5)} ${svgPoint(p.x + 4.3, p.y - 2.5)} ${svgPoint(p.x + 4.3, p.y + 2.5)} ${svgPoint(p.x, p.y + 5)} ${svgPoint(p.x - 4.3, p.y + 2.5)} ${svgPoint(p.x - 4.3, p.y - 2.5)}`}
                 fill="#3b82f6" fillOpacity="0.3" stroke="#60a5fa" strokeWidth="0.8" />
               <circle cx={svgCoord(p.x)} cy={svgCoord(p.y)} r={2} fill="#60a5fa" filter="url(#g-glow-sm)" />
-              <text x={svgCoord(p.x)} y={svgCoord(p.y - 9)} textAnchor="middle" fontSize={7.5} fill="#93c5fd" fontWeight={600}>{city.label}</text>
+              <text x={svgCoord(p.x)} y={svgCoord(p.y - 9)} textAnchor="middle" fontSize={7.5} fill="#93c5fd" fontWeight={600}>{location.city}</text>
             </g>
           );
         })}
@@ -365,19 +388,34 @@ export default function ThreatMap() {
       {latestAttack && (
         <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 text-[10px] relative z-10">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: mdrSeverityHex(latestAttack.severity) }} />
-          <span className="text-slate-500">最新威胁:</span>
-          <span className="text-slate-800 font-medium">{CITIES[latestAttack.fromKey].label}</span>
+          <span className="text-slate-500">最新遥测:</span>
+          <span className="text-slate-800 font-medium">{latestAttack.source.city}</span>
           <span className="text-slate-500">→</span>
-          <span className="text-blue-600 font-medium">{CITIES[latestAttack.toKey].label}</span>
+          <span className="text-blue-600 font-medium">{latestAttack.destination.city}</span>
           <span className="px-1.5 py-0.5 rounded text-[9px] font-medium" style={{ background: `${mdrSeverityHex(latestAttack.severity)}15`, color: mdrSeverityHex(latestAttack.severity) }}>
-            {latestAttack.type}
+            {latestAttack.category}
           </span>
           <span className="ml-auto inline-flex items-center gap-1 font-medium" style={{ color: mdrDeviceStatusHex("online") }}>
             <SystemIcon className="system-icon" name="check" size={12} />
-            已拦截
+            {formatCompact(latestAttack.reports)} reports
           </span>
         </div>
       )}
+
+      {!latestAttack && (
+        <div className="mt-2 flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-50 border border-dashed border-slate-200 text-[10px] text-slate-500 relative z-10">
+          <SystemIcon className="system-icon" name="radar" size={12} />
+          {loading ? "正在同步 SANS ISC/DShield 全球攻击遥测..." : error || "暂无可绘制的全球威胁遥测"}
+        </div>
+      )}
+
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-100 bg-white/75 px-3 py-2 text-[9px] text-slate-500 relative z-10">
+        <span className="flex items-center gap-1.5">
+          <SystemIcon className="system-icon" name="database" size={11} />
+          SANS ISC/DShield Top IP + CISA KEV
+        </span>
+        <span>同步 {formatSyncTime(snapshot?.updatedAt)} · {snapshot?.degraded ? "部分源降级" : "来源在线"}</span>
+      </div>
 
       {/* Legend */}
       <div className="flex items-center justify-center gap-5 mt-2 text-[9px] text-slate-500 relative z-10">
