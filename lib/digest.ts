@@ -1,5 +1,5 @@
 import { jsonrepair } from "jsonrepair";
-import { getDeepSeekClient, getLLMModel } from "./deepseek";
+import { getDeepSeekClient, getLLMChatOptions, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
 import { pickDisplayTitle, pickLocalizedField } from "./translation-detection";
 
@@ -290,9 +290,10 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   });
 
   const client = getDeepSeekClient();
-  const model = getLLMModel();
+  const model = getLLMModel("analysis");
   const response = await client.chat.completions.create({
     model,
+    ...getLLMChatOptions("analysis"),
     max_tokens: 8192,
     messages: [
       {

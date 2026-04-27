@@ -1,5 +1,5 @@
 import { jsonrepair } from "jsonrepair";
-import { getDeepSeekClient, getLLMModel } from "./deepseek";
+import { getDeepSeekClient, getLLMChatOptions, getLLMModel } from "./deepseek";
 import { FeedItem } from "./feeds";
 
 type TranslationResult = { titleZh: string; summaryZh: string };
@@ -8,9 +8,10 @@ async function translateBatch(
   items: { title: string; summary: string }[],
 ): Promise<TranslationResult[]> {
   const client = getDeepSeekClient();
-  const model = getLLMModel();
+  const model = getLLMModel("translation");
   const response = await client.chat.completions.create({
     model,
+    ...getLLMChatOptions("translation"),
     max_tokens: 8192,
     messages: [
       {

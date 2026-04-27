@@ -15,13 +15,15 @@ if (!kvUrl || !kvToken) {
 function resolveLlmConfig() {
   if (deepseekApiKey) {
     return {
+      provider: 'deepseek',
       apiKey: deepseekApiKey,
       baseURL: 'https://api.deepseek.com/v1',
-      model: process.env.DEEPSEEK_MODEL || 'deepseek-chat',
+      model: process.env.DEEPSEEK_TRANSLATION_MODEL || process.env.DEEPSEEK_MODEL || 'deepseek-v4-flash',
     };
   }
   if (kimiApiKey) {
     return {
+      provider: 'kimi',
       apiKey: kimiApiKey,
       baseURL: 'https://api.kimi.com/coding/v1',
       model: process.env.KIMI_MODEL || 'kimi-k2',
@@ -29,6 +31,7 @@ function resolveLlmConfig() {
   }
   if (openaiApiKey) {
     return {
+      provider: 'openai',
       apiKey: openaiApiKey,
       baseURL: '',
       model: process.env.OPENAI_MODEL || 'gpt-4o-mini',
@@ -46,6 +49,10 @@ const kv = new Redis({
 const client = llm.baseURL
   ? new OpenAI({ apiKey: llm.apiKey, baseURL: llm.baseURL })
   : new OpenAI({ apiKey: llm.apiKey });
+const chatOptions =
+  llm.provider === 'deepseek' && llm.model.startsWith('deepseek-v4-')
+    ? { thinking: { type: 'disabled' } }
+    : {};
 
 const BATCH_SIZE = 10;
 const MIN_CHINESE_CHARS_FOR_LOCALIZATION = 2;
@@ -128,6 +135,7 @@ function autoFillChineseFields(items) {
 async function translateBatch(items) {
   const response = await client.chat.completions.create({
     model: llm.model,
+    ...chatOptions,
     max_tokens: 8192,
     messages: [{
       role: 'system',

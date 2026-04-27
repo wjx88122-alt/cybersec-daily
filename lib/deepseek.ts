@@ -1,10 +1,18 @@
 import OpenAI from "openai";
 
 const DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1";
+const DEEPSEEK_DEFAULT_ANALYSIS_MODEL = "deepseek-v4-pro";
+const DEEPSEEK_DEFAULT_TRANSLATION_MODEL = "deepseek-v4-flash";
 const KIMI_BASE_URL = "https://api.kimi.com/coding/v1";
 
+export type LLMTask = "analysis" | "translation";
+
+type LLMChatOptions = {
+  thinking?: { type: "disabled" };
+};
+
 let cachedClient: OpenAI | null = null;
-let cachedModel: string | null = null;
+const cachedModels: Partial<Record<LLMTask, string>> = {};
 let cachedProvider: "deepseek" | "kimi" | "openai" | null = null;
 
 function resolveLLMConfig():
@@ -12,7 +20,7 @@ function resolveLLMConfig():
       provider: "deepseek";
       apiKey: string;
       baseURL: string;
-      model: string;
+      models: Record<LLMTask, string>;
     }
   | {
       provider: "kimi";
@@ -27,11 +35,21 @@ function resolveLLMConfig():
     } {
   const deepseekKey = process.env.DEEPSEEK_API_KEY?.trim();
   if (deepseekKey) {
+    const globalModel = process.env.DEEPSEEK_MODEL?.trim();
     return {
       provider: "deepseek",
       apiKey: deepseekKey,
       baseURL: DEEPSEEK_BASE_URL,
-      model: process.env.DEEPSEEK_MODEL?.trim() || "deepseek-chat",
+      models: {
+        analysis:
+          process.env.DEEPSEEK_ANALYSIS_MODEL?.trim() ||
+          globalModel ||
+          DEEPSEEK_DEFAULT_ANALYSIS_MODEL,
+        translation:
+          process.env.DEEPSEEK_TRANSLATION_MODEL?.trim() ||
+          globalModel ||
+          DEEPSEEK_DEFAULT_TRANSLATION_MODEL,
+      },
     };
   }
 
@@ -63,7 +81,6 @@ export function getDeepSeekClient(): OpenAI {
   if (cachedClient) return cachedClient;
 
   const cfg = resolveLLMConfig();
-  cachedModel = cfg.model;
   cachedProvider = cfg.provider;
 
   cachedClient =
@@ -74,12 +91,13 @@ export function getDeepSeekClient(): OpenAI {
   return cachedClient;
 }
 
-export function getLLMModel(): string {
-  if (!cachedModel) {
+export function getLLMModel(task: LLMTask = "translation"): string {
+  if (!cachedModels[task]) {
     const cfg = resolveLLMConfig();
-    cachedModel = cfg.model;
+    cachedProvider = cfg.provider;
+    cachedModels[task] = cfg.provider === "deepseek" ? cfg.models[task] : cfg.model;
   }
-  return cachedModel;
+  return cachedModels[task];
 }
 
 export function getLLMProvider(): "deepseek" | "kimi" | "openai" {
@@ -88,4 +106,15 @@ export function getLLMProvider(): "deepseek" | "kimi" | "openai" {
     cachedProvider = cfg.provider;
   }
   return cachedProvider;
+}
+
+export function getLLMChatOptions(task: LLMTask = "translation"): LLMChatOptions {
+  const provider = getLLMProvider();
+  const model = getLLMModel(task);
+
+  if (provider === "deepseek" && model.startsWith("deepseek-v4-")) {
+    return { thinking: { type: "disabled" } };
+  }
+
+  return {};
 }

@@ -261,9 +261,13 @@ npm run repair:translations:all
 
 可选模型变量：
 
+- `DEEPSEEK_ANALYSIS_MODEL`
+- `DEEPSEEK_TRANSLATION_MODEL`
 - `DEEPSEEK_MODEL`
 - `KIMI_MODEL`
 - `OPENAI_MODEL`
+
+DeepSeek 未设置模型变量时，翻译类任务默认使用 `deepseek-v4-flash`，摘要和日报分析类任务默认使用 `deepseek-v4-pro`。`DEEPSEEK_ANALYSIS_MODEL` / `DEEPSEEK_TRANSLATION_MODEL` 会分别覆盖对应任务；旧的 `DEEPSEEK_MODEL` 会作为全局覆盖同时作用于两类任务。
 
 ### 站点地址
 
