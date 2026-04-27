@@ -61,6 +61,18 @@ test("mdr dashboard alert ticker renders dynamic rows after hydration", () => {
   assert.equal(dashboard.includes("tickerReady ? [...items, ...items] : []"), true);
 });
 
+test("mdr dashboard real-time event panel does not stretch beside the globe", () => {
+  const dashboard = readFileSync(
+    join(root, "app/(ops)/mdr/dashboard/page.tsx"),
+    "utf8",
+  );
+
+  assert.equal(
+    dashboard.includes("mdr-board-card col-span-12 self-start rounded-xl p-4 overflow-hidden xl:col-span-5"),
+    true,
+  );
+});
+
 test("mdr dashboard uses the real attack feed API as its operations data source", () => {
   const dashboard = readFileSync(
     join(root, "app/(ops)/mdr/dashboard/page.tsx"),

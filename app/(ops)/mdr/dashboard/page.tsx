@@ -602,7 +602,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Real-time Alert Feed */}
-        <div className="mdr-board-card col-span-12 rounded-xl p-4 overflow-hidden xl:col-span-5">
+        <div className="mdr-board-card col-span-12 self-start rounded-xl p-4 overflow-hidden xl:col-span-5">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
               <SystemIcon className="system-icon" name="activity" size={14} />
