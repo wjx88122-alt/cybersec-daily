@@ -61,15 +61,18 @@ test("mdr dashboard alert ticker renders dynamic rows after hydration", () => {
   assert.equal(dashboard.includes("tickerReady ? [...items, ...items] : []"), true);
 });
 
-test("mdr dashboard real-time event panel does not stretch beside the globe", () => {
+test("mdr dashboard fills the real-time event rail instead of leaving a short card", () => {
   const dashboard = readFileSync(
     join(root, "app/(ops)/mdr/dashboard/page.tsx"),
     "utf8",
   );
 
+  assert.equal(dashboard.includes("threat-intel-rail"), true);
+  assert.equal(dashboard.includes("attack-telemetry-strip"), true);
+  assert.equal(dashboard.includes("当前攻击面焦点"), true);
   assert.equal(
     dashboard.includes("mdr-board-card col-span-12 self-start rounded-xl p-4 overflow-hidden xl:col-span-5"),
-    true,
+    false,
   );
 });
 
@@ -175,4 +178,23 @@ test("mdr dashboard passes live attack snapshot into the global threat map", () 
     dashboard.includes("<ThreatMap snapshot={attackSnapshot} loading={attackLoading} error={attackError} />"),
     true,
   );
+});
+
+test("mdr dashboard pairs the global threat map with a filled intelligence rail", () => {
+  const dashboard = readFileSync(
+    join(root, "app/(ops)/mdr/dashboard/page.tsx"),
+    "utf8",
+  );
+
+  for (const marker of [
+    "global-threat-overview",
+    "threat-intel-rail",
+    "ThreatIntelRail",
+    "attack-telemetry-strip",
+    "source-health-grid",
+  ]) {
+    assert.equal(dashboard.includes(marker), true, `expected ${marker} in the threat overview layout`);
+  }
+
+  assert.equal(dashboard.includes("self-start rounded-xl p-4 overflow-hidden xl:col-span-5"), false);
 });

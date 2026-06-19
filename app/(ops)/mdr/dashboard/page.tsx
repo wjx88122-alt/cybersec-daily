@@ -99,8 +99,10 @@ function BarChart({ data, maxH = 80 }: { data: { label: string; value: number; c
   );
 }
 
+type TickerItem = { text: string; severity: string; time: string };
+
 /* ── Scrolling Alert Ticker ── */
-function AlertTicker({ items }: { items: { text: string; severity: string; time: string }[] }) {
+function AlertTicker({ items, className = "h-[180px]" }: { items: TickerItem[]; className?: string }) {
   const [tickerReady, setTickerReady] = useState(false);
   const tickerItems = tickerReady ? [...items, ...items] : [];
 
@@ -113,7 +115,7 @@ function AlertTicker({ items }: { items: { text: string; severity: string; time:
   }, []);
 
   return (
-    <div className="overflow-hidden h-[180px] relative">
+    <div className={`relative overflow-hidden ${className}`}>
       <div className="animate-scroll space-y-2">
         {tickerItems.map((item, i) => (
           <div key={i} className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white">
@@ -132,6 +134,158 @@ function AlertTicker({ items }: { items: { text: string; severity: string; time:
         )}
       </div>
     </div>
+  );
+}
+
+function ThreatIntelRail({
+  snapshot,
+  loading,
+  error,
+  tickerItems,
+  attackReportTotal,
+}: {
+  snapshot: AttackOperationsSnapshot | null;
+  loading: boolean;
+  error: string;
+  tickerItems: TickerItem[];
+  attackReportTotal: number;
+}) {
+  const topAttacker = snapshot?.topAttackers[0];
+  const topPorts = snapshot?.topPorts.slice(0, 3) ?? [];
+  const topPort = topPorts[0];
+  const maxPortRecords = Math.max(...topPorts.map((port) => port.records), 1);
+  const telemetryCards = [
+    {
+      label: "攻击源",
+      value: snapshot?.topAttackers.length ?? 0,
+      unit: "个",
+      icon: "target",
+      color: mdrSeverityHex("high"),
+    },
+    {
+      label: "扫描报告",
+      value: attackReportTotal,
+      unit: "次",
+      icon: "activity",
+      color: mdrSeverityHex("critical"),
+    },
+    {
+      label: "高压端口",
+      value: snapshot?.topPorts.length ?? 0,
+      unit: "个",
+      icon: "network",
+      color: "#0891b2",
+    },
+    {
+      label: "在野漏洞",
+      value: snapshot?.kevHighlights.length ?? 0,
+      unit: "项",
+      icon: "alert",
+      color: "#7c3aed",
+    },
+  ] satisfies Array<{
+    label: string;
+    value: number;
+    unit: string;
+    icon: SystemIconName;
+    color: string;
+  }>;
+
+  return (
+    <aside className="threat-intel-rail mdr-board-card flex h-full min-h-[640px] flex-col gap-3 overflow-hidden rounded-xl p-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-700">
+          <SystemIcon className="system-icon" name="activity" size={14} />
+          实时安全事件
+        </div>
+        <div className="flex items-center gap-1">
+          <span className={`h-1.5 w-1.5 rounded-full animate-pulse ${mdrConnectionDotClass(error ? "error" : "success")}`} />
+          <span className={`text-[10px] font-bold ${error ? "text-red-700" : "text-emerald-700"}`}>LIVE</span>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-slate-50/80 p-3">
+        <AlertTicker items={tickerItems} className="h-[260px]" />
+      </div>
+
+      <div className="attack-telemetry-strip grid grid-cols-2 gap-2">
+        {telemetryCards.map((item) => (
+          <div key={item.label} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-bold text-slate-500">{item.label}</span>
+              <SystemIcon className="system-icon text-slate-400" name={item.icon} size={12} />
+            </div>
+            <div className="mt-2 font-mono text-lg font-black text-slate-950">
+              <span style={{ color: item.color }}>{formatCompactNumber(item.value)}</span>
+              <span className="ml-1 text-[10px] font-semibold text-slate-500">{item.unit}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-slate-200 bg-white p-3">
+        <div className="mb-2 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-[11px] font-bold text-slate-700">
+            <SystemIcon className="system-icon" name="radar" size={13} />
+            当前攻击面焦点
+          </div>
+          <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] font-bold text-slate-500">
+            {formatFeedTime(snapshot?.updatedAt)}
+          </span>
+        </div>
+
+        {topAttacker ? (
+          <div className="rounded-lg border border-red-100 bg-red-50/70 p-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <div className="truncate font-mono text-sm font-black text-slate-950">{topAttacker.indicator}</div>
+                <div className="mt-1 text-[11px] leading-5 text-slate-600">
+                  Top #{topAttacker.rank} · {topAttacker.mitreId} · {formatCompactNumber(topAttacker.targets ?? 0)} targets
+                </div>
+              </div>
+              <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: mdrSeverityHex(topAttacker.severity) }}>
+                {formatCompactNumber(topAttacker.reports ?? 0)}
+              </span>
+            </div>
+          </div>
+        ) : (
+          <EmptyLiveFeed label={loading ? "正在同步攻击源焦点..." : "暂无攻击源焦点"} />
+        )}
+
+        <div className="mt-2 grid gap-2 sm:grid-cols-3 xl:grid-cols-1 2xl:grid-cols-3">
+          {topPorts.length > 0 ? topPorts.map((port) => (
+            <PortPressureCard key={port.port} port={port} maxRecords={maxPortRecords} />
+          )) : (
+            <EmptyLiveFeed label={loading ? "正在同步端口热区..." : "暂无端口压力数据"} />
+          )}
+        </div>
+      </div>
+
+      <div className="source-health-grid grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        <AttackSourceBadge
+          icon="globe"
+          label="DShield 攻击遥测"
+          status={snapshot?.sourceStatus.dshield ?? (loading ? "degraded" : "offline")}
+        />
+        <AttackSourceBadge
+          icon="shield"
+          label="CISA KEV 在野利用"
+          status={snapshot?.sourceStatus.cisaKev ?? (loading ? "degraded" : "offline")}
+        />
+      </div>
+
+      <div className="rounded-xl border border-blue-100 bg-gradient-to-br from-blue-50 via-white to-cyan-50 p-3">
+        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-700">
+          <SystemIcon className="system-icon" name="workflow" size={12} />
+          Ops next
+        </div>
+        <p className="mt-2 text-xs leading-5 text-slate-600">
+          {topAttacker && topPort
+            ? `先核查 ${topAttacker.indicator} 是否触达客户边界，再把 :${topPort.port} 端口压力同步给防火墙、NDR 和 SIEM 规则观察项。`
+            : "等待攻击遥测补齐后，右侧会自动生成攻击源、端口和来源健康的联动研判。"}
+        </p>
+      </div>
+    </aside>
   );
 }
 
@@ -596,25 +750,19 @@ export default function DashboardPage() {
 
         <AttackRadarPanel snapshot={attackSnapshot} loading={attackLoading} error={attackError} />
 
-        {/* Global Threat Map */}
-        <div className="col-span-12 xl:col-span-7">
-          <ThreatMap snapshot={attackSnapshot} loading={attackLoading} error={attackError} />
-        </div>
-
-        {/* Real-time Alert Feed */}
-        <div className="mdr-board-card col-span-12 self-start rounded-xl p-4 overflow-hidden xl:col-span-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-600">
-              <SystemIcon className="system-icon" name="activity" size={14} />
-              实时安全事件
-            </div>
-            <div className="flex items-center gap-1">
-              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${mdrConnectionDotClass(attackError ? "error" : "success")}`} />
-              <span className={`text-[10px] ${attackError ? "text-red-700" : "text-emerald-700"}`}>LIVE</span>
-            </div>
+        {/* Global Threat Map + Intelligence Rail */}
+        <section className="global-threat-overview col-span-12 grid gap-3 xl:grid-cols-[minmax(0,1.36fr)_minmax(360px,0.64fr)] xl:items-stretch">
+          <div className="min-w-0">
+            <ThreatMap snapshot={attackSnapshot} loading={attackLoading} error={attackError} />
           </div>
-          <AlertTicker items={tickerItems} />
-        </div>
+          <ThreatIntelRail
+            snapshot={attackSnapshot}
+            loading={attackLoading}
+            error={attackError}
+            tickerItems={tickerItems}
+            attackReportTotal={attackReportTotal}
+          />
+        </section>
 
         {/* Threat Distribution */}
         <div className="mdr-board-card col-span-3 rounded-xl p-4 relative scan-line">
