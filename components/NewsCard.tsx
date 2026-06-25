@@ -182,9 +182,18 @@ function CategoryIcon({
 export default function NewsCard({
   item,
   hero = false,
+  score,
+  rank,
+  coverageCount,
 }: {
   item: FeedItem;
   hero?: boolean;
+  /** 热度分 (热榜页传入时显示热度徽章)。 */
+  score?: number;
+  /** 排名 (热榜页传入时显示排名角标)。 */
+  rank?: number;
+  /** 覆盖信源数 (热榜页传入时显示多信源提示)。 */
+  coverageCount?: number;
 }) {
   const [imgError, setImgError] = useState(false);
 
@@ -323,6 +332,27 @@ export default function NewsCard({
               )}
             </div>
             <div className="absolute left-4 top-4 flex flex-wrap gap-2">
+              {typeof rank === "number" && rank > 0 && (
+                <span
+                  className={`inline-flex h-7 min-w-7 items-center justify-center rounded-full px-2 text-[11px] font-bold tabular-nums shadow-sm ${
+                    rank === 1
+                      ? "bg-red-500 text-white"
+                      : rank === 2
+                        ? "bg-orange-500 text-white"
+                        : rank === 3
+                          ? "bg-amber-500 text-white"
+                          : "bg-white/90 text-slate-700"
+                  }`}
+                >
+                  #{rank}
+                </span>
+              )}
+              {typeof score === "number" && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/95 px-2.5 py-1 text-[10px] font-bold text-amber-950 shadow-sm backdrop-blur-sm">
+                  <span aria-hidden>🔥</span>
+                  {score}
+                </span>
+              )}
               <span
                 className={`system-pill inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-semibold backdrop-blur-sm ${catAccent}`}
               >
@@ -344,6 +374,11 @@ export default function NewsCard({
             <div className="mt-5 flex items-center gap-2 border-t border-slate-200/80 pt-4 text-[11px] text-slate-500">
               <SystemIcon className="system-icon shrink-0 text-slate-400" name="globe" size={13} />
               <span className="truncate font-medium text-slate-700">{item.source}</span>
+              {typeof coverageCount === "number" && coverageCount > 1 && (
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 font-semibold text-emerald-700">
+                  +{coverageCount - 1} 信源
+                </span>
+              )}
               <span className="ml-auto inline-flex shrink-0 items-center gap-1.5">
                 <SystemIcon className="system-icon" name="clock" size={13} />
                 {timeAgo}

@@ -64,85 +64,28 @@ function enrichDigestWithFeedItems(
   };
 }
 
-const DIGEST_LOOKBACK_HOURS = 72;
-const AI_CATEGORY_PREFIX = "AI ";
-const SECURITY_KEYWORDS: Array<[RegExp, number]> = [
-  [/\bcve-\d{4}-\d+\b/i, 16],
-  [/(zero[- ]day|0[- ]day|在野利用|已被利用|actively exploited)/i, 14],
-  [/(rce|remote code execution|提权|privilege escalation|沙箱逃逸)/i, 12],
-  [/(勒索软件|ransomware|数据泄露|data breach|供应链|supply chain)/i, 10],
-  [/(apt|后门|backdoor|botnet|僵尸网络|恶意软件)/i, 8],
-  [/(cisa|msrc|advisory|补丁|patch|fortinet|cisco|microsoft)/i, 6],
-];
-const AI_KEYWORDS: Array<[RegExp, number]> = [
-  [/(模型发布|model release|launch|agent|copilot|多模态|multimodal)/i, 8],
-  [/(政策|监管|regulation|compliance|版权|copyright|治理|governance)/i, 10],
-  [/(提示注入|prompt injection|越狱|jailbreak|泄露|data leak|abuse|滥用)/i, 12],
-  [/(企业落地|enterprise|成本|roi|推理|inference|开源|open[- ]source)/i, 6],
-];
+// 评分原语已迁移到 lib/hot-score.ts (自包含、可被 node --test 直接加载)。
+// 这里 re-export 以保持对既有引用方的兼容 (零行为变更)。
+export {
+  DIGEST_LOOKBACK_HOURS,
+  AI_CATEGORY_PREFIX,
+  SECURITY_KEYWORDS,
+  AI_KEYWORDS,
+  isAiCategory,
+  normalizeTitle,
+  scoreFeedItem,
+} from "./hot-score";
+import {
+  DIGEST_LOOKBACK_HOURS,
+  AI_CATEGORY_PREFIX,
+  SECURITY_KEYWORDS,
+  AI_KEYWORDS,
+  isAiCategory,
+  normalizeTitle,
+  scoreFeedItem,
+  type ScoredItem,
+} from "./hot-score";
 
-type ScoredItem = { item: FeedItem; score: number };
-
-function isAiCategory(category: string): boolean {
-  return category.startsWith(AI_CATEGORY_PREFIX);
-}
-
-function normalizeTitle(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[^a-z0-9\u4e00-\u9fff]+/gi, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function scoreFeedItem(item: FeedItem, now: number): number {
-  const title = pickLocalizedField({
-    source: item.title,
-    candidate: item.titleZh,
-    existing: item.title,
-  });
-  const summary = pickLocalizedField({
-    source: item.summary,
-    candidate: item.summaryZh,
-    existing: item.summaryAi,
-  });
-  const text = `${title || item.title} ${summary || item.summaryAi || item.summary}`.toLowerCase();
-  const patterns = isAiCategory(item.category) ? AI_KEYWORDS : SECURITY_KEYWORDS;
-  const pub = new Date(item.pubDate).getTime();
-  const ageHours = Number.isFinite(pub)
-    ? Math.max(0, (now - pub) / 3_600_000)
-    : DIGEST_LOOKBACK_HOURS;
-
-  let score = Math.max(0, DIGEST_LOOKBACK_HOURS - ageHours) * 0.35;
-  for (const [re, weight] of patterns) {
-    if (re.test(text)) score += weight;
-  }
-
-  const source = item.source.toLowerCase();
-  if (
-    /(cisa|msrc|nvd|talos|mandiant|securityweek|the hacker news)/i.test(source)
-  ) {
-    score += 3;
-  }
-  if (
-    /(openai|deepmind|google ai|microsoft ai|nvidia|hugging face|langchain)/i.test(
-      source,
-    )
-  ) {
-    score += 2;
-  }
-  if (
-    pickLocalizedField({ source: item.title, candidate: item.titleZh }) &&
-    pickLocalizedField({
-      source: item.summary,
-      candidate: item.summaryZh,
-      existing: item.summaryAi,
-    })
-  )
-    score += 1;
-
-  return score;
-}
 
 function pickWithCoverage(
   scoredItems: ScoredItem[],

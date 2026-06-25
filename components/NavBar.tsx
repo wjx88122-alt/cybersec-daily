@@ -8,6 +8,7 @@ import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 
 const NAV_ITEMS = [
   { label: "安全", href: "/", icon: "shield" },
+  { label: "热榜", href: "/hot", icon: "activity" },
   { label: "AI", href: "/ai", icon: "spark" },
   { label: "团队", href: "/team", icon: "users" },
   { label: "情报中心", href: "/intelligence", icon: "radar" },
