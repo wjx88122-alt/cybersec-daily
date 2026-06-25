@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import CategoryFilter from "@/components/CategoryFilter";
 import { SEC_CATEGORIES } from "@/components/CategoryFilter";
 import { SystemIcon } from "@/components/ui/SystemIcon";
@@ -21,7 +22,10 @@ const WINDOW_OPTIONS: Array<{ key: HotWindow; label: string; hint: string }> = [
 ];
 
 type HotListClientProps = {
-  items: FeedItem[];
+  /** 服务端已按 24h 窗口排好的热榜 (首屏直出)。 */
+  items: HotItem[];
+  /** 原始安全 feed (切换时间窗时在客户端重排用)。不传则禁用窗口切换。 */
+  rawItems?: FeedItem[];
 };
 
 /** 热度分数 → 徽章颜色档位 (从冷到热)。 */
@@ -92,31 +96,76 @@ function cardAccent(rank: number): {
   };
 }
 
-export default function HotListClient({ items }: HotListClientProps) {
-  const [window, setWindow] = useState<HotWindow>("24h");
-  const [category, setCategory] = useState("全部");
-  const [search, setSearch] = useState("");
-
-  // 计算热榜：聚合 + 打分 + 排序 (随 window 变化重算)
-  const ranked: HotItem[] = useMemo(
-    () => rankHotItems(items, WINDOW_HOURS[window]),
-    [items, window],
+export default function HotListClient(props: HotListClientProps) {
+  // useSearchParams 必须包在 Suspense 里 (Next.js App Router 要求)
+  // fallback 用轻量骨架屏，不能也调用 useSearchParams
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6">
+          <div className="h-10 w-64 animate-pulse rounded-lg bg-slate-100" />
+          <div className="mt-6 space-y-4">
+            {[0, 1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-28 animate-pulse rounded-[26px] bg-slate-100"
+              />
+            ))}
+          </div>
+        </div>
+      }
+    >
+      <HotListInner {...props} />
+    </Suspense>
   );
+}
+
+function HotListInner({ items, rawItems }: HotListClientProps) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  // 从 URL 初始化窗口/搜索 (支持分享搜索结果)
+  const initialWindow =
+    searchParams.get("window") === "7d" ? "7d" : "24h";
+  const initialSearch = searchParams.get("q") ?? "";
+  const initialCategory = searchParams.get("cat") ?? "全部";
+
+  const [window, setWindow] = useState<HotWindow>(initialWindow);
+  const [category, setCategory] = useState(initialCategory);
+  const [search, setSearch] = useState(initialSearch);
+
+  // 切换时间窗时用 rawItems 在客户端重排; 24h 直接用服务端 items
+  const ranked: HotItem[] = useMemo(() => {
+    if (window === "24h") return items;
+    if (rawItems) return rankHotItems(rawItems, WINDOW_HOURS[window]);
+    return items;
+  }, [items, rawItems, window]);
 
   // 客户端二次过滤：分类 + 搜索
   const filtered = useMemo(() => {
     return ranked.filter((item) => {
-      const categoryOk =
-        category === "全部" || item.category === category;
+      const categoryOk = category === "全部" || item.category === category;
       const searchOk = !search || matchesFeedSearch(item, search);
       return categoryOk && searchOk;
     });
   }, [ranked, category, search]);
 
   const totalSources = useMemo(
-    () => new Set(items.map((i) => i.source)).size,
-    [items],
+    () => new Set((rawItems ?? items).map((i) => i.source)).size,
+    [items, rawItems],
   );
+
+  // URL 同步：把 window/cat/q 写进 query string (可分享、可前进后退)
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (window !== "24h") params.set("window", window);
+    if (category !== "全部") params.set("cat", category);
+    if (search) params.set("q", search);
+    const qs = params.toString();
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [window, category, search]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 pb-20 pt-8 sm:px-6">

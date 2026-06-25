@@ -1,0 +1,123 @@
+openapi: 3.1.0
+
+info:
+  title: Security Hot Public API
+  version: 1.0.0
+  summary: Security Hot 公开 REST API（匿名只读）
+  description: |
+    Security Hot (安全热榜) 是中文网络安全热度聚合服务。本 API 提供按热度排序的
+    安全动态与每日产业观察的程序化访问，供 RSS 阅读器、AI Agent、二次开发消费。
+
+    匿名访问，无需 token。三种接入方式参考 https://cybersec-daily.vercel.app/agent。
+  contact:
+    name: Security Hot
+    url: https://cybersec-daily.vercel.app/agent
+  license:
+    name: Reference Use
+    url: https://cybersec-daily.vercel.app
+
+servers:
+  - url: https://cybersec-daily.vercel.app
+    description: Production
+
+paths:
+  /api/hot/items:
+    get:
+      operationId: listHotItems
+      summary: Security Hot items (selected / all, by window)
+      description: |
+        安全热榜。可按精选 / 全量、24h / 7d 时间窗筛选，cursor 翻页。匿名只读。
+
+        **排序契约**：按热度分 (基础分 + 覆盖信源数加权) 倒序。
+        Agent / 二次开发者按 id 做去重是契约红线。
+
+        **cursor 翻页**：响应里的 `nextCursor` 直接作为下次请求的 `cursor` 参数。
+        cursor 失效 / 篡改 → 静默回首屏，不报错。
+
+        **限流**：单 IP 600 r/min（burst 40，超出 429）。
+      parameters:
+        - name: mode
+          in: query
+          schema: { type: string, enum: ["selected", "all"], default: "selected" }
+          description: selected = 精选热榜（默认）；all = 全部动态。
+        - name: window
+          in: query
+          schema: { type: string, enum: ["24h", "7d"], default: "24h" }
+          description: 时间窗，默认 24h。
+        - name: limit
+          in: query
+          schema: { type: integer, minimum: 1, maximum: 50, default: 50 }
+        - name: cursor
+          in: query
+          schema: { type: string }
+          description: 翻页游标，来自上次响应的 nextCursor。
+      responses:
+        "200":
+          description: 热榜条目列表
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  count: { type: integer }
+                  window: { type: string }
+                  mode: { type: string }
+                  hasNext: { type: boolean }
+                  nextCursor: { type: string, nullable: true }
+                  items:
+                    type: array
+                    items: { $ref: "#/components/schemas/HotItem" }
+        "429":
+          description: 限流超出
+
+  /api/hot/daily:
+    get:
+      operationId: getDailyDigest
+      summary: 每日安全产业观察 (JSON)
+      description: 复用 cron 生成的每日 digest（LLM 安全产业视角）。
+      responses:
+        "200":
+          description: 每日产业观察
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DailyDigest" }
+        "503":
+          description: digest 尚未生成
+
+components:
+  schemas:
+    HotItem:
+      type: object
+      properties:
+        id: { type: string }
+        rank: { type: integer }
+        score: { type: number }
+        coverageCount: { type: integer, description: 覆盖信源数 }
+        title: { type: string }
+        title_en: { type: string, nullable: true }
+        summary: { type: string }
+        url: { type: string, description: 原文链接 }
+        permalink: { type: string }
+        source: { type: string }
+        sources: { type: array, items: { type: string } }
+        relatedLinks: { type: array, items: { type: string } }
+        category: { type: string }
+        publishedAt: { type: string, format: date-time }
+        selected: { type: boolean }
+    DailyDigest:
+      type: object
+      properties:
+        ok: { type: boolean }
+        date: { type: string }
+        overview: { type: string }
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              headline: { type: string }
+              summary: { type: string }
+              importance: { type: string, enum: [critical, high, medium] }
+              category: { type: string }
+              sourceTitle: { type: string }
+              sourceLink: { type: string }
