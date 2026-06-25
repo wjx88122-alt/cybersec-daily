@@ -168,9 +168,12 @@ test("rankHotItems HotItem carries all required fields", async () => {
     "coverageCount",
     "sources",
     "relatedLinks",
+    "reason",
   ]) {
     assert.equal(key in item, true, `HotItem must include field: ${key}`);
   }
+  assert.equal(typeof item.reason, "string", "reason must be a string");
+  assert.ok(item.reason.length > 0, "reason must be non-empty");
   assert.equal(Array.isArray(item.sources), true);
   assert.equal(Array.isArray(item.relatedLinks), true);
   assert.equal(item.relatedLinks.length, item.coverageCount, "relatedLinks length must equal coverageCount");

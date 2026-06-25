@@ -8,6 +8,10 @@ import { SystemIcon } from "@/components/ui/SystemIcon";
 import { type FeedItem } from "@/lib/feeds";
 import { rankHotItems, type HotItem } from "@/lib/hot-rank";
 import { matchesFeedSearch } from "@/lib/feed-search";
+import {
+  pickDisplayTitle,
+  pickLocalizedField,
+} from "@/lib/translation-detection";
 
 type HotWindow = "24h" | "7d";
 
@@ -275,6 +279,23 @@ function HotRow({ item }: { item: HotItem }) {
   const hasCoverage = item.coverageCount > 1;
   // 展开时展示除主条目外的其他信源链接
   const extraSources = item.sources.slice(1);
+  // 中文兜底标题 (源字段已是中文则直接用)
+  const displayTitle = pickDisplayTitle({
+    source: item.title,
+    candidate: item.titleZh,
+    existing: item.title,
+    summarySource: item.summary,
+    summaryCandidate: item.summaryZh,
+    summaryExisting: item.summaryAi,
+  }) || item.title;
+  const displaySummary =
+    pickLocalizedField({
+      source: item.summary,
+      candidate: item.summaryZh,
+      existing: item.summaryAi,
+    }) ||
+    item.summaryAi ||
+    item.summary;
 
   return (
     <li className="relative">
@@ -325,15 +346,44 @@ function HotRow({ item }: { item: HotItem }) {
               className="group/title block"
             >
               <h2 className="text-[17px] font-semibold leading-[1.4] tracking-[-0.02em] text-slate-950 transition-colors group-hover/title:text-slate-700 sm:text-[18px]">
-                {item.title}
+                {displayTitle}
               </h2>
             </a>
 
             {/* 摘要 */}
-            {item.summaryAi && (
+            {displaySummary && (
               <p className="mt-2 line-clamp-2 text-[14px] leading-7 text-slate-600">
-                {item.summaryAi}
+                {displaySummary}
               </p>
+            )}
+
+            {/* AI 推荐理由 */}
+            {item.reason && (
+              <div className="mt-2.5 flex items-start gap-1.5 rounded-xl bg-amber-50/80 px-3 py-2 text-[12.5px] leading-6 text-amber-900">
+                <span aria-hidden className="mt-0.5 shrink-0">💡</span>
+                <span>
+                  <span className="font-semibold">推荐理由：</span>
+                  {item.reason}
+                </span>
+              </div>
+            )}
+
+            {/* 多信源清单 (聚合簇直接展示所有信源，不只主源) */}
+            {item.sources.length > 1 && (
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">
+                  信源
+                </span>
+                {item.sources.map((src) => (
+                  <span
+                    key={src}
+                    className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white/70 px-2 py-0.5 text-[10.5px] font-medium text-slate-600"
+                  >
+                    <SystemIcon name="globe" size={9} className="system-icon" />
+                    {src}
+                  </span>
+                ))}
+              </div>
             )}
 
             {/* footer：主信源 + 时间 + 阅读原文 */}

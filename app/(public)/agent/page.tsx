@@ -92,6 +92,53 @@ rate_limit: 600 r/min per IP`}</code>
           </pre>
         </section>
 
+        {/* 实战调用示例 */}
+        <section className="mt-12">
+          <h2 className="mb-3 text-xl font-semibold tracking-[-0.02em] text-slate-950">
+            实战调用示例
+          </h2>
+          <p className="mb-4 text-sm leading-7 text-slate-600">
+            一行 curl 即可拿到热榜 JSON，匿名访问、无需 token：
+          </p>
+          <pre className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-950 p-5 text-[12.5px] leading-6 text-slate-100">
+            <code>{`# 取今日 TOP 10 安全热榜
+curl "https://cybersec-daily.vercel.app/api/hot/items?limit=10"
+
+# 翻页：用上一次返回的 nextCursor
+curl "https://cybersec-daily.vercel.app/api/hot/items?limit=10&cursor=<nextCursor>"`}</code>
+          </pre>
+          <p className="mt-4 mb-2 text-sm leading-7 text-slate-600">
+            响应结构（含 AI 推荐理由 reason、多信源 sources、中文标题 title）：
+          </p>
+          <pre className="overflow-x-auto rounded-2xl border border-slate-200 bg-slate-950 p-5 text-[12px] leading-6 text-slate-100">
+            <code>{`{
+  "count": 10,
+  "hasNext": true,
+  "nextCursor": "eyJyIjoy...",
+  "items": [{
+    "rank": 1,
+    "score": 68.2,
+    "coverageCount": 5,
+    "title": "Cisco Unified CM 漏洞 CVE-2026-20230 遭野外主动利用",
+    "title_en": "Cisco Unified CM Flaw CVE-2026-20230 ...",  // 英文原文备用
+    "summary": "攻击者利用 Cisco Unified CM 漏洞...",
+    "reason": "CVE-2026-20230 已被证实在野利用，建议立即排查受影响资产。",
+    "source": "Security Affairs",
+    "sources": ["CyberInsider","Infosecurity Magazine","Help Net Security","SecurityWeek","Bleeping Computer"],
+    "category": "综合资讯",
+    "url": "https://...",
+    "publishedAt": "2026-06-24T13:10:57.000Z",
+    "selected": true
+  }]
+}`}</code>
+          </pre>
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
+            <FieldChip label="title" desc="中文化标题（全中文）" />
+            <FieldChip label="reason" desc="AI 推荐理由（为什么值得看）" />
+            <FieldChip label="sources[]" desc="全部覆盖信源清单（多信源）" />
+          </div>
+        </section>
+
         {/* 排序契约 */}
         <section className="mt-10 rounded-2xl border border-amber-200 bg-amber-50/60 p-6">
           <h2 className="mb-2 flex items-center gap-2 text-base font-semibold text-amber-900">
@@ -117,6 +164,15 @@ rate_limit: 600 r/min per IP`}</code>
         </div>
       </div>
     </PublicShell>
+  );
+}
+
+function FieldChip({ label, desc }: { label: string; desc: string }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white/70 px-3 py-2.5">
+      <code className="text-[12.5px] font-bold text-amber-600">{label}</code>
+      <p className="mt-0.5 text-[11.5px] leading-5 text-slate-500">{desc}</p>
+    </div>
   );
 }
 

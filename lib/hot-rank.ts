@@ -29,6 +29,8 @@ export type HotItem = FeedItem & {
   sources: string[];
   /** 聚合簇内所有条目的链接 (主条目在前)。 */
   relatedLinks: string[];
+  /** AI 推荐理由: 一句话说明这条为什么值得看 (热度/多信源/严重度维度)。 */
+  reason: string;
 };
 
 /** 聚类相似度阈值：token 集合 Jaccard ≥ 此值视为同一事件。 */
@@ -245,6 +247,64 @@ export function clusterItems(items: FeedItem[]): Cluster[] {
 }
 
 /**
+ * 生成「推荐理由」: 一句话说明这条为什么值得看。
+ *
+ * 设计取舍: 这里用确定性规则生成 (热度/多信源/严重度/分类维度)，
+ * 不在 SSR 路径调 LLM (会拖慢页面、增加成本，违背 ISR 设计)。
+ * 若未来要更强的语义理由，可在 cron 流水线预计算 reason 后存入 FeedItem，
+ * 这里优先读取已存值，接口不变。
+ */
+function buildReason(
+  primary: FeedItem,
+  score: number,
+  coverageCount: number,
+): string {
+  // 优先使用已预计算的 reason (未来 LLM 预计算路径写入)
+  const precomputed = (primary as FeedItem & { reason?: string }).reason;
+  if (precomputed && precomputed.trim()) return precomputed.trim();
+
+  const title = pickLocalizedField({
+    source: primary.title,
+    candidate: primary.titleZh,
+    existing: primary.title,
+  });
+  const lower = `${title || primary.title} ${primary.summary || ""}`.toLowerCase();
+
+  // 维度 1: 严重度 (CVE/在野利用/勒索)
+  if (/\bcve-\d{4}-\d+\b/i.test(lower)) {
+    const cve = (lower.match(/\bcve-\d{4}-\d+\b/i) || [])[0]?.toUpperCase();
+    if (/(zero[- ]day|0[- ]day|在野利用|actively exploited)/i.test(lower)) {
+      return `${cve ?? "该漏洞"}已被证实在野利用，建议立即排查受影响资产。`;
+    }
+    return `${cve ?? "该漏洞"}值得跟进，关注厂商补丁与影响范围。`;
+  }
+  if (/(ransomware|勒索|data breach|数据泄露)/i.test(lower)) {
+    return coverageCount > 1
+      ? `重大${/ransomware|勒索/.test(lower) ? "勒索" : "泄露"}事件，已被 ${coverageCount} 个信源广泛报道，行业关注度高。`
+      : `${/ransomware|勒索/.test(lower) ? "勒索" : "泄露"}事件，关注受影响范围与攻击手法。`;
+  }
+
+  // 维度 2: 多信源 (行业共识信号)
+  if (coverageCount >= 5) {
+    return `已被 ${coverageCount} 个信源报道，是今日安全圈共识性热点。`;
+  }
+  if (coverageCount >= 3) {
+    return `获 ${coverageCount} 个信源关注，热度持续上升。`;
+  }
+
+  // 维度 3: 热度档位
+  if (score >= 45) return `今日高热度话题，反映当前安全趋势值得关注。`;
+  if (score >= 30) return `有代表性的安全动态，可作为日常关注参考。`;
+
+  // 维度 4: 分类兜底
+  const cat = primary.category;
+  if (cat === "威胁情报" || cat === "漏洞预警") {
+    return `${cat}类信息，对研判当前威胁态势有参考价值。`;
+  }
+  return `${cat}类动态，提供安全行业的最新视角。`;
+}
+
+/**
  * 把一个聚合簇折叠成一条 HotItem。
  * - 主条目取簇内最新 (pubDate 最大) 的一条
  * - score 用主条目基础分 + 覆盖信源数加权
@@ -271,6 +331,8 @@ function collapseCluster(members: FeedItem[], now: number): HotItem {
     ...byDesc.slice(1).map((m) => m.link),
   ];
 
+  const reason = buildReason(primary, score, coverageCount);
+
   return {
     ...primary,
     score,
@@ -278,6 +340,7 @@ function collapseCluster(members: FeedItem[], now: number): HotItem {
     coverageCount,
     sources,
     relatedLinks,
+    reason,
   };
 }
 

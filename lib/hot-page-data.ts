@@ -113,6 +113,7 @@ export function hotItemToJson(item: HotItem) {
     title: hotItemTitle(item),
     title_en: item.titleZh ? item.title : null,
     summary: hotItemSummary(item),
+    reason: item.reason,
     url: item.link,
     permalink: `https://cybersec-daily.vercel.app/hot#${item.id}`,
     source: item.source,
