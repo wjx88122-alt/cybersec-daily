@@ -1,4 +1,4 @@
-import { xUserUrl, wechatUrl } from "./rsshub.ts";
+import { xUserUrl, wechatBizUrl } from "./rsshub.ts";
 
 export const FEED_SOURCES_A = [
   {
@@ -591,34 +591,36 @@ export const FEED_SOURCES_KOL: FeedSource[] = [
     category: "威胁情报",
     description: "安全老兵 Carlos Perez，专注 PowerShell 安全与防御技术。",
   },
-  // —— 安全公众号（RSSHub ggh 路由，需在实例配公众号 cookie） ——
+  // —— 安全公众号（RSSHub biz 路由，需在实例配公众号 cookie） ——
+  // ⚠️ 占位 biz 值需替换为真实值：微信打开该公众号任一文章 → URL 取 __biz
+  //     未替换时这些源会抓到空/错误（不影响其他源）。详见 docs/deploy-rsshub.md。
   {
     name: "公众号：奇安信威胁情报中心",
-    urlBuilder: () => wechatUrl("gh_3808b62e1c80"),
+    urlBuilder: () => wechatBizUrl("REPLACE_WITH_BIZ_QIANXIN"),
     category: "威胁情报",
     description: "奇安信威胁情报中心公众号，发布 APT 追踪与威胁分析。",
   },
   {
     name: "公众号：腾讯安全威胁情报中心",
-    urlBuilder: () => wechatUrl("gh_d0142a6a6d3c"),
+    urlBuilder: () => wechatBizUrl("REPLACE_WITH_BIZ_TENCENT"),
     category: "威胁情报",
     description: "腾讯安全威胁情报中心公众号，发布漏洞与攻击活动预警。",
   },
   {
     name: "公众号：微步在线研究响应中心",
-    urlBuilder: () => wechatUrl("gh_5e911cc1a73d"),
+    urlBuilder: () => wechatBizUrl("REPLACE_WITH_BIZ_THREATBOOK"),
     category: "威胁情报",
     description: "微步在线研究响应中心公众号，发布威胁情报与攻防分析。",
   },
   {
     name: "公众号：长亭科技",
-    urlBuilder: () => wechatUrl("gh_ba2d6013d12f"),
+    urlBuilder: () => wechatBizUrl("REPLACE_WITH_BIZ_CHAITIN"),
     category: "深度分析",
     description: "长亭科技公众号，发布攻防技术研究与安全方案。",
   },
   {
     name: "公众号：绿盟科技研究通讯",
-    urlBuilder: () => wechatUrl("gh_3eeae3a4f5d6"),
+    urlBuilder: () => wechatBizUrl("REPLACE_WITH_BIZ_NSFOCUS"),
     category: "威胁情报",
     description: "绿盟科技研究通讯公众号，发布漏洞分析与威胁研究。",
   },

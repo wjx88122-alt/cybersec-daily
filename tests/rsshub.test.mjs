@@ -6,6 +6,7 @@ import {
   isRssHubReady,
   xUserUrl,
   wechatUrl,
+  wechatBizUrl,
   telegramChannelUrl,
 } from "../lib/rsshub.ts";
 
@@ -35,6 +36,14 @@ test("wechatUrl builds wechat ggh route", () => {
   assert.equal(wechatUrl("gh_abc123"), "https://rh.example.com/wechat/ggh/gh_abc123");
 });
 
+test("wechatBizUrl builds wechat mp route with encoded biz", () => {
+  process.env.RSSHUB_BASE = "https://rh.example.com";
+  assert.equal(
+    wechatBizUrl("MzI1MjM=="),
+    "https://rh.example.com/wechat/mp/MzI1MjM%3D%3D",
+  );
+});
+
 test("telegramChannelUrl builds telegram channel route", () => {
   process.env.RSSHUB_BASE = "https://rh.example.com";
   assert.equal(telegramChannelUrl("somechannel"), "https://rh.example.com/telegram/channel/somechannel");
@@ -55,10 +64,10 @@ test("FEED_SOURCES_KOL urlBuilder resolves correctly when RSSHub ready", async (
   const xSrc = FEED_SOURCES_KOL.find((s) => s.name.startsWith("X："));
   assert.ok(xSrc?.urlBuilder, "X source must use urlBuilder");
   assert.match(xSrc.urlBuilder(), /\/twitter\/user\//);
-  // 公众号源解出 wechat 路由
+  // 公众号源解出 wechat mp 路由（biz 路由）
   const wxSrc = FEED_SOURCES_KOL.find((s) => s.name.startsWith("公众号："));
   assert.ok(wxSrc?.urlBuilder, "wechat source must use urlBuilder");
-  assert.match(wxSrc.urlBuilder(), /\/wechat\/ggh\//);
+  assert.match(wxSrc.urlBuilder(), /\/wechat\/mp\//);
 });
 
 test("FEED_SOURCES_KOL urlBuilder returns empty when RSSHub unset", async () => {

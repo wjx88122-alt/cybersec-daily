@@ -26,15 +26,23 @@ export function xUserUrl(handle: string): string {
 }
 
 /**
- * 微信公众号 RSS。
- * @param id 公众号 id。RSSHub 支持多种路由：
- *   - ggh: 公众号gh_id（如 gh_xxxx）
- *   - mp:  公众号biz（Mzxxxx）
- *   - ceaseunique: 公众号名称
- * 这里默认用 ggh 路由（最稳定，需在 RSSHub 配 cookie）。
+ * 微信公众号 RSS（ggh 路由，用 gh_ 原始 ID）。
+ * @param ghId 公众号原始 ID，形如 gh_xxxxxxxxxx。
+ *   获取：微信打开该公众号任一文章 → 右上角...→ 复制链接 → URL 取 __biz
+ *   或在公众号设置页查看"原始ID"。需在 RSSHub 实例配微信 cookie。
  */
-export function wechatUrl(id: string): string {
-  return `${getRssHubBase()}/wechat/ggh/${id}`;
+export function wechatUrl(ghId: string): string {
+  return `${getRssHubBase()}/wechat/ggh/${ghId}`;
+}
+
+/**
+ * 微信公众号 RSS（biz 路由，用 __biz base64 ID）。
+ * @param biz 公众号 __biz，形如 MzIxxxxxxxxxxx==
+ *   获取：微信打开该公众号任一文章 → URL 里 __biz= 后的值。
+ *   注意 biz 路由需 URL 编码（== 要转义），RSSHub 内部已处理。
+ */
+export function wechatBizUrl(biz: string): string {
+  return `${getRssHubBase()}/wechat/mp/${encodeURIComponent(biz)}`;
 }
 
 /** Telegram 频道 RSS（备用，频道名不带 @）。 */
