@@ -183,6 +183,86 @@ export const FEED_SOURCES_A = [
     category: "综合资讯",
     description: "360 支持的安全资讯平台，覆盖威胁情报、漏洞与攻防技术。",
   },
+  // —— 国内安全实验室 / 漏洞平台（来自 CyberSecurityRSS 精选） ——
+  {
+    name: "腾讯玄武实验室",
+    url: "https://xlab.tencent.com/cn/feed",
+    category: "威胁情报",
+    description: "腾讯玄武实验室，发布漏洞研究、攻击技术与安全工具。",
+  },
+  {
+    name: "腾讯科恩实验室",
+    url: "https://keenlab.tencent.com/zh/atom.xml",
+    category: "威胁情报",
+    description: "腾讯科恩实验室，专注前沿攻防研究，含车联网与移动安全。",
+  },
+  {
+    name: "绿盟科技技术博客",
+    url: "https://blog.nsfocus.net/feed",
+    category: "深度分析",
+    description: "绿盟科技技术博客，发布漏洞分析与安全技术研究。",
+  },
+  {
+    name: "华为安全通告",
+    url: "https://www.huawei.com/cn/rss-feeds/psirt/rss",
+    category: "漏洞预警",
+    description: "华为 PSIRT 官方安全通告，发布华为产品漏洞与补丁信息。",
+  },
+  {
+    name: "Seebug 漏洞社区",
+    url: "https://www.seebug.org/rss/new",
+    category: "漏洞预警",
+    description: "Seebug 漏洞社区，发布最新漏洞 PoC 与安全研究。",
+  },
+  {
+    name: "先知安全技术社区",
+    url: "https://xz.aliyun.com/feed",
+    category: "深度分析",
+    description: "阿里先知社区，安全研究者发布攻防技术与漏洞分析。",
+  },
+  {
+    name: "信息安全知识库",
+    url: "https://vipread.com/feed",
+    category: "综合资讯",
+    description: "信息安全知识库，聚合安全报告与学习资料。",
+  },
+  // —— 安全公众号（经 wechat2rss 桥接，腾讯玄武维护，直连可用） ——
+  {
+    name: "公众号：奇安信CERT",
+    url: "https://wechat2rss.xlab.app/feed/981c000a01bbdc1f128d260cc91c15d3a6afb530.xml",
+    category: "漏洞预警",
+    description: "奇安信 CERT 公众号，发布漏洞预警与应急响应信息。",
+  },
+  {
+    name: "公众号：微步在线研究响应中心",
+    url: "https://wechat2rss.xlab.app/feed/ac64c385ebcdb17fee8df733eb620a22b979928c.xml",
+    category: "威胁情报",
+    description: "微步在线公众号，发布威胁情报与攻防分析。",
+  },
+  {
+    name: "公众号：看雪学院",
+    url: "https://wechat2rss.xlab.app/feed/0e026637254d450ae84c59f87d4e4fb4616651ca.xml",
+    category: "深度分析",
+    description: "看雪学院公众号，专注逆向工程与漏洞利用技术。",
+  },
+  {
+    name: "公众号：腾讯安全应急响应中心",
+    url: "https://wechat2rss.xlab.app/feed/7898375f78fd1018302d54577cd0fd05d5ed324f.xml",
+    category: "威胁情报",
+    description: "腾讯 TSRC 公众号，发布漏洞公告与安全动态。",
+  },
+  {
+    name: "公众号：安全客",
+    url: "https://wechat2rss.xlab.app/feed/7fc9f5344f14228ba49208282d844349f8afdee7.xml",
+    category: "综合资讯",
+    description: "安全客公众号，覆盖威胁情报、漏洞与攻防技术。",
+  },
+  {
+    name: "公众号：长亭安全课堂",
+    url: "https://wechat2rss.xlab.app/feed/ae5cf9ab99ae03269527af0f7a6c05ff14d5863c.xml",
+    category: "深度分析",
+    description: "长亭科技公众号，发布攻防技术研究与安全方案。",
+  },
   // —— 安全播客（对齐 AI HOT 的播客/Newsletter 源） ——
   {
     name: "Risky Business News",
@@ -518,6 +598,43 @@ export const FEED_SOURCES_B = [
     category: "综合资讯",
     description: "中文安全知识社区，聚合国内安全文章、工具与会议资讯。",
   },
+  // —— 国际攻防 / 研究博客（来自 CyberSecurityRSS 精选） ——
+  {
+    name: "Pen Test Partners",
+    url: "https://www.pentestpartners.com/feed/",
+    category: "深度分析",
+    description: "Pen Test Partners 渗透测试团队，发布攻防案例与漏洞研究。",
+  },
+  {
+    name: "XPN InfoSec Blog",
+    url: "https://blog.xpnsec.com/rss.xml",
+    category: "深度分析",
+    description: "安全研究员 Adam Chester (XPN)，专注 Windows 内核与红队技术。",
+  },
+  {
+    name: "TaoSecurity Blog",
+    url: "https://taosecurity.blogspot.com/feeds/posts/default?alt=rss",
+    category: "深度分析",
+    description: "Richard Bejtlich (TaoSecurity)，网络安全战略与威胁狩猎先驱。",
+  },
+  {
+    name: "SensePost (Orange Cyberdefense)",
+    url: "https://sensepost.com/rss.xml",
+    category: "威胁情报",
+    description: "Orange Cyberdefense SensePost 团队，发布攻防研究与威胁分析。",
+  },
+  {
+    name: "NVISO Labs",
+    url: "https://blog.nviso.eu/feed/",
+    category: "深度分析",
+    description: "NVISO 安全实验室，发布防御、取证与红队研究。",
+  },
+  {
+    name: "Kali Linux Tutorials",
+    url: "https://kalilinuxtutorials.com/feed/",
+    category: "深度分析",
+    description: "Kali Linux 教程站，发布渗透测试工具用法与攻击技术。",
+  },
 ];
 
 /**
@@ -657,12 +774,6 @@ export const FEED_SOURCES_AI = [
     description: "Google Research，含 AI 安全、对抗鲁棒性与负责任 AI 研究。",
   },
   {
-    name: "Microsoft Security：Blog",
-    url: "https://www.microsoft.com/en-us/security/blog/feed/",
-    category: "AI 安全",
-    description: "微软安全博客，含 AI 红队(Microsoft AI Red Team)、AI 诈骗与防护研究。",
-  },
-  {
     name: "NVIDIA：Blog",
     url: "https://blogs.nvidia.com/feed/",
     category: "AI 安全",
@@ -680,12 +791,6 @@ export const FEED_SOURCES_AI = [
     url: "https://blogs.cisco.com/security/feed",
     category: "AI 安全",
     description: "Cisco 安全博客，含 AI 驱动威胁检测与 LLM 防护研究。",
-  },
-  {
-    name: "Cloudflare：Blog",
-    url: "https://blog.cloudflare.com/rss/",
-    category: "AI 安全",
-    description: "Cloudflare 博客，含 AI API 防护、提示注入缓解与边缘 AI 安全。",
   },
   {
     name: "PortSwigger：Daily Swig",
@@ -714,12 +819,6 @@ export const FEED_SOURCES_AI = [
     description: "NIST 新闻，含 AI RMF、对抗机器学习分类(NIST AI 100-2)等标准动态。",
   },
   // —— 深度分析 / 独立观察 ——
-  {
-    name: "Daniel Miessler",
-    url: "https://danielmiessler.com/feed/",
-    category: "AI 安全",
-    description: "安全专家 Daniel Miessler，聚焦 AI 安全、威胁情报与 LLM 应用风险(含 OWASP Top 10 for LLMs 实践)。",
-  },
   {
     name: "Simon Willison",
     url: "https://simonwillison.net/atom/everything/",
