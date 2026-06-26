@@ -10,6 +10,12 @@ import {
 import crypto from "crypto";
 import { FeedFetchResult, normalizeFeedPubDate } from "./feed-refresh";
 import { pickFeedImage } from "./feed-image";
+import {
+  buildXPostUrl,
+  fetchXUserPosts,
+  isXApiReady,
+  summarizeXPostText,
+} from "./x-api";
 
 const parser = new Parser({
   timeout: 5000,
@@ -30,14 +36,38 @@ function resolveSourceUrl(source: FeedSource): string {
   return source.url ?? "";
 }
 
+async function fetchXSource(source: FeedSource): Promise<FeedItem[]> {
+  if (!source.xHandle) return [];
+  const posts = await fetchXUserPosts(source.xHandle);
+  return posts.map((post) => ({
+    id: crypto
+      .createHash("sha256")
+      .update(`x:${source.xHandle}:${post.id}`)
+      .digest("hex"),
+    title: summarizeXPostText(post.text),
+    link: buildXPostUrl(source.xHandle as string, post.id),
+    summary: summarizeXPostText(post.text, 200),
+    source: source.name,
+    category: source.category,
+    pubDate: normalizeFeedPubDate(post.createdAt),
+  }));
+}
+
 async function fetchSources(sources: FeedSource[]): Promise<FeedFetchResult<FeedItem>> {
   // 过滤掉 URL 为空的源（如 RSSHUB_BASE 未配置时的 X/公众号源）
   const resolved = sources
-    .map((source) => ({ source, url: resolveSourceUrl(source) }))
-    .filter((entry) => entry.url.length > 0);
+    .map((source) => {
+      if (source.xHandle && isXApiReady()) {
+        return { source, mode: "x-api" as const, url: "" };
+      }
+      return { source, mode: "rss" as const, url: resolveSourceUrl(source) };
+    })
+    .filter((entry) => entry.mode === "x-api" || entry.url.length > 0);
 
   const results = await Promise.allSettled(
-    resolved.map(async ({ source, url }) => {
+    resolved.map(async ({ source, mode, url }) => {
+      if (mode === "x-api") return fetchXSource(source);
+
       const feed = await parser.parseURL(url);
       return (feed.items || []).slice(0, 20).map((item) => ({
         id: crypto

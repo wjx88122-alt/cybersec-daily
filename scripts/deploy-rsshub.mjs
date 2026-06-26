@@ -5,7 +5,7 @@
  * 已执行记录（2026-06-26）：
  *   - RSSHub 项目已创建并部署：rsshub-wjx88122-alts-projects.vercel.app
  *   - RSSHUB_BASE 已写入 cybersec-daily 项目（production + preview）
- *   - 待办：配 TWITTER_AUTH_TOKEN（X 推文）+ WECHAT_cookies（公众号）
+ *   - 待办：配 WECHAT_cookies（公众号）；X 长期稳定主路径改用 cybersec-daily 的 X_BEARER_TOKEN
  *
  * 用法（如需重跑 / 迁移实例）：
  *   VERCEL_TOKEN=你的token node scripts/deploy-rsshub.mjs
@@ -110,10 +110,11 @@ async function main() {
   console.log(`RSSHub 地址：${url}`);
   console.log(`━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`);
   console.log(`\n接下来配置环境变量（${url} 项目 → Settings → Environment Variables）：`);
-  console.log(`  1. X 推文：TWITTER_AUTH_TOKEN = <你的 X auth_token>`);
-  console.log(`  2. 公众号：WECHAT_cookies = <你的微信 cookie>`);
+  console.log(`  1. 公众号：WECHAT_cookies = <你的微信 cookie>`);
+  console.log(`  2. 可选 X fallback：TWITTER_AUTH_TOKEN = <你的 X auth_token>`);
   console.log(`\n然后在 cybersec-daily 项目配置：`);
   console.log(`  RSSHUB_BASE=${url}`);
+  console.log(`  X 长期稳定主路径请在 cybersec-daily 配 X_BEARER_TOKEN`);
 }
 
 main().catch((e) => {

@@ -1,12 +1,13 @@
-# 部署自建 RSSHub（接 X / 公众号）
+# 部署自建 RSSHub（公众号 + X fallback）
 
-> 参照 AI HOT 的实现：它的 X 与公众号源经自建桥接服务转为 RSS。
-> 本文记录如何把 RSSHub 部署到你自己的 Vercel，并接入 cybersec-daily。
+> X 长期稳定主路径已经改为官方 X API，见 [`docs/deploy-x-api.md`](./deploy-x-api.md)。
+> 本文只记录 RSSHub：公众号桥接，以及没有 `X_BEARER_TOKEN` 时的 X cookie fallback。
 
 ## 当前状态
 
 - ✅ **RSSHub 已 fork 到你的 GitHub**：https://github.com/wjx88122-alt/RSSHub
-- ⬜ 需要你完成：Vercel 部署 + 配置 X/公众号 cookie + 填真实公众号 ID
+- ⬜ 需要你完成：Vercel 部署 + 配置公众号 cookie + 填真实公众号 ID
+- 可选：如暂时没有官方 X API Bearer Token，可配置 X cookie fallback
 
 ---
 
@@ -23,7 +24,9 @@
 
 > 验证：浏览器打开 `https://你的域名/`，应看到 RSSHub 欢迎页。
 
-### 步骤 2：配置 X（Twitter）cookie（2 分钟）
+### 步骤 2：可选，配置 X（Twitter）cookie fallback（2 分钟）
+
+长期稳定不要用这一步，优先配置官方 `X_BEARER_TOKEN`。只有暂时没有 X Developer API 权限时，才用 RSSHub 的 cookie fallback。
 
 1. 浏览器登录你的 X（Twitter）账号
 2. F12 打开 DevTools → **Application** 标签 → 左侧 **Cookies** → `https://x.com`
@@ -84,7 +87,7 @@ RSSHUB_BASE=https://你的rsshub域名
 
 （也配到本地 `.env.local` 用于本地开发。）
 
-配置后，`FEED_SOURCES_KOL`（8 个 X 大V + 5 个公众号）自动生效。未配置时这组源静默跳过。
+配置后，公众号源自动生效。X 源在 `X_BEARER_TOKEN` 存在时优先走官方 API；没有官方 token 时才尝试 RSSHub fallback。
 
 ---
 
@@ -92,10 +95,11 @@ RSSHUB_BASE=https://你的rsshub域名
 
 ```
 cybersec-daily (本项目)
-   │  读 RSSHUB_BASE → feeds.ts 的 KOL 源拼出 RSS URL
+   │  X：优先读 X_BEARER_TOKEN → 官方 X API
+   │  公众号 / X fallback：读 RSSHUB_BASE → RSSHub URL
    ▼
 你的 RSSHub (https://rsshub-xxxx.vercel.app)
-   │  /twitter/user/briankrebs   → 拉 X 推文 → RSS
+   │  /twitter/user/briankrebs   → 拉 X 推文 → RSS（仅 fallback）
    │  /wechat/mp/MzIxxxx==       → 拉公众号文章 → RSS
    ▼
 X / 公众号（你的 cookie 认证）
@@ -103,7 +107,8 @@ X / 公众号（你的 cookie 认证）
 
 ## 维护
 
-- **X cookie 失效**（~30 天）：重登 X 取 `auth_token`，更新后 Redeploy
+- **X 官方 token 异常**：检查 X Developer Portal 的权限、套餐、额度和 token 状态
+- **X cookie fallback 失效**（~30 天）：重登 X 取 `auth_token`，更新后 Redeploy
 - **公众号 cookie 失效**（更频繁）：同上更新 `WECHAT_cookies`
 - 失效不影响其他源（计入 failedSources，静默跳过）
 

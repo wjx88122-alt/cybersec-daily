@@ -52,8 +52,8 @@ test("telegramChannelUrl builds telegram channel route", () => {
 
 test("xUserUrl returns base-less path when RSSHUB_BASE unset (relative)", () => {
   delete process.env.RSSHUB_BASE;
-  // 未配置时仍返回路径串（fetchSources 靠 isRssHubReady/空判断跳过）
-  assert.equal(xUserUrl("briankrebs"), "/twitter/user/briankrebs");
+  // 未配置时返回空串，fetchSources 会跳过 RSSHub fallback。
+  assert.equal(xUserUrl("briankrebs"), "");
 });
 
 test("FEED_SOURCES_KOL urlBuilder resolves correctly when RSSHub ready", async () => {
@@ -63,6 +63,7 @@ test("FEED_SOURCES_KOL urlBuilder resolves correctly when RSSHub ready", async (
   // X 源用 urlBuilder，解出 twitter 路由
   const xSrc = FEED_SOURCES_KOL.find((s) => s.name.startsWith("X："));
   assert.ok(xSrc?.urlBuilder, "X source must use urlBuilder");
+  assert.equal(xSrc.xHandle, "briankrebs");
   assert.match(xSrc.urlBuilder(), /\/twitter\/user\//);
   // 公众号源解出 wechat mp 路由（biz 路由）
   const wxSrc = FEED_SOURCES_KOL.find((s) => s.name.startsWith("公众号："));
@@ -74,7 +75,8 @@ test("FEED_SOURCES_KOL urlBuilder returns empty when RSSHub unset", async () => 
   delete process.env.RSSHUB_BASE;
   const { FEED_SOURCES_KOL } = await import("../lib/feeds.ts");
   const xSrc = FEED_SOURCES_KOL.find((s) => s.name.startsWith("X："));
-  // urlBuilder 仍返回路径串（非空），但 isRssHubReady=false；fetchSources 用 isRssHubReady 判断
-  // 这里验证：当 RSSHUB_BASE 未设置，源仍可被识别为"动态源"
+  // 官方 X API 用 xHandle；RSSHub 只作为可选 fallback。
   assert.ok(xSrc?.urlBuilder, "urlBuilder should exist regardless");
+  assert.equal(xSrc.xHandle, "briankrebs");
+  assert.equal(xSrc.urlBuilder(), "");
 });

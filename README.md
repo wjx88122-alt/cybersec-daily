@@ -251,6 +251,18 @@ npm run repair:translations:all
 - `KV_REST_API_TOKEN`
   用于 Upstash Redis / KV 缓存
 
+### X / 公众号信源
+
+- `X_BEARER_TOKEN`
+  官方 X API Bearer Token，用于长期稳定拉取 X KOL 公开推文。兼容旧名 `TWITTER_BEARER_TOKEN`，但推荐用 `X_BEARER_TOKEN`。
+- `RSSHUB_BASE`
+  可选。用于公众号 RSSHub 桥接，以及没有 `X_BEARER_TOKEN` 时的 X cookie fallback。
+
+配置说明：
+
+- [docs/deploy-x-api.md](./docs/deploy-x-api.md)
+- [docs/deploy-rsshub.md](./docs/deploy-rsshub.md)
+
 ### LLM 提供方
 
 至少配置一个：
