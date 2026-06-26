@@ -8,6 +8,7 @@ import {
   fetchFeedsAI,
   fetchFeedsB,
 } from "./fetchFeeds";
+import { fetchWebpageSources, WEBPAGE_SOURCES } from "./webpage-collector";
 import {
   readDigestFromStore,
   readFeedCacheState,
@@ -225,15 +226,25 @@ export async function rebuildDigestFromStore(): Promise<DigestRebuildJobResult> 
 }
 
 export async function runFeedRefreshJob(): Promise<FeedRefreshJobResult> {
-  const [feedAResult, feedBResult, feedAIResult, previousState] = await Promise.all([
+  const [feedAResult, feedBResult, feedAIResult, webpageResult, previousState] = await Promise.all([
     fetchFeedsA(),
     fetchFeedsB(),
     fetchFeedsAI(),
+    // 网页型源（无 RSS 的厂商官网）；WEBPAGE_SOURCES 为空时为 no-op
+    fetchWebpageSources(WEBPAGE_SOURCES),
     readFeedCacheState(),
   ]);
 
   const refreshedA = resolveFeedRefresh(feedAResult, previousState.feedA);
-  const refreshedB = resolveFeedRefresh(feedBResult, previousState.feedB);
+  // B 组 RSS 结果合并网页采集结果（对齐 AI HOT「网页」源策略）
+  const combinedBResult: typeof feedBResult = webpageResult.items.length
+    ? {
+        items: [...feedBResult.items, ...webpageResult.items],
+        succeededSources: feedBResult.succeededSources + webpageResult.succeededSources,
+        failedSources: feedBResult.failedSources + webpageResult.failedSources,
+      }
+    : feedBResult;
+  const refreshedB = resolveFeedRefresh(combinedBResult, previousState.feedB);
   const refreshedAI = resolveFeedRefresh(feedAIResult, previousState.feedAI);
 
   const mergedA = refreshedA.stale

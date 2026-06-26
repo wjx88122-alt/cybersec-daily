@@ -1,5 +1,12 @@
 import Parser from "rss-parser";
-import { FEED_SOURCES_A, FEED_SOURCES_B, FEED_SOURCES_AI, FeedItem } from "./feeds";
+import {
+  FEED_SOURCES_A,
+  FEED_SOURCES_B,
+  FEED_SOURCES_AI,
+  FEED_SOURCES_KOL,
+  type FeedSource,
+  FeedItem,
+} from "./feeds";
 import crypto from "crypto";
 import { FeedFetchResult, normalizeFeedPubDate } from "./feed-refresh";
 import { pickFeedImage } from "./feed-image";
@@ -17,12 +24,21 @@ const parser = new Parser({
   },
 });
 
-type Source = { name: string; url: string; category: string };
+/** 解析一个 FeedSource 的实际 URL（静态 url 或动态 urlBuilder）。空串=不可用。 */
+function resolveSourceUrl(source: FeedSource): string {
+  if (source.urlBuilder) return source.urlBuilder();
+  return source.url ?? "";
+}
 
-async function fetchSources(sources: Source[]): Promise<FeedFetchResult<FeedItem>> {
+async function fetchSources(sources: FeedSource[]): Promise<FeedFetchResult<FeedItem>> {
+  // 过滤掉 URL 为空的源（如 RSSHUB_BASE 未配置时的 X/公众号源）
+  const resolved = sources
+    .map((source) => ({ source, url: resolveSourceUrl(source) }))
+    .filter((entry) => entry.url.length > 0);
+
   const results = await Promise.allSettled(
-    sources.map(async (source) => {
-      const feed = await parser.parseURL(source.url);
+    resolved.map(async ({ source, url }) => {
+      const feed = await parser.parseURL(url);
       return (feed.items || []).slice(0, 20).map((item) => ({
         id: crypto
           .createHash("sha256")
@@ -70,7 +86,8 @@ function sortFeedItems(items: FeedItem[]): FeedItem[] {
 }
 
 export async function fetchFeedsA(): Promise<FeedFetchResult<FeedItem>> {
-  const result = await fetchSources(FEED_SOURCES_A);
+  // A 组安全媒体 + KOL（X/公众号，经 RSSHub 桥接；未配置时自动跳过）
+  const result = await fetchSources([...FEED_SOURCES_A, ...FEED_SOURCES_KOL]);
   return { ...result, items: sortFeedItems(result.items) };
 }
 
@@ -103,15 +120,23 @@ export async function fetchFeedImageMapForSources(
   const requested = new Set(sourceNames.map((name) => name.trim()).filter(Boolean));
   if (requested.size === 0) return new Map();
 
-  const sources = [...FEED_SOURCES_A, ...FEED_SOURCES_B, ...FEED_SOURCES_AI].filter(
-    (source) => requested.has(source.name),
-  );
-  if (sources.length === 0) return new Map();
+  const allSources = [
+    ...FEED_SOURCES_A,
+    ...FEED_SOURCES_KOL,
+    ...FEED_SOURCES_B,
+    ...FEED_SOURCES_AI,
+  ].filter((source) => requested.has(source.name));
+  if (allSources.length === 0) return new Map();
+
+  // 仅处理 URL 实际可用的源
+  const resolved = allSources
+    .map((source) => ({ source, url: resolveSourceUrl(source) }))
+    .filter((entry) => entry.url.length > 0);
 
   const map = new Map<string, string>();
   const results = await Promise.allSettled(
-    sources.map(async (source) => {
-      const feed = await parser.parseURL(source.url);
+    resolved.map(async ({ url }) => {
+      const feed = await parser.parseURL(url);
       (feed.items || []).slice(0, 30).forEach((item) => {
         const link = normalizeLinkKey(item.link || "");
         if (!link) return;

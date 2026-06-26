@@ -1,3 +1,5 @@
+import { xUserUrl, wechatUrl } from "./rsshub.ts";
+
 export const FEED_SOURCES_A = [
   {
     name: "The Hacker News",
@@ -515,6 +517,110 @@ export const FEED_SOURCES_B = [
     url: "https://www.sec-wiki.com/news/rss",
     category: "综合资讯",
     description: "中文安全知识社区，聚合国内安全文章、工具与会议资讯。",
+  },
+];
+
+/**
+ * 信源统一类型。
+ * - 静态源：直接给 `url`（标准 RSS）。
+ * - 动态源：给 `urlBuilder`（运行时解析，用于 RSSHub 桥接的 X/公众号等）。
+ *   当依赖的环境变量（如 RSSHUB_BASE）未配置时，urlBuilder 返回空串，
+ *   fetchSources 会跳过该源。
+ */
+export type FeedSource = {
+  name: string;
+  url?: string;
+  /** 动态 URL 构造器（与 url 二选一）。返回空串表示该源不可用。 */
+  urlBuilder?: () => string;
+  category: string;
+  description?: string;
+};
+
+/**
+ * KOL 信源：X 安全大V + 安全公众号，经自建 RSSHub 桥接。
+ * 对齐 AI HOT 的 X/公众号源（它的 source 字段标注 X：@handle / 公众号：xxx）。
+ * RSSHUB_BASE 未配置时这组源整体跳过，不影响其他源。
+ */
+export const FEED_SOURCES_KOL: FeedSource[] = [
+  // —— X 安全大V ——
+  {
+    name: "X：Brian Krebs (@briankrebs)",
+    urlBuilder: () => xUserUrl("briankrebs"),
+    category: "深度分析",
+    description: "Krebs on Security 作者 Brian Krebs 的 X 动态，深度追踪网络犯罪。",
+  },
+  {
+    name: "X：SwiftOnSecurity (@SwiftOnSecurity)",
+    urlBuilder: () => xUserUrl("SwiftOnSecurity"),
+    category: "综合资讯",
+    description: "匿名安全社区 KOL SwiftOnSecurity，分享防御实践与安全科普。",
+  },
+  {
+    name: "X：Troy Hunt (@troyhunt)",
+    urlBuilder: () => xUserUrl("troyhunt"),
+    category: "深度分析",
+    description: "Have I Been Pwned 创始人 Troy Hunt 的 X 动态，关注数据泄露。",
+  },
+  {
+    name: "X：Kevin Beaumont (@GossiTheDog)",
+    urlBuilder: () => xUserUrl("GossiTheDog"),
+    category: "威胁情报",
+    description: "安全研究员 Kevin Beaumont，追踪勒索软件与重大漏洞事件。",
+  },
+  {
+    name: "X：MalwareHunterTeam (@malaboratories)",
+    urlBuilder: () => xUserUrl("malaboratories"),
+    category: "恶意软件",
+    description: "恶意软件猎手 MalwareHunterTeam，实时披露新型勒索与恶意样本。",
+  },
+  {
+    name: "X：Vitali Kremez (@VitaliKremez)",
+    urlBuilder: () => xUserUrl("VitaliKremez"),
+    category: "威胁情报",
+    description: "威胁情报分析师 Vitali Kremez，深度分析 APT 与勒索团伙。",
+  },
+  {
+    name: "X：Jake Williams (@MalwareJake)",
+    urlBuilder: () => xUserUrl("MalwareJake"),
+    category: "威胁情报",
+    description: "前 NSA 黑客 Jake Williams，分享红队、取证与事件响应洞察。",
+  },
+  {
+    name: "X：Carlos Perez (@Carlos_Perez)",
+    urlBuilder: () => xUserUrl("Carlos_Perez"),
+    category: "威胁情报",
+    description: "安全老兵 Carlos Perez，专注 PowerShell 安全与防御技术。",
+  },
+  // —— 安全公众号（RSSHub ggh 路由，需在实例配公众号 cookie） ——
+  {
+    name: "公众号：奇安信威胁情报中心",
+    urlBuilder: () => wechatUrl("gh_3808b62e1c80"),
+    category: "威胁情报",
+    description: "奇安信威胁情报中心公众号，发布 APT 追踪与威胁分析。",
+  },
+  {
+    name: "公众号：腾讯安全威胁情报中心",
+    urlBuilder: () => wechatUrl("gh_d0142a6a6d3c"),
+    category: "威胁情报",
+    description: "腾讯安全威胁情报中心公众号，发布漏洞与攻击活动预警。",
+  },
+  {
+    name: "公众号：微步在线研究响应中心",
+    urlBuilder: () => wechatUrl("gh_5e911cc1a73d"),
+    category: "威胁情报",
+    description: "微步在线研究响应中心公众号，发布威胁情报与攻防分析。",
+  },
+  {
+    name: "公众号：长亭科技",
+    urlBuilder: () => wechatUrl("gh_ba2d6013d12f"),
+    category: "深度分析",
+    description: "长亭科技公众号，发布攻防技术研究与安全方案。",
+  },
+  {
+    name: "公众号：绿盟科技研究通讯",
+    urlBuilder: () => wechatUrl("gh_3eeae3a4f5d6"),
+    category: "威胁情报",
+    description: "绿盟科技研究通讯公众号，发布漏洞分析与威胁研究。",
   },
 ];
 
