@@ -4,10 +4,11 @@
  * 所有消费方 (hot 页面、feed.xml、api/hot/items) 都走这里，
  * 避免聚合逻辑重复实现、保证排序契约一致。
  */
-import { readSecurityFeedItems } from "./feed-store.ts";
+import { readSecurityFeedItems, readSnapshotsFromStore } from "./feed-store.ts";
 import { rankHotItems } from "./hot-rank.ts";
 import type { HotItem } from "./hot-rank.ts";
 import { pickDisplayTitle, pickLocalizedField } from "./translation-detection.ts";
+import { getShanghaiDateStamp } from "./date-stamp.ts";
 
 /** 热榜时间窗选项。 */
 export type HotWindow = "24h" | "7d";
@@ -52,6 +53,111 @@ export async function loadAllTimeline(
   return loadHotItems("7d", limit);
 }
 
+/** 日报数据：历史 snapshot 列表 + 指定日期的日报正文。 */
+export type DailyPageData = {
+  /** 全部历史日期（YYYY-MM-DD，倒序），供侧边栏导航。 */
+  history: Array<{ date: string; headline: string }>;
+  /** 当前展示日期。 */
+  date: string;
+  /** 日报正文（当日热榜精选 + 综述）。无数据时为 null。 */
+  overview: string | null;
+  /** 当日重点条目（取当日窗口热榜前 N）。 */
+  items: HotItem[];
+};
+
+/** mock 日报头条（本地无 KV 时用）。 */
+import { MOCK_DAILY_HEADLINES } from "./hot-mock.ts";
+
+/**
+ * 取日报数据。
+ * @param date 指定日期 YYYY-MM-DD；省略则取最新一期。
+ */
+export async function loadDailyDigest(date?: string): Promise<DailyPageData> {
+  const snapshots = await readSnapshotsFromStore();
+  const sorted = [...snapshots].sort((a, b) => b.date.localeCompare(a.date));
+
+  const target =
+    (date && sorted.find((s) => s.date === date)?.date) ||
+    sorted[0]?.date ||
+    getShanghaiDateStamp();
+
+  const history = sorted.map((s) => ({
+    date: s.date,
+    headline:
+      MOCK_DAILY_HEADLINES[s.date] ??
+      `${s.date} 共 ${s.totalCount} 条安全动态`,
+  }));
+
+  // 当日重点条目：用 7d 窗口热榜筛出当日的
+  const ranked = await loadHotItems("7d");
+  const dayItems = ranked.filter(
+    (it) => getShanghaiDateStamp(it.pubDate) === target,
+  );
+
+  return {
+    history,
+    date: target,
+    overview:
+      MOCK_DAILY_HEADLINES[target] ??
+      (dayItems.length > 0
+        ? `${target} 共收录 ${dayItems.length} 条安全动态，下文按热度精选呈现。`
+        : `${target} 暂无安全日报数据。`),
+    items: dayItems.slice(0, 12),
+  };
+}
+
+/** 条目详情：主条目 + 同事件（聚合簇）的其他信源成员。 */
+export type ItemDetail = {
+  item: HotItem;
+  /** 同事件的其他条目（不含主条目本身），按时间倒序。 */
+  siblings: HotItem[];
+  score: number;
+  coverageCount: number;
+};
+
+/**
+ * 取一个条目的详情：在足够大的时间窗内重算聚合簇，
+ * 找到 id 对应的主条目及其同事件兄弟条目。
+ * id 不存在 → 返回 null（由调用方 notFound）。
+ */
+export async function getItemDetail(id: string): Promise<ItemDetail | null> {
+  const all = await readSecurityFeedItems();
+  // 用 7d 窗口覆盖足够多同事件条目
+  const ranked = rankHotItems(all, HOT_WINDOW_HOURS["7d"]);
+  const main = ranked.find((it) => it.id === id);
+  if (!main) return null;
+
+  // 主条目已带聚合元信息（score/coverageCount/sources/relatedLinks）。
+  // siblings：以 relatedLinks 为锚，匹配 ranked 中 link 相同的条目（不含主条目）。
+  const byLink = new Map<string, HotItem>();
+  for (const it of ranked) byLink.set(it.link, it);
+
+  const seenIds = new Set<string>([id]);
+  const siblings: HotItem[] = [];
+  for (const link of main.relatedLinks) {
+    if (link === main.link) continue;
+    const sib = byLink.get(link);
+    if (sib && !seenIds.has(sib.id)) {
+      seenIds.add(sib.id);
+      siblings.push(sib);
+    }
+  }
+
+  // siblings 按时间倒序
+  siblings.sort((a, b) => {
+    const ta = new Date(a.pubDate).getTime();
+    const tb = new Date(b.pubDate).getTime();
+    return (Number.isNaN(tb) ? 0 : tb) - (Number.isNaN(ta) ? 0 : ta);
+  });
+
+  return {
+    item: main,
+    siblings,
+    score: main.score,
+    coverageCount: main.coverageCount,
+  };
+}
+
 /** 取一个 HotItem 的展示标题 (中文化优先)。 */
 export function hotItemTitle(item: HotItem): string {
   return (
@@ -77,6 +183,41 @@ export function hotItemSummary(item: HotItem): string {
     item.summaryAi ||
     item.summary
   );
+}
+
+/**
+ * 把热榜按日期 (上海时区，YYYY-MM-DD) 分桶，用于时间轴列表展示。
+ * 返回数组按日期倒序（最新在前），桶内保持传入顺序（已按热度/时间排好）。
+ */
+export type DateGroup = { date: string; label: string; items: HotItem[] };
+
+const CN_DATE_FORMATTER = new Intl.DateTimeFormat("zh-CN", {
+  month: "long",
+  day: "numeric",
+  timeZone: "Asia/Shanghai",
+});
+
+/** 取一个 pubDate 的上海时区 YYYY-MM-DD。复用 lib/date-stamp。 */
+export const shanghaiDateStamp = (iso: string): string => getShanghaiDateStamp(iso);
+
+export function groupByDate(items: HotItem[]): DateGroup[] {
+  const buckets = new Map<string, HotItem[]>();
+  const order: string[] = [];
+  for (const item of items) {
+    const key = getShanghaiDateStamp(item.pubDate);
+    if (!buckets.has(key)) {
+      buckets.set(key, []);
+      order.push(key);
+    }
+    buckets.get(key)!.push(item);
+  }
+  return order
+    .sort((a, b) => b.localeCompare(a))
+    .map((date) => ({
+      date,
+      label: CN_DATE_FORMATTER.format(new Date(`${date}T00:00:00+08:00`)),
+      items: buckets.get(date)!,
+    }));
 }
 
 /** HotItem 序列化为 RSS <item> XML 片段。 */

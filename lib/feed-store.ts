@@ -2,6 +2,7 @@ import { DailyDigest } from "./digest";
 import { FeedItem } from "./feeds";
 import { kv } from "./kv";
 import { DailySnapshot } from "./snapshot";
+import { MOCK_SECURITY_ITEMS, MOCK_SNAPSHOTS, hasMockEnv } from "./hot-mock";
 
 export type FeedGroupKey = "feed-a" | "feed-b" | "feed-ai";
 
@@ -43,7 +44,12 @@ export async function writeFeedCacheState(state: FeedCacheState) {
 
 export async function readSecurityFeedItems(): Promise<FeedItem[]> {
   const { feedA, feedB } = await readFeedCacheState();
-  return sortByPubDate([...feedA, ...feedB]);
+  const real = [...feedA, ...feedB];
+  // 本地无 KV env 时回退 mock 数据，保证 /hot /items /daily 有内容可渲染与截图
+  if (real.length === 0 && hasMockEnv()) {
+    return sortByPubDate(MOCK_SECURITY_ITEMS);
+  }
+  return sortByPubDate(real);
 }
 
 export async function readAiFeedItems(): Promise<FeedItem[]> {
@@ -65,7 +71,12 @@ export async function writeDigestToStore(digest: DailyDigest) {
 }
 
 export async function readSnapshotsFromStore() {
-  return (await kv.get<DailySnapshot[]>("snapshots")) ?? [];
+  const snapshots = (await kv.get<DailySnapshot[]>("snapshots")) ?? [];
+  // 本地无 KV env 时回退 mock 日报历史
+  if (snapshots.length === 0 && hasMockEnv()) {
+    return MOCK_SNAPSHOTS;
+  }
+  return snapshots;
 }
 
 export async function writeSnapshotsToStore(snapshots: DailySnapshot[]) {

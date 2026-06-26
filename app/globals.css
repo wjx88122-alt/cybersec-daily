@@ -1,5 +1,9 @@
 @import "tailwindcss";
 @import "./styles/tokens.css";
+
+/* Security Hot 三态主题：dark: 前缀基于 <html class="dark"> 生效。
+   防止 `dark:` 前缀在 Tailwind v4 默认 media 策略下不跟随 class。 */
+@custom-variant dark (&:where(.dark, .dark *));
 @import "./styles/system.css";
 @import "./styles/public.css";
 @import "./styles/team.css";

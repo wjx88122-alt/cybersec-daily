@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import HotListClient from "@/components/feed/HotListClient";
-import PublicShell from "@/components/shells/PublicShell";
+import HotShell from "@/components/shells/HotShell";
 import { loadHotItems, hotItemTitle } from "@/lib/hot-page-data";
 import { HOT_DEFAULT_WINDOW } from "@/lib/hot-page-data";
 import { readSecurityFeedItems } from "@/lib/feed-store";
@@ -79,7 +79,7 @@ export default async function HotPage() {
   };
 
   return (
-    <PublicShell>
+    <HotShell>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
@@ -89,6 +89,6 @@ export default async function HotPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
       <HotListClient items={items} rawItems={rawItems} />
-    </PublicShell>
+    </HotShell>
   );
 }
