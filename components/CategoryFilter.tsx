@@ -3,7 +3,7 @@
 import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
 
 const SEC_CATEGORIES = ["全部", "综合资讯", "深度分析", "漏洞预警", "威胁情报", "恶意软件", "政府/监管"];
-const AI_CATEGORIES = ["全部", "AI 产品", "AI 研究", "AI 商业", "AI 开发", "AI 政策", "AI 洞察"];
+const AI_CATEGORIES = ["全部", "AI 红队与攻击", "AI 对抗与鲁棒", "AI 提示注入", "AI 治理与标准", "AI 隐私与数据", "AI 安全"];
 
 const CATEGORY_ACTIVE: Record<string, string> = {
   全部: "bg-slate-900 text-white border-slate-900 shadow-[0_8px_24px_rgba(15,23,42,0.12)]",
@@ -13,12 +13,12 @@ const CATEGORY_ACTIVE: Record<string, string> = {
   威胁情报: "bg-orange-50 text-orange-700 border-orange-100",
   恶意软件: "bg-pink-50 text-pink-700 border-pink-100",
   "政府/监管": "bg-emerald-50 text-emerald-700 border-emerald-100",
-  "AI 产品": "bg-cyan-50 text-cyan-700 border-cyan-100",
-  "AI 研究": "bg-indigo-50 text-indigo-700 border-indigo-100",
-  "AI 商业": "bg-amber-50 text-amber-700 border-amber-100",
-  "AI 开发": "bg-teal-50 text-teal-700 border-teal-100",
-  "AI 政策": "bg-slate-100 text-slate-700 border-slate-200",
-  "AI 洞察": "bg-yellow-50 text-yellow-700 border-yellow-100",
+  "AI 红队与攻击": "bg-red-50 text-red-700 border-red-100",
+  "AI 对抗与鲁棒": "bg-orange-50 text-orange-700 border-orange-100",
+  "AI 提示注入": "bg-pink-50 text-pink-700 border-pink-100",
+  "AI 治理与标准": "bg-emerald-50 text-emerald-700 border-emerald-100",
+  "AI 隐私与数据": "bg-violet-50 text-violet-700 border-violet-100",
+  "AI 安全": "bg-slate-100 text-slate-700 border-slate-200",
 };
 
 const CATEGORY_ICON: Record<string, SystemIconName> = {
@@ -29,12 +29,12 @@ const CATEGORY_ICON: Record<string, SystemIconName> = {
   威胁情报: "target",
   恶意软件: "shield",
   "政府/监管": "briefcase",
-  "AI 产品": "spark",
-  "AI 研究": "radar",
-  "AI 商业": "chart",
-  "AI 开发": "workflow",
-  "AI 政策": "file",
-  "AI 洞察": "eye",
+  "AI 红队与攻击": "alert",
+  "AI 对抗与鲁棒": "shield",
+  "AI 提示注入": "target",
+  "AI 治理与标准": "file",
+  "AI 隐私与数据": "lock",
+  "AI 安全": "spark",
 };
 
 export { SEC_CATEGORIES, AI_CATEGORIES };

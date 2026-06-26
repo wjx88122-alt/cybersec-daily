@@ -21,7 +21,10 @@ type CategoryIconKind =
   | "code"
   | "scroll"
   | "bulb"
-  | "news";
+  | "news"
+  | "spark"
+  | "file"
+  | "lock";
 
 const CATEGORY_GRADIENT: Record<string, string> = {
   综合资讯: "from-[#eff6ff] via-[#dbeafe] to-[#bfdbfe]",
@@ -30,12 +33,12 @@ const CATEGORY_GRADIENT: Record<string, string> = {
   威胁情报: "from-[#fff7ed] via-[#ffedd5] to-[#fed7aa]",
   恶意软件: "from-[#fdf2f8] via-[#fce7f3] to-[#fbcfe8]",
   "政府/监管": "from-[#ecfdf5] via-[#d1fae5] to-[#a7f3d0]",
-  "AI 产品": "from-[#ecfeff] via-[#cffafe] to-[#a5f3fc]",
-  "AI 研究": "from-[#eef2ff] via-[#e0e7ff] to-[#c7d2fe]",
-  "AI 商业": "from-[#fffbeb] via-[#fef3c7] to-[#fde68a]",
-  "AI 开发": "from-[#ecfdf5] via-[#ccfbf1] to-[#99f6e4]",
-  "AI 政策": "from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]",
-  "AI 洞察": "from-[#fefce8] via-[#fef9c3] to-[#fde047]",
+  "AI 安全": "from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0]",
+  "AI 红队与攻击": "from-[#fef2f2] via-[#fee2e2] to-[#fecaca]",
+  "AI 对抗与鲁棒": "from-[#fff7ed] via-[#ffedd5] to-[#fed7aa]",
+  "AI 提示注入": "from-[#fdf2f8] via-[#fce7f3] to-[#fbcfe8]",
+  "AI 治理与标准": "from-[#ecfdf5] via-[#d1fae5] to-[#a7f3d0]",
+  "AI 隐私与数据": "from-[#f5f3ff] via-[#ede9fe] to-[#ddd6fe]",
 };
 
 const CATEGORY_ACCENT: Record<string, string> = {
@@ -45,12 +48,12 @@ const CATEGORY_ACCENT: Record<string, string> = {
   威胁情报: "bg-orange-50 text-orange-700 border-orange-100",
   恶意软件: "bg-pink-50 text-pink-700 border-pink-100",
   "政府/监管": "bg-emerald-50 text-emerald-700 border-emerald-100",
-  "AI 产品": "bg-cyan-50 text-cyan-700 border-cyan-100",
-  "AI 研究": "bg-indigo-50 text-indigo-700 border-indigo-100",
-  "AI 商业": "bg-amber-50 text-amber-700 border-amber-100",
-  "AI 开发": "bg-teal-50 text-teal-700 border-teal-100",
-  "AI 政策": "bg-slate-100 text-slate-700 border-slate-200",
-  "AI 洞察": "bg-yellow-50 text-yellow-700 border-yellow-100",
+  "AI 安全": "bg-slate-100 text-slate-700 border-slate-200",
+  "AI 红队与攻击": "bg-red-50 text-red-700 border-red-100",
+  "AI 对抗与鲁棒": "bg-orange-50 text-orange-700 border-orange-100",
+  "AI 提示注入": "bg-pink-50 text-pink-700 border-pink-100",
+  "AI 治理与标准": "bg-emerald-50 text-emerald-700 border-emerald-100",
+  "AI 隐私与数据": "bg-violet-50 text-violet-700 border-violet-100",
 };
 
 const CATEGORY_ICON: Record<string, CategoryIconKind> = {
@@ -59,13 +62,13 @@ const CATEGORY_ICON: Record<string, CategoryIconKind> = {
   漏洞预警: "alert",
   威胁情报: "target",
   恶意软件: "shield",
-  "政府/监管": "building",
-  "AI 产品": "cpu",
-  "AI 研究": "flask",
-  "AI 商业": "briefcase",
-  "AI 开发": "code",
-  "AI 政策": "scroll",
-  "AI 洞察": "bulb",
+  "政府/监管": "briefcase",
+  "AI 安全": "spark",
+  "AI 红队与攻击": "alert",
+  "AI 对抗与鲁棒": "shield",
+  "AI 提示注入": "target",
+  "AI 治理与标准": "file",
+  "AI 隐私与数据": "lock",
 };
 
 function CategoryIcon({
@@ -167,6 +170,26 @@ function CategoryIcon({
         <svg {...common}>
           <path d="M12 3a6 6 0 0 0-3.5 10.9c.9.7 1.5 1.8 1.5 3.1h4c0-1.3.6-2.4 1.5-3.1A6 6 0 0 0 12 3Z" />
           <path d="M10 20h4M10.5 17.5h3" />
+        </svg>
+      );
+    case "spark":
+      return (
+        <svg {...common}>
+          <path d="M12 2v6M12 16v6M2 12h6M16 12h6M5.5 5.5l3 3M15.5 15.5l3 3M18.5 5.5l-3 3M8.5 15.5l-3 3" />
+        </svg>
+      );
+    case "file":
+      return (
+        <svg {...common}>
+          <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8l-5-5Z" />
+          <path d="M14 3v5h5M9 13h6M9 17h6" />
+        </svg>
+      );
+    case "lock":
+      return (
+        <svg {...common}>
+          <rect x="5" y="11" width="14" height="9" rx="2" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3M12 15v2" />
         </svg>
       );
     default:

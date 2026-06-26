@@ -18,10 +18,16 @@ export const SECURITY_KEYWORDS: Array<[RegExp, number]> = [
   [/(cisa|msrc|advisory|补丁|patch|fortinet|cisco|microsoft)/i, 6],
 ];
 export const AI_KEYWORDS: Array<[RegExp, number]> = [
-  [/(模型发布|model release|launch|agent|copilot|多模态|multimodal)/i, 8],
-  [/(政策|监管|regulation|compliance|版权|copyright|治理|governance)/i, 10],
-  [/(提示注入|prompt injection|越狱|jailbreak|泄露|data leak|abuse|滥用)/i, 12],
-  [/(企业落地|enterprise|成本|roi|推理|inference|开源|open[- ]source)/i, 6],
+  // AI 安全高信号：提示注入 / 越狱 / 在野利用
+  [/(prompt injection|indirect prompt injection|提示注入|jailbreak|越狱|sandbox escape|沙箱逃逸)/i, 14],
+  // 红队 / 攻击 / 滥用 / deepfake
+  [/(red team|red-team|红队|adversarial|对抗|attack|攻击|abuse|滥用|deepfake|深度伪造|data poisoning|投毒|model stealing|模型窃取|exfiltrat)/i, 10],
+  // 数据泄露 / 隐私
+  [/(data leak|数据泄露|data breach|training data|训练数据|memoriz|记忆|pii|个人信息|membership inference|成员推断)/i, 10],
+  // 治理 / 标准 / 合规
+  [/(governance|治理|regulation|监管|regulat|compliance|合规|nist|rmf|eu ai act|ai act|owasp|standard|标准)/i, 8],
+  // 鲁棒性 / 对齐 / 可信
+  [/(robustness|鲁棒|alignment|对齐|guardrails?|护栏|safety research|安全研究|trusted (?:ai|ml)|可信)/i, 6],
 ];
 
 export type ScoredItem = { item: import("./feeds").FeedItem; score: number };

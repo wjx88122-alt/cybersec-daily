@@ -2,7 +2,13 @@ import { DailyDigest } from "./digest";
 import { FeedItem } from "./feeds";
 import { kv } from "./kv";
 import { DailySnapshot } from "./snapshot";
-import { MOCK_SECURITY_ITEMS, MOCK_SNAPSHOTS, hasMockEnv } from "./hot-mock";
+import {
+  MOCK_SECURITY_ITEMS,
+  MOCK_AI_ITEMS,
+  MOCK_SNAPSHOTS,
+  hasMockEnv,
+} from "./hot-mock";
+import { applyAiSubcategories } from "./ai-security-classify";
 
 export type FeedGroupKey = "feed-a" | "feed-b" | "feed-ai";
 
@@ -54,12 +60,22 @@ export async function readSecurityFeedItems(): Promise<FeedItem[]> {
 
 export async function readAiFeedItems(): Promise<FeedItem[]> {
   const { feedAI } = await readFeedCacheState();
-  return sortByPubDate(feedAI);
+  const real = feedAI;
+  // 本地无 KV env 时回退 mock AI Security 数据
+  const source = real.length === 0 && hasMockEnv() ? MOCK_AI_ITEMS : real;
+  // 读取时按关键词打 AI Security 子分类（红队/对抗/提示注入/治理/隐私）
+  return sortByPubDate(applyAiSubcategories(source));
 }
 
 export async function readAllFeedItems(): Promise<FeedItem[]> {
   const { feedA, feedB, feedAI } = await readFeedCacheState();
-  return sortByPubDate([...feedA, ...feedB, ...feedAI]);
+  const realSecurity = [...feedA, ...feedB];
+  const security =
+    realSecurity.length === 0 && hasMockEnv()
+      ? MOCK_SECURITY_ITEMS
+      : realSecurity;
+  const ai = feedAI.length === 0 && hasMockEnv() ? MOCK_AI_ITEMS : feedAI;
+  return sortByPubDate([...security, ...applyAiSubcategories(ai)]);
 }
 
 export async function readDigestFromStore() {

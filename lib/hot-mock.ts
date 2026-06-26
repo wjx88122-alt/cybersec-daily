@@ -184,6 +184,105 @@ export const MOCK_SECURITY_ITEMS: FeedItem[] = [
   },
 ];
 
+/**
+ * mock AI Security feed 条目。覆盖各子分类（提示注入/红队/对抗/治理/隐私），
+ * 验证 ai-security-classify 子分类与 /ai 页渲染。原始 category 均为 "AI 安全"，
+ * 由 applyAiSubcategories 在读取时重新打子分类标签。
+ */
+export const MOCK_AI_ITEMS: FeedItem[] = [
+  {
+    id: "mock-ai-injection",
+    title: "Indirect prompt injection via tool outputs hijacks LLM agents",
+    titleZh: "通过工具输出的间接提示注入可劫持 LLM 智能体",
+    summary:
+      "Researchers demonstrate that untrusted tool/API outputs can carry hidden instructions that hijack agentic LLM workflows, bypassing system prompts and exfiltrating data.",
+    summaryAi:
+      "研究人员演示，不可信的工具/API 输出可携带隐藏指令，劫持智能体 LLM 工作流，绕过系统提示并窃取数据。提示注入仍是 LLM 应用最现实的攻击面。",
+    link: "https://simonwillison.net/indirect-prompt-injection",
+    source: "Simon Willison",
+    category: "AI 安全",
+    pubDate: agoMinutes(25),
+  },
+  {
+    id: "mock-ai-redteam",
+    title: "Microsoft AI Red Team uncovers abuse vectors in production copilots",
+    titleZh: "微软 AI 红队发现生产环境 Copilot 中的滥用向量",
+    summary:
+      "Microsoft's AI Red Team details how prompt-based copilots can be abused for data exfiltration and unauthorized actions, sharing their red-teaming methodology.",
+    summaryAi:
+      "微软 AI 红队详述基于提示的 Copilot 如何被滥用于数据外泄和未授权操作，并分享了其红队方法论。",
+    link: "https://www.microsoft.com/en-us/security/blog/ai-red-team",
+    source: "Microsoft Security：Blog",
+    category: "AI 安全",
+    pubDate: agoMinutes(70),
+  },
+  {
+    id: "mock-ai-adversarial",
+    title: "Adversarial patches evade multimodal model safety filters at scale",
+    titleZh: "对抗补丁可大规模绕过多模态模型安全过滤器",
+    summary:
+      "A new study shows small adversarial image patches reliably bypass safety guardrails in vision-language models, undermining robustness of content filters.",
+    summaryAi:
+      "新研究表明，微小的对抗图像补丁能可靠绕过视觉语言模型的安全护栏，削弱内容过滤器的鲁棒性。对齐与防御研究需跟进。",
+    link: "https://arxiv.org/abs/adversarial-patches-vlm",
+    source: "arXiv：密码学与安全 (cs.CR)",
+    category: "AI 安全",
+    pubDate: agoMinutes(140),
+  },
+  {
+    id: "mock-ai-governance",
+    title: "NIST updates AI RMF with adversarial machine learning taxonomy",
+    titleZh: "NIST 更新 AI RMF，纳入对抗机器学习分类法",
+    summary:
+      "NIST publishes an update to the AI Risk Management Framework incorporating the NIST AI 100-2 adversarial ML taxonomy, giving organizations a standard reference for AI threats.",
+    summaryAi:
+      "NIST 发布 AI 风险管理框架更新，纳入 NIST AI 100-2 对抗机器学习分类法，为组织提供 AI 威胁的标准参照。",
+    link: "https://www.nist.gov/ai-rmf-update",
+    source: "NIST：News",
+    category: "AI 安全",
+    pubDate: agoMinutes(220),
+  },
+  {
+    id: "mock-ai-privacy",
+    title: "Training data extraction attacks recover PII from production LLMs",
+    titleZh: "训练数据抽取攻击可从生产 LLM 中还原个人信息",
+    summary:
+      "Researchers show that targeted prompts can extract memorized personally identifiable information from production language models, raising privacy concerns over training data leakage.",
+    summaryAi:
+      "研究人员展示定向提示可从生产语言模型中抽取被记忆的个人身份信息，引发训练数据泄露的隐私担忧。",
+    link: "https://danielmiessler.com/training-data-extraction",
+    source: "Daniel Miessler",
+    category: "AI 安全",
+    pubDate: agoMinutes(320),
+  },
+  {
+    id: "mock-ai-jailbreak",
+    title: "New jailbreak technique bypasses alignment using cipher-encoded prompts",
+    titleZh: "新越狱技术利用密文编码提示绕过对齐",
+    summary:
+      "A novel jailbreak encodes disallowed requests as ciphers, slipping past RLHF alignment and eliciting harmful content from frontier models.",
+    summaryAi:
+      "一种新越狱手法将违禁请求编码为密文，绕过 RLHF 对齐，诱导前沿模型生成有害内容。",
+    link: "https://www.aisnakeoil.com/cipher-jailbreak",
+    source: "AI Snake Oil",
+    category: "AI 安全",
+    pubDate: agoMinutes(420),
+  },
+  {
+    id: "mock-ai-deepfake",
+    title: "Deepfake-powered CEO voice fraud drains $25M from multinational",
+    titleZh: "Deepfake 伪造 CEO 语音诈骗致跨国公司损失 2500 万美元",
+    summary:
+      "A multinational lost $25M after scammers used deepfake technology to clone its CFO's voice and face in a video call, weaponizing generative AI for corporate fraud.",
+    summaryAi:
+      "某跨国公司因诈骗者用深度伪造技术克隆其 CFO 的声音和面部进行视频通话而损失 2500 万美元，将生成式 AI 武器化用于企业欺诈。",
+    link: "https://www.wiz.io/blog/deepfake-ceo-fraud",
+    source: "Wiz：Research",
+    category: "AI 安全",
+    pubDate: agoMinutes(520),
+  },
+];
+
 /** mock 安全 feed 是否启用：仅当无 KV env 时（本地开发）。 */
 export function hasMockEnv(): boolean {
   return !process.env.KV_REST_API_URL || !process.env.KV_REST_API_TOKEN;

@@ -399,41 +399,126 @@ export const FEED_SOURCES_B = [
 ];
 
 export const FEED_SOURCES_AI = [
-  // 官方一手
-  { name: "OpenAI Blog", url: "https://openai.com/blog/rss.xml", category: "AI 产品", description: "OpenAI 官方博客，发布模型更新、产品动态和安全研究。" },
-  { name: "Google AI Blog", url: "https://blog.google/technology/ai/rss/", category: "AI 产品", description: "Google AI 产品与技术动态。" },
-  { name: "DeepMind Blog", url: "https://deepmind.google/blog/rss.xml", category: "AI 研究", description: "Google DeepMind 前沿 AI 研究成果。" },
-  { name: "Microsoft AI Blog", url: "https://blogs.microsoft.com/ai/feed/", category: "AI 产品", description: "微软 AI 战略与产品动态。" },
-  { name: "NVIDIA AI Blog", url: "https://blogs.nvidia.com/feed/", category: "AI 产品", description: "NVIDIA AI 硬件与应用生态。" },
-  { name: "Apple ML Research", url: "https://machinelearning.apple.com/rss.xml", category: "AI 研究", description: "苹果机器学习研究团队发布的论文与技术报告。" },
-  { name: "Hugging Face Blog", url: "https://huggingface.co/blog/feed.xml", category: "AI 开发", description: "Hugging Face 开源模型生态与工具更新。" },
-  // 专业媒体
-  { name: "MIT Tech Review AI", url: "https://www.technologyreview.com/topic/artificial-intelligence/feed", category: "AI 洞察", description: "MIT 科技评论 AI 深度报道。" },
-  { name: "The Verge AI", url: "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", category: "AI 产品", description: "The Verge AI 产品与行业动态。" },
-  { name: "TechCrunch AI", url: "https://techcrunch.com/category/artificial-intelligence/feed/", category: "AI 商业", description: "TechCrunch AI 创投与产品报道。" },
-  { name: "Ars Technica AI", url: "https://feeds.arstechnica.com/arstechnica/technology-lab", category: "AI 洞察", description: "Ars Technica 技术深度分析。" },
-  { name: "VentureBeat AI", url: "https://venturebeat.com/category/ai/feed/", category: "AI 商业", description: "VentureBeat 企业 AI 报道。" },
-  { name: "Wired AI", url: "https://www.wired.com/feed/tag/ai/latest/rss", category: "AI 洞察", description: "Wired AI 科技文化报道。" },
-  { name: "Bloomberg Tech", url: "https://feeds.bloomberg.com/technology/news.rss", category: "AI 商业", description: "Bloomberg 科技商业视角。" },
-  { name: "The Register", url: "https://www.theregister.com/headlines.atom", category: "AI 产品", description: "英国老牌科技媒体，犀利风格报道。" },
-  { name: "ZDNet AI", url: "https://www.zdnet.com/topic/artificial-intelligence/rss.xml", category: "AI 产品", description: "ZDNet AI 实用技术报道。" },
-  { name: "Marktechpost", url: "https://www.marktechpost.com/feed/", category: "AI 研究", description: "AI 研究论文速报与技术解读。" },
-  // 深度分析/独立博客
-  { name: "Simon Willison", url: "https://simonwillison.net/atom/everything/", category: "AI 开发", description: "LLM 实践专家 Simon Willison 的博客。" },
-  { name: "One Useful Thing", url: "https://www.oneusefulthing.org/feed", category: "AI 洞察", description: "Ethan Mollick 的 AI 应用洞察。" },
-  { name: "Import AI", url: "https://importai.substack.com/feed", category: "AI 政策", description: "Jack Clark 的 AI 政策与研究周报。" },
-  { name: "Latent Space", url: "https://www.latent.space/feed", category: "AI 开发", description: "AI 工程深度访谈与分析。" },
-  { name: "AI Snake Oil", url: "https://www.aisnakeoil.com/feed", category: "AI 政策", description: "AI 批判性思考与政策分析。" },
-  { name: "Interconnects", url: "https://www.interconnects.ai/feed", category: "AI 研究", description: "Nathan Lambert 的开源模型深度分析。" },
-  { name: "The Gradient", url: "https://thegradient.pub/rss/", category: "AI 研究", description: "学术与产业交叉的 AI 深度文章。" },
-  { name: "Ahead of AI", url: "https://magazine.sebastianraschka.com/feed", category: "AI 研究", description: "Sebastian Raschka 的 LLM 技术解读。" },
-  // 工具/平台
-  { name: "LangChain Blog", url: "https://blog.langchain.dev/rss/", category: "AI 开发", description: "LangChain AI 开发框架动态。" },
-  { name: "Replicate Blog", url: "https://replicate.com/blog/rss", category: "AI 开发", description: "Replicate 模型部署平台博客。" },
-  // 中文源
-  { name: "机器之心", url: "https://www.jiqizhixin.com/rss", category: "AI 产品", description: "国内最专业的 AI 媒体。" },
-  { name: "量子位", url: "https://www.qbitai.com/feed", category: "AI 产品", description: "AI 快讯与深度报道。" },
-  { name: "36kr", url: "https://36kr.com/feed", category: "AI 商业", description: "科技商业媒体，覆盖 AI 创投动态。" },
+  // —— 官方一手：AI 实验室的安全/研究动态 ——
+  {
+    name: "OpenAI：动态",
+    url: "https://openai.com/news/rss.xml",
+    category: "AI 安全",
+    description: "OpenAI 官方动态，含模型安全研究、红队报告与对齐工作。",
+  },
+  {
+    name: "Google DeepMind：Blog",
+    url: "https://deepmind.google/blog/rss.xml",
+    category: "AI 安全",
+    description: "Google DeepMind 前沿研究，含对齐、可解释性与前沿安全(Frontier Safety)成果。",
+  },
+  {
+    name: "Google Research：Blog",
+    url: "https://research.google/blog/rss/",
+    category: "AI 安全",
+    description: "Google Research，含 AI 安全、对抗鲁棒性与负责任 AI 研究。",
+  },
+  {
+    name: "Microsoft Security：Blog",
+    url: "https://www.microsoft.com/en-us/security/blog/feed/",
+    category: "AI 安全",
+    description: "微软安全博客，含 AI 红队(Microsoft AI Red Team)、AI 诈骗与防护研究。",
+  },
+  {
+    name: "NVIDIA：Blog",
+    url: "https://blogs.nvidia.com/feed/",
+    category: "AI 安全",
+    description: "NVIDIA 博客，含 AI 基础设施安全与可信 AI 相关动态。",
+  },
+  // —— 安全厂商：AI 安全专项研究 ——
+  {
+    name: "Wiz：Research",
+    url: "https://www.wiz.io/blog/rss.xml",
+    category: "AI 安全",
+    description: "Wiz 安全研究，聚焦云原生 AI 与大模型基础设施安全威胁。",
+  },
+  {
+    name: "Cisco Security：Blog",
+    url: "https://blogs.cisco.com/security/feed",
+    category: "AI 安全",
+    description: "Cisco 安全博客，含 AI 驱动威胁检测与 LLM 防护研究。",
+  },
+  {
+    name: "Cloudflare：Blog",
+    url: "https://blog.cloudflare.com/rss/",
+    category: "AI 安全",
+    description: "Cloudflare 博客，含 AI API 防护、提示注入缓解与边缘 AI 安全。",
+  },
+  {
+    name: "PortSwigger：Daily Swig",
+    url: "https://portswigger.net/daily-swig/rss",
+    category: "AI 安全",
+    description: "PortSwigger 安全新闻，覆盖 Web 安全与新兴 AI/LLM 攻击研究。",
+  },
+  // —— 学术与论文 ——
+  {
+    name: "arXiv：密码学与安全 (cs.CR)",
+    url: "https://export.arxiv.org/rss/cs.CR",
+    category: "AI 安全",
+    description: "arXiv 安全与密码学最新预印本，含对抗 ML、LLM 攻击与防御前沿。",
+  },
+  {
+    name: "arXiv：机器学习 (cs.LG)",
+    url: "https://export.arxiv.org/rss/cs.LG",
+    category: "AI 安全",
+    description: "arXiv 机器学习最新预印本，含鲁棒性、隐私与可信 ML 研究。",
+  },
+  // —— 监管与标准 ——
+  {
+    name: "NIST：News",
+    url: "https://www.nist.gov/news-events/news/rss.xml",
+    category: "AI 安全",
+    description: "NIST 新闻，含 AI RMF、对抗机器学习分类(NIST AI 100-2)等标准动态。",
+  },
+  // —— 深度分析 / 独立观察 ——
+  {
+    name: "Daniel Miessler",
+    url: "https://danielmiessler.com/feed/",
+    category: "AI 安全",
+    description: "安全专家 Daniel Miessler，聚焦 AI 安全、威胁情报与 LLM 应用风险(含 OWASP Top 10 for LLMs 实践)。",
+  },
+  {
+    name: "Simon Willison",
+    url: "https://simonwillison.net/atom/everything/",
+    category: "AI 安全",
+    description: "LLM 实践专家 Simon Willison，持续跟踪提示注入与 LLM 安全实践。",
+  },
+  {
+    name: "AI Snake Oil",
+    url: "https://www.aisnakeoil.com/feed",
+    category: "AI 安全",
+    description: "AI 批判性分析与政策评论，含 AI 滥用、隐私与风险评估。",
+  },
+  {
+    name: "AI Village (DEF CON)",
+    url: "https://aivillage.org/feed.xml",
+    category: "AI 安全",
+    description: "DEF CON AI Village，AI 安全社区攻防研究与大会议题。",
+  },
+  {
+    name: "Securing AI (Dawn Song)",
+    url: "https://medium.com/feed/@dawnsong",
+    category: "AI 安全",
+    description: "伯克利教授 Dawn Song 的 AI 安全与隐私研究洞察。",
+  },
+  // —— 中文源 ——
+  {
+    name: "机器之心",
+    url: "https://www.jiqizhixin.com/rss",
+    category: "AI 安全",
+    description: "国内专业 AI 媒体，覆盖 AI 安全与大模型风险报道。",
+  },
+  {
+    name: "量子位",
+    url: "https://www.qbitai.com/feed",
+    category: "AI 安全",
+    description: "AI 媒体，跟踪 AI 安全事件与产业动态。",
+  },
 ];
 
 export const FEED_SOURCES = [...FEED_SOURCES_A, ...FEED_SOURCES_B];

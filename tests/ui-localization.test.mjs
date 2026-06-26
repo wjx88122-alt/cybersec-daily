@@ -26,8 +26,8 @@ test("security page keeps key UI labels in Chinese", () => {
 test("ai page keeps key UI labels in Chinese", () => {
   const page = load("app/(public)/ai/page.tsx");
 
-  assert.ok(page.includes("AI 观察"));
-  assert.ok(page.includes("AI 概览"));
+  assert.ok(page.includes("AI 安全"));
+  assert.ok(page.includes("AI 安全概览"));
   assert.ok(page.includes("今日焦点"));
   assert.ok(page.includes("更多资讯"));
 
