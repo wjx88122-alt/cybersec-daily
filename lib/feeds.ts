@@ -181,6 +181,43 @@ export const FEED_SOURCES_A = [
     category: "综合资讯",
     description: "360 支持的安全资讯平台，覆盖威胁情报、漏洞与攻防技术。",
   },
+  // —— 安全播客（对齐 AI HOT 的播客/Newsletter 源） ——
+  {
+    name: "Risky Business News",
+    url: "https://risky.biz/feeds/risky-business-news/",
+    category: "综合资讯",
+    description: "Patrick Gray 主理的每日安全要闻，资深安全播客的新闻简报。",
+  },
+  {
+    name: "Smashing Security",
+    url: "https://feeds.feedburner.com/smashingsecurity",
+    category: "综合资讯",
+    description: "Graham Cluley 与 Carole Theriault 主理的安全播客，讨论每周网络犯罪与隐私事件。",
+  },
+  {
+    name: "Darknet Diaries",
+    url: "https://feeds.megaphone.fm/darknetdiaries",
+    category: "深度分析",
+    description: "Jack Rhysider 主理的真实黑客故事播客，深度讲述暗网与网络犯罪案例。",
+  },
+  {
+    name: "Security Now",
+    url: "https://feeds.twit.tv/sn.xml",
+    category: "深度分析",
+    description: "Steve Gibson 与 Leo Laporte 主理的长青安全播客，详解漏洞与加密技术。",
+  },
+  {
+    name: "Brakeing Down Security",
+    url: "https://brakeingsecurity.libsyn.com/rss",
+    category: "威胁情报",
+    description: "安全从业者播客，讨论防御、取证与威胁狩猎实战。",
+  },
+  {
+    name: "Defensive Security",
+    url: "https://defensivesecurity.org/feed/",
+    category: "威胁情报",
+    description: "防御视角安全播客，聚焦蓝队、事件响应与安全运营。",
+  },
 ];
 
 export const FEED_SOURCES_B = [
@@ -436,12 +473,6 @@ export const FEED_SOURCES_B = [
     description: "PortSwigger 安全研究团队发布的 Web 漏洞深度技术分析。",
   },
   {
-    name: "Risky Business",
-    url: "https://risky.biz/feeds/risky-business-news/",
-    category: "综合资讯",
-    description: "资深安全播客 Patrick Gray 主理，每日安全要闻与深度访谈。",
-  },
-  {
     name: "GreyNoise",
     url: "https://www.greynoise.io/blog/rss.xml",
     category: "威胁情报",
@@ -465,6 +496,25 @@ export const FEED_SOURCES_B = [
     url: "https://www.sonatype.com/blog/rss.xml",
     category: "漏洞预警",
     description: "Sonatype 软件供应链安全研究，发布开源组件漏洞与供应链攻击分析。",
+  },
+  // —— 安全 KOL 独立博客（X 大V 的稳定博客形态，弥补 X 无 RSS 的缺口） ——
+  {
+    name: "Robert Heaton",
+    url: "https://robertheaton.com/feed.xml",
+    category: "深度分析",
+    description: "安全工程师 Robert Heaton 的博客，专注支付安全、浏览器隔离与逆向工程。",
+  },
+  {
+    name: "Jeremy Jordan",
+    url: "https://www.jeremyjordan.me/rss/",
+    category: "深度分析",
+    description: "安全工程师 Jeremy Jordan 的博客，覆盖 ML 安全、云原生与防御工程。",
+  },
+  {
+    name: "SecWiki",
+    url: "https://www.sec-wiki.com/news/rss",
+    category: "综合资讯",
+    description: "中文安全知识社区，聚合国内安全文章、工具与会议资讯。",
   },
 ];
 
