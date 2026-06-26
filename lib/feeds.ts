@@ -263,6 +263,115 @@ export const FEED_SOURCES_A = [
     category: "深度分析",
     description: "长亭科技公众号，发布攻防技术研究与安全方案。",
   },
+  // —— 更多安全公众号（机构/CERT/团队，经 wechat2rss 桥接） ——
+  {
+    name: "公众号：国家互联网应急中心CNCERT",
+    url: "https://wechat2rss.xlab.app/feed/c6662e88d278561b8293a607dcdcbe26aea98e04.xml",
+    category: "政府/监管",
+    description: "CNCERT 官方公众号，发布国家网络安全通告与事件预警。",
+  },
+  {
+    name: "公众号：CNVD漏洞平台",
+    url: "https://wechat2rss.xlab.app/feed/edf17c7a01a7152b7a1ca14133258dc4abc1ca61.xml",
+    category: "漏洞预警",
+    description: "国家信息安全漏洞共享平台，发布漏洞通告。",
+  },
+  {
+    name: "公众号：奇安信威胁情报中心",
+    url: "https://wechat2rss.xlab.app/feed/b93962f981247c0091dad08df5b7a6864ab888e9.xml",
+    category: "威胁情报",
+    description: "奇安信威胁情报中心，发布 APT 追踪与威胁分析。",
+  },
+  {
+    name: "公众号：360威胁情报中心",
+    url: "https://wechat2rss.xlab.app/feed/920f171e3dae0c8eeb4c97b366b229ba19807732.xml",
+    category: "威胁情报",
+    description: "360 威胁情报中心，发布 APT 与攻击活动分析。",
+  },
+  {
+    name: "公众号：安天AVL威胁情报中心",
+    url: "https://wechat2rss.xlab.app/feed/c17498223ad8f92e5434100b16f4894a3107a90b.xml",
+    category: "威胁情报",
+    description: "安天科技威胁情报，发布高级威胁与恶意软件分析。",
+  },
+  {
+    name: "公众号：百度安全实验室",
+    url: "https://wechat2rss.xlab.app/feed/c396e3a4fb11318adaa9dac2637657d6fe56ba90.xml",
+    category: "深度分析",
+    description: "百度安全实验室，发布安全研究与攻防技术。",
+  },
+  {
+    name: "公众号：京东安全应急响应中心",
+    url: "https://wechat2rss.xlab.app/feed/9bce95ccd16c1e5e30f45722847cc9ea2a27c09d.xml",
+    category: "漏洞预警",
+    description: "京东 JSRC，发布漏洞公告与安全动态。",
+  },
+  {
+    name: "公众号：美团安全应急响应中心",
+    url: "https://wechat2rss.xlab.app/feed/294bc034c9941529cd86a8a4b8999d100186c04d.xml",
+    category: "漏洞预警",
+    description: "美团 SRC，发布漏洞公告与安全技术分享。",
+  },
+  {
+    name: "公众号：小米安全中心",
+    url: "https://wechat2rss.xlab.app/feed/c950a13786cac4f432ad2f1dc4ef6dd427a5b802.xml",
+    category: "深度分析",
+    description: "小米安全中心，发布移动与 IoT 安全研究。",
+  },
+  {
+    name: "公众号：腾讯云鼎实验室",
+    url: "https://wechat2rss.xlab.app/feed/d762fbf5f8f256afb63bcfe9a362184072338819.xml",
+    category: "威胁情报",
+    description: "腾讯云鼎实验室，聚焦云安全与数据安全威胁研究。",
+  },
+  {
+    name: "公众号：腾讯天御攻防实验室",
+    url: "https://wechat2rss.xlab.app/feed/8b57281ce8c62c8bf12743aeb0279bfb807eb00d.xml",
+    category: "威胁情报",
+    description: "腾讯天御实验室，发布攻防对抗与威胁狩猎研究。",
+  },
+  {
+    name: "公众号：PeckShield",
+    url: "https://wechat2rss.xlab.app/feed/d180634ccb9dccfe000b1cfbb843522811b49172.xml",
+    category: "威胁情报",
+    description: "PeckShield 区块链安全公司，发布智能合约漏洞与黑客攻击分析。",
+  },
+  {
+    name: "公众号：山石网科安全技术研究院",
+    url: "https://wechat2rss.xlab.app/feed/dce539f9deadfc68ce8bf82d3be59a4c6d8ddef9.xml",
+    category: "深度分析",
+    description: "山石网科研究院，发布网络安全技术与威胁研究。",
+  },
+  {
+    name: "公众号：ChaMd5安全团队",
+    url: "https://wechat2rss.xlab.app/feed/ffb536c22df3989d8077ce9babb475f41719d62d.xml",
+    category: "威胁情报",
+    description: "ChaMd5 安全团队，发布漏洞分析与攻防技术研究。",
+  },
+  {
+    name: "公众号：关键基础设施安全应急响应中心",
+    url: "https://wechat2rss.xlab.app/feed/1aa5b8c8e4fb27ccb905694f7563b5529cd12269.xml",
+    category: "政府/监管",
+    description: "关键基础设施 CIIERC，发布关基安全通告与防护指南。",
+  },
+  {
+    name: "公众号：Yak Project",
+    url: "https://wechat2rss.xlab.app/feed/1800f529b600474a4cd0434c65654c483739e192.xml",
+    category: "深度分析",
+    description: "Yak 安全语言项目，发布网络安全编程与 fuzzing 技术。",
+  },
+  {
+    name: "公众号：SecPulse安全脉搏",
+    url: "https://wechat2rss.xlab.app/feed/3bd096819fedf4e94ef23d95c24dd7b2644f3d10.xml",
+    category: "综合资讯",
+    description: "SecPulse 安全脉搏社区，发布漏洞预警与攻防文章。",
+  },
+  {
+    name: "公众号：网安国际",
+    url: "https://wechat2rss.xlab.app/feed/6fa942a9bdf8d6e67cf9b051ed3fae441ddb2bae.xml",
+    category: "深度分析",
+    description: "网络与信息安全学术社区 InForSec，发布前沿安全研究。",
+  },
   // —— 安全播客（对齐 AI HOT 的播客/Newsletter 源） ——
   {
     name: "Risky Business News",
@@ -634,6 +743,61 @@ export const FEED_SOURCES_B = [
     url: "https://kalilinuxtutorials.com/feed/",
     category: "深度分析",
     description: "Kali Linux 教程站，发布渗透测试工具用法与攻击技术。",
+  },
+  // —— 更多国际厂商/平台（来自 CyberSecurityRSS / SecurityRSS 集合） ——
+  {
+    name: "Shodan Blog",
+    url: "https://blog.shodan.io/rss",
+    category: "威胁情报",
+    description: "Shodan 搜索引擎博客，发布互联网暴露面与威胁态势研究。",
+  },
+  {
+    name: "TrustedSec",
+    url: "https://www.trustedsec.com/feed/",
+    category: "深度分析",
+    description: "TrustedSec 安全公司，发布渗透测试与红队工具研究。",
+  },
+  {
+    name: "Fortinet Threat Research",
+    url: "https://feeds.fortinet.com/fortinet/blog/threat-research",
+    category: "威胁情报",
+    description: "Fortinet 威胁研究，发布恶意软件分析与威胁趋势报告。",
+  },
+  {
+    name: "bellingcat",
+    url: "https://bellingcat.com/feed",
+    category: "深度分析",
+    description: "bellingcat 开源情报调查组织，发布网络调查与溯源报告。",
+  },
+  {
+    name: "DEFCON RSS",
+    url: "https://www.defcon.org/defconrss.xml",
+    category: "综合资讯",
+    description: "DEFCON 黑客大会官方动态，发布议题与安全社区活动。",
+  },
+  {
+    name: "Google Online Security Blog",
+    url: "https://feeds.feedburner.com/GoogleOnlineSecurityBlog",
+    category: "深度分析",
+    description: "Google 在线安全博客，发布漏洞研究、滥用防护与平台安全。",
+  },
+  {
+    name: "NETRESEC",
+    url: "https://www.netresec.com/rss.ashx",
+    category: "威胁情报",
+    description: "NETRESEC 网络安全，专注网络流量分析与 PCAP 取证研究。",
+  },
+  {
+    name: "Shielder",
+    url: "https://www.shielder.it/blog/index.xml",
+    category: "深度分析",
+    description: "Shielder 安全团队，发布漏洞研究、云安全与红队技术。",
+  },
+  {
+    name: "Mozilla Security Blog",
+    url: "https://blog.mozilla.org/security/feed",
+    category: "深度分析",
+    description: "Mozilla 安全团队，发布浏览器安全、漏洞与隐私防护研究。",
   },
 ];
 
