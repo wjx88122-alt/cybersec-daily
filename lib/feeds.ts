@@ -168,6 +168,19 @@ export const FEED_SOURCES_A = [
     description:
       "Have I Been Pwned 创始人 Troy Hunt 的博客，深度分析数据泄露和密码安全。",
   },
+  // —— 中文安全媒体（对齐 AI HOT 的中文源覆盖） ——
+  {
+    name: "FreeBuf",
+    url: "https://www.freebuf.com/feed",
+    category: "综合资讯",
+    description: "国内老牌安全社区，每日发布漏洞预警、安全事件与技术分析。",
+  },
+  {
+    name: "安全客",
+    url: "https://api.anquanke.com/data/v1/rss",
+    category: "综合资讯",
+    description: "360 支持的安全资讯平台，覆盖威胁情报、漏洞与攻防技术。",
+  },
 ];
 
 export const FEED_SOURCES_B = [
@@ -395,6 +408,63 @@ export const FEED_SOURCES_B = [
     category: "威胁情报",
     description:
       "Huntress 安全研究团队发布的中小企业威胁分析和攻击活动追踪报告。",
+  },
+  // —— 政府 / CERT（对齐 AI HOT 多源类型，补充国家级权威公告） ——
+  {
+    name: "NCSC UK",
+    url: "https://www.ncsc.gov.uk/api/1/services/v1/all-rss-feed.xml",
+    category: "政府/监管",
+    description: "英国国家网络安全中心，发布威胁报告、漏洞公告与安全指南。",
+  },
+  {
+    name: "CERT-FR",
+    url: "https://www.cert.ssi.gouv.fr/alerte/feed/",
+    category: "政府/监管",
+    description: "法国国家网络安全事件响应团队（ANSSI），发布安全警报与漏洞通告。",
+  },
+  {
+    name: "MS-ISAC / CIS",
+    url: "https://www.cisecurity.org/feed",
+    category: "政府/监管",
+    description: "美国多州信息共享与分析中心，发布面向州/地方政府的威胁公告与建议。",
+  },
+  // —— 研究 / Newsletter / 播客（对齐 AI HOT 的独立内容源） ——
+  {
+    name: "PortSwigger Research",
+    url: "https://portswigger.net/research/rss",
+    category: "深度分析",
+    description: "PortSwigger 安全研究团队发布的 Web 漏洞深度技术分析。",
+  },
+  {
+    name: "Risky Business",
+    url: "https://risky.biz/feeds/risky-business-news/",
+    category: "综合资讯",
+    description: "资深安全播客 Patrick Gray 主理，每日安全要闻与深度访谈。",
+  },
+  {
+    name: "GreyNoise",
+    url: "https://www.greynoise.io/blog/rss.xml",
+    category: "威胁情报",
+    description: "GreyNoise 互联网背景噪音监测，发布扫描活动与攻击趋势研究。",
+  },
+  {
+    name: "Black Hills InfoSec",
+    url: "https://www.blackhillsinfosec.com/feed/",
+    category: "深度分析",
+    description: "Black Hills 信息安全团队的红队实战与攻防技术研究博客。",
+  },
+  // —— 供应链 / 漏洞专项 ——
+  {
+    name: "Patchstack",
+    url: "https://patchstack.com/feed/",
+    category: "漏洞预警",
+    description: "Patchstack 漏洞数据库，专注 CMS/插件生态的漏洞披露与补丁追踪。",
+  },
+  {
+    name: "Sonatype Research",
+    url: "https://www.sonatype.com/blog/rss.xml",
+    category: "漏洞预警",
+    description: "Sonatype 软件供应链安全研究，发布开源组件漏洞与供应链攻击分析。",
   },
 ];
 
