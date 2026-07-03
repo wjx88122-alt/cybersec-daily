@@ -76,10 +76,6 @@ export {
   scoreFeedItem,
 } from "./hot-score";
 import {
-  DIGEST_LOOKBACK_HOURS,
-  AI_CATEGORY_PREFIX,
-  SECURITY_KEYWORDS,
-  AI_KEYWORDS,
   isAiCategory,
   normalizeTitle,
   scoreFeedItem,

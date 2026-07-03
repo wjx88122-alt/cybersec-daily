@@ -897,7 +897,7 @@ function DetailPanel({ threat }: { threat: ThreatItem | null }) {
       </div>
     );
   }
-  return <DetailContent threat={threat} />;
+  return <DetailContent key={threat.id} threat={threat} />;
 }
 
 /* ----- Mobile detail (stacked drawer below the list) ----- */
@@ -906,7 +906,7 @@ function MobileDetail({ threat }: { threat: ThreatItem | null }) {
   if (!threat) return null;
   return (
     <div className="border-t border-zinc-800 bg-zinc-900/60 xl:hidden">
-      <DetailContent threat={threat} />
+      <DetailContent key={threat.id} threat={threat} />
     </div>
   );
 }
@@ -916,12 +916,6 @@ function MobileDetail({ threat }: { threat: ThreatItem | null }) {
 function DetailContent({ threat }: { threat: ThreatItem }) {
   const [copied, setCopied] = useState(false);
   const [pushed, setPushed] = useState(false);
-
-  // reset transient action states when the threat changes
-  useEffect(() => {
-    setCopied(false);
-    setPushed(false);
-  }, [threat.id]);
 
   const copyable = useMemo(() => {
     const parts: string[] = [];

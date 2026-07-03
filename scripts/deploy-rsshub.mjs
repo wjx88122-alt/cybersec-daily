@@ -86,7 +86,7 @@ async function main() {
       if (d.readyState === "ERROR" || d.readyState === "CANCELED") {
         throw new Error(`部署失败：${d.readyState}`);
       }
-    } catch (e) {
+    } catch {
       // v13 与 v6 endpoint 差异：回退查项目最新部署
     }
     process.stdout.write(".");
