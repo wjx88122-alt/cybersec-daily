@@ -13,14 +13,13 @@
     "repair:translations:all": "node scripts/repair-translations.mjs --scope=all"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.78.0",
     "@upstash/redis": "^1.36.2",
     "date-fns": "^4.1.0",
     "jsonrepair": "^3.13.2",
-    "next": "16.1.6",
+    "next": "^16.2.10",
     "openai": "^6.25.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
@@ -29,7 +28,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "^16.2.10",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
