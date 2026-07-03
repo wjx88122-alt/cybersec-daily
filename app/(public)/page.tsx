@@ -16,6 +16,7 @@ export default async function Home() {
         heroMode="contentSummary"
         digestOverview={digest?.overview}
         digestItems={digest?.items ?? []}
+        digestBoardAnalysis={digest?.boardAnalysis}
         eyebrow="市场机会日报"
         headline="今日市场机会"
         lead=""

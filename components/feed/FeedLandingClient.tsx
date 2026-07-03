@@ -5,7 +5,7 @@ import CategoryFilter from "@/components/CategoryFilter";
 import DigestCard from "@/components/DigestCard";
 import NewsCard from "@/components/NewsCard";
 import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
-import type { DigestItem } from "@/lib/digest";
+import type { DigestItem, OpportunityBoardAnalysis } from "@/lib/digest";
 import { type FeedItem } from "@/lib/feeds";
 import { buildFeedLandingState } from "@/lib/feed-view-model.js";
 
@@ -23,6 +23,7 @@ type FeedLandingClientProps = {
   heroMode?: "static" | "contentSummary";
   digestOverview?: string;
   digestItems?: DigestItem[];
+  digestBoardAnalysis?: OpportunityBoardAnalysis;
   eyebrow: string;
   headline: string;
   lead: string;
@@ -43,6 +44,7 @@ export default function FeedLandingClient({
   heroMode = "static",
   digestOverview = "",
   digestItems = [],
+  digestBoardAnalysis,
   eyebrow,
   headline,
   lead,
@@ -343,6 +345,40 @@ export default function FeedLandingClient({
               今日机会看板
             </div>
           </div>
+          {digestBoardAnalysis?.synthesis && (
+            <div className="public-panel mb-5 rounded-[24px] border border-slate-200/80 bg-white/88 p-4 sm:p-5">
+              <div className="public-section-label inline-flex items-center gap-2">
+                <SystemIcon className="system-icon" name="spark" size={14} />
+                AI 综合分析
+              </div>
+              <p className="mt-3 text-[15px] leading-7 text-slate-700">
+                {digestBoardAnalysis.synthesis}
+              </p>
+              {digestBoardAnalysis.hotSegments?.length > 0 && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {digestBoardAnalysis.hotSegments.map((segment) => (
+                    <span
+                      key={segment.name}
+                      className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-[12px] leading-5 text-slate-600"
+                    >
+                      <strong className="mr-1 text-slate-900">{segment.name}</strong>
+                      {segment.reason}
+                    </span>
+                  ))}
+                </div>
+              )}
+              {digestBoardAnalysis.portfolioMoves?.length > 0 && (
+                <ol className="mt-4 grid gap-2 text-[13px] leading-6 text-slate-600 sm:grid-cols-2">
+                  {digestBoardAnalysis.portfolioMoves.map((move, index) => (
+                    <li key={move} className="flex gap-2">
+                      <span className="font-semibold text-slate-900">{index + 1}.</span>
+                      <span>{move}</span>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          )}
           <div className="grid items-start gap-5 lg:grid-cols-[1.05fr_1.95fr]">
             <DigestCard item={featuredDigestItem} featured />
             {digestRest.length > 0 && (

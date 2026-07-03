@@ -1,6 +1,11 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
 import { SystemIcon } from "@/components/ui/SystemIcon";
 import { DigestItem } from "@/lib/digest";
 import { resolveSafeExternalHref } from "@/lib/remote-url";
+
+const ANALYSIS_SECTION = /^(市场判断|竞争格局|客户与渠道|切入建议|风险与前提)：/;
 
 const IMPORTANCE_CONFIG = {
   critical: {
@@ -38,12 +43,38 @@ export default function DigestCard({
 }) {
   const cfg = IMPORTANCE_CONFIG[item.importance] || IMPORTANCE_CONFIG.medium;
   const safeHref = resolveSafeExternalHref(item.sourceLink);
+  const [panel, setPanel] = useState<"closed" | "loading" | "open" | "error">("closed");
+  const [analysis, setAnalysis] = useState("");
+  const [error, setError] = useState("");
+  const ignore = useRef(false);
+
+  useEffect(() => () => {
+    ignore.current = true;
+  }, []);
+
+  const toggleAnalysis = async () => {
+    if (panel === "loading") return;
+    if (panel === "open") return setPanel("closed");
+    setPanel("loading");
+    setError("");
+    try {
+      const res = await fetch("/api/opportunity-analysis", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ headline: item.headline }) });
+      const data = (await res.json().catch(() => ({}))) as { analysis?: string; error?: string };
+      if (!res.ok) throw new Error(data.error || "深度分析暂时不可用，请稍后重试");
+      if (!ignore.current) {
+        setAnalysis(data.analysis ?? "");
+        setPanel("open");
+      }
+    } catch (err) {
+      if (!ignore.current) {
+        setError(err instanceof Error ? err.message : "深度分析暂时不可用，请稍后重试");
+        setPanel("error");
+      }
+    }
+  };
 
   return (
-    <a
-      href={safeHref}
-      target="_blank"
-      rel="noopener noreferrer"
+    <div
       className={`group public-panel relative flex flex-col overflow-hidden rounded-[28px] border border-slate-200/80 bg-white/88 transition-all duration-300 hover:-translate-y-1 ${cfg.border} ${cfg.glow}`}
     >
       {/* Top gradient bar */}
@@ -80,7 +111,14 @@ export default function DigestCard({
         <h3
           className={`mb-2.5 font-semibold leading-snug text-slate-950 transition-colors group-hover:text-slate-800 ${featured ? "text-[18px]" : "text-[15px]"}`}
         >
-          {item.headline}
+          <a
+            href={safeHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
+          >
+            {item.headline}
+          </a>
         </h3>
 
         {/* Summary */}
@@ -100,17 +138,49 @@ export default function DigestCard({
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between border-t border-slate-200/80 pt-3">
-          <span className="inline-flex max-w-[80%] items-center gap-1.5 truncate text-[11px] text-slate-500">
+          <a
+            href={safeHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex max-w-[80%] items-center gap-1.5 truncate text-[11px] text-slate-500 hover:text-slate-800"
+          >
             <SystemIcon className="system-icon shrink-0" name="globe" size={13} />
             {item.sourceTitle}
-          </span>
-          <SystemIcon
-            className={`system-icon shrink-0 ${cfg.accent} opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100`}
-            name="external"
-            size={14}
-          />
+            <SystemIcon
+              className={`system-icon shrink-0 ${cfg.accent} opacity-0 transition-all group-hover:translate-x-0.5 group-hover:opacity-100`}
+              name="external"
+              size={14}
+            />
+          </a>
+          <button
+            type="button"
+            onClick={toggleAnalysis}
+            disabled={panel === "loading"}
+            className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-[11px] font-semibold ${cfg.accent} disabled:opacity-60`}
+          >
+            <SystemIcon className="system-icon" name="spark" size={13} />
+            {panel === "loading" ? "分析中…" : panel === "open" ? "收起" : "深度分析"}
+          </button>
         </div>
+        {panel !== "closed" && (
+          <div className="mt-3 border-t border-slate-200/80 pt-3 text-[13px] leading-6 text-slate-600">
+            {panel === "loading" ? (
+              <p>正在生成深度分析…</p>
+            ) : panel === "error" ? (
+              <div className="space-y-2">
+                <p>{error}</p>
+                <button type="button" onClick={toggleAnalysis} className={`text-[12px] font-semibold ${cfg.accent}`}>
+                  重试
+                </button>
+              </div>
+            ) : (
+              analysis.split(/\n+/).filter(Boolean).map((line) => (
+                <p key={line} className={ANALYSIS_SECTION.test(line) ? "mt-2 font-semibold text-slate-900" : ""}>{line}</p>
+              ))
+            )}
+          </div>
+        )}
       </div>
-    </a>
+    </div>
   );
 }

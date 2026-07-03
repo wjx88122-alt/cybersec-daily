@@ -15,10 +15,17 @@ export type DigestItem = {
   action?: string;
 };
 
+export type OpportunityBoardAnalysis = {
+  synthesis: string;
+  hotSegments: Array<{ name: string; reason: string }>;
+  portfolioMoves: string[];
+};
+
 export type DailyDigest = {
   date: string;
   overview: string;
   items: DigestItem[];
+  boardAnalysis?: OpportunityBoardAnalysis;
 };
 
 function normalizeLink(link: string): string {
@@ -254,6 +261,7 @@ export async function generateDigest(items: FeedItem[]): Promise<DailyDigest> {
   - 2-3条，说明竞品发布、并购融资或厂商合纵连横
   布局建议：
   - 2-3条，说明未来 24-72 小时建议的动作（评估/接触/立项/观察）及理由
+- 输出 boardAnalysis 字段，基于最终选出的条目做跨条目综合，不得复述 overview 内容；hotSegments 按热度排序并给出一句话原因；portfolioMoves 必须是组合视角动作，不能重复单条目的 action
 - 每条 summary：2-3 句话，结构为：发生了什么 -> 机会含义是什么 -> 对客户、竞品格局或产品策略的影响是什么
 - 安全类与 AI 类都要覆盖，AI 类事件不能缺失
 - importance 仅能是 critical/high/medium：
@@ -296,7 +304,12 @@ ${articlesText}
       "sourceTitle": "中文来源标题（若原文为英文请翻译）",
       "sourceLink": "原文链接"
     }
-  ]
+  ],
+  "boardAnalysis": {
+    "synthesis": "2-3句：今天这批机会合起来说明了什么",
+    "hotSegments": [{ "name": "赛道名", "reason": "一句话原因" }],
+    "portfolioMoves": ["组合式布局动作及理由"]
+  }
 }
 
 从各类别中选取最重要事件，共9-12条并按机会价值排序，且满足：
