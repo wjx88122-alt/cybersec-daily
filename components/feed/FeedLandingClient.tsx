@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import CategoryFilter from "@/components/CategoryFilter";
+import DigestCard from "@/components/DigestCard";
 import NewsCard from "@/components/NewsCard";
 import { SystemIcon, type SystemIconName } from "@/components/ui/SystemIcon";
+import type { DigestItem } from "@/lib/digest";
 import { type FeedItem } from "@/lib/feeds";
 import { buildFeedLandingState } from "@/lib/feed-view-model.js";
 
@@ -20,6 +22,7 @@ type FeedLandingClientProps = {
   categories?: string[];
   heroMode?: "static" | "contentSummary";
   digestOverview?: string;
+  digestItems?: DigestItem[];
   eyebrow: string;
   headline: string;
   lead: string;
@@ -39,6 +42,7 @@ export default function FeedLandingClient({
   categories,
   heroMode = "static",
   digestOverview = "",
+  digestItems = [],
   eyebrow,
   headline,
   lead,
@@ -62,6 +66,7 @@ export default function FeedLandingClient({
   const { filtered, heroSummary, isFallback, scopeLabel } = landingState;
 
   const [hero, ...rest] = filtered;
+  const [featuredDigestItem, ...digestRest] = digestItems;
   const usesContentSummary = heroMode === "contentSummary";
   const heroTitle = usesContentSummary ? heroSummary.title : headline;
   const heroLead = usesContentSummary ? heroSummary.body || lead : lead;
@@ -146,8 +151,8 @@ export default function FeedLandingClient({
                         <SystemIcon className="system-icon" name="radar" size={15} />
                       </span>
                       <div>
-                        <span>产业雷达</span>
-                        <strong>从信号、影响和观察方向拆解今天的产业主线</strong>
+                        <span>机会雷达</span>
+                        <strong>从机会信号、竞争格局和布局建议拆解今天的市场主线</strong>
                       </div>
                     </div>
                   </div>
@@ -329,6 +334,27 @@ export default function FeedLandingClient({
           </div>
         </div>
       </section>
+
+      {featuredDigestItem && (
+        <section className="mt-12">
+          <div className="mb-5 reveal-rise delay-2">
+            <div className="public-section-label inline-flex items-center gap-2">
+              <SystemIcon className="system-icon" name="radar" size={14} />
+              今日机会看板
+            </div>
+          </div>
+          <div className="grid items-start gap-5 lg:grid-cols-[1.05fr_1.95fr]">
+            <DigestCard item={featuredDigestItem} featured />
+            {digestRest.length > 0 && (
+              <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {digestRest.map((item) => (
+                  <DigestCard key={`${item.sourceLink}-${item.headline}`} item={item} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {filtered.length === 0 && (
         <div className="public-empty py-24 text-center">

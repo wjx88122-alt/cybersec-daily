@@ -111,7 +111,7 @@ test("feed landing hero summary uses cached digest overview when available", () 
     },
   );
 
-  assert.equal(state.heroSummary.sourceLabel, "LLM 安全产业观察生成");
+  assert.equal(state.heroSummary.sourceLabel, "LLM 市场机会雷达生成");
   assert.equal(
     state.heroSummary.title,
     "今日重点是边界漏洞、凭据风险和勒索活动的连续升温。",
@@ -311,7 +311,7 @@ test("security industry summary uses a hierarchy board instead of equal columns"
     "public-summary-focus-chip",
     "public-summary-sections-heading",
     "is-primary",
-    "产业雷达",
+    "机会雷达",
     "产业样本",
   ]) {
     assert.equal(source.includes(phrase), true, `expected component to render ${phrase}`);
@@ -354,19 +354,19 @@ test("public overview rail is compact and does not stretch beside the brief", ()
   }
 });
 
-test("daily digest prompt asks for security industry judgment instead of threat intel", () => {
+test("daily digest prompt asks for market opportunity judgment instead of threat intel", () => {
   const source = load("lib/digest.ts");
 
   for (const phrase of [
-    "安全产业视角",
-    "不是安全情报简报",
-    "产业判断",
-    "产业信号",
-    "市场影响",
-    "关注方向",
+    "首席市场情报官",
+    "市场机会雷达",
+    "机会判断",
+    "机会信号",
+    "竞争与格局",
+    "布局建议",
     "不要围绕漏洞技术细节、IOC、修补动作展开",
-    "客户预算",
-    "厂商格局",
+    "采购窗口",
+    "竞品压力",
   ]) {
     assert.equal(source.includes(phrase), true, `expected digest prompt phrase ${phrase}`);
   }

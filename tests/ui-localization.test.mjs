@@ -12,9 +12,9 @@ function load(relativePath) {
 test("security page keeps key UI labels in Chinese", () => {
   const page = load("app/(public)/page.tsx");
 
-  assert.ok(page.includes("安全日报"));
+  assert.ok(page.includes("市场机会日报"));
   assert.ok(page.includes("今日概览"));
-  assert.ok(page.includes("今日简报"));
+  assert.ok(page.includes("今日机会"));
   assert.ok(page.includes("更多资讯"));
 
   assert.equal(page.includes("Security Daily"), false);

@@ -4,28 +4,28 @@ import { resolveSafeExternalHref } from "@/lib/remote-url";
 
 const IMPORTANCE_CONFIG = {
   critical: {
-    label: "严重",
-    bar: "from-red-500 to-rose-400",
-    badge: "bg-red-50 text-red-700 border-red-100",
-    accent: "text-red-600",
-    border: "hover:border-red-200",
-    glow: "hover:shadow-[0_26px_70px_rgba(239,68,68,0.08)]",
+    label: "优先布局",
+    bar: "from-indigo-500 to-blue-400",
+    badge: "bg-indigo-50 text-indigo-700 border-indigo-100",
+    accent: "text-indigo-600",
+    border: "hover:border-indigo-200",
+    glow: "hover:shadow-[0_26px_70px_rgba(79,70,229,0.10)]",
   },
   high: {
-    label: "高危",
-    bar: "from-orange-500 to-amber-400",
-    badge: "bg-orange-50 text-orange-700 border-orange-100",
-    accent: "text-orange-600",
-    border: "hover:border-orange-200",
-    glow: "hover:shadow-[0_26px_70px_rgba(249,115,22,0.08)]",
+    label: "重点评估",
+    bar: "from-teal-500 to-cyan-400",
+    badge: "bg-teal-50 text-teal-700 border-teal-100",
+    accent: "text-teal-600",
+    border: "hover:border-teal-200",
+    glow: "hover:shadow-[0_26px_70px_rgba(20,184,166,0.10)]",
   },
   medium: {
-    label: "中等",
-    bar: "from-yellow-500 to-yellow-400",
-    badge: "bg-yellow-50 text-yellow-700 border-yellow-100",
-    accent: "text-yellow-600",
-    border: "hover:border-yellow-200",
-    glow: "hover:shadow-[0_26px_70px_rgba(234,179,8,0.08)]",
+    label: "持续观察",
+    bar: "from-slate-500 to-slate-400",
+    badge: "bg-slate-50 text-slate-700 border-slate-200",
+    accent: "text-slate-600",
+    border: "hover:border-slate-300",
+    glow: "hover:shadow-[0_26px_70px_rgba(15,23,42,0.08)]",
   },
 };
 
@@ -51,17 +51,29 @@ export default function DigestCard({
 
       <div className={`flex flex-col flex-1 ${featured ? "p-5" : "p-4"}`}>
         {/* Badges row */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
           <span
             className={`inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border ${cfg.badge}`}
           >
             <SystemIcon className="system-icon" name="alert" size={12} />
             {cfg.label}
           </span>
+          {item.opportunityType && (
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-blue-100 bg-blue-50 px-2 py-0.5 text-[10px] text-blue-700">
+              <SystemIcon className="system-icon shrink-0" name="spark" size={12} />
+              {item.opportunityType}
+            </span>
+          )}
           <span className="inline-flex max-w-[140px] items-center gap-1.5 truncate rounded-full border border-slate-200 bg-slate-50 px-2 py-0.5 text-[10px] text-slate-500">
             <SystemIcon className="system-icon shrink-0" name="filter" size={12} />
             {item.category}
           </span>
+          {item.segment && (
+            <span className="inline-flex max-w-[140px] items-center gap-1.5 truncate rounded-full border border-slate-200 bg-white px-2 py-0.5 text-[10px] text-slate-500">
+              <SystemIcon className="system-icon shrink-0" name="chart" size={12} />
+              {item.segment}
+            </span>
+          )}
         </div>
 
         {/* Headline */}
@@ -77,6 +89,14 @@ export default function DigestCard({
         >
           {item.summary}
         </p>
+        {item.action && (
+          <div className="mt-3 flex items-start gap-1.5 rounded-2xl border border-slate-200/80 bg-slate-50/80 px-3 py-2 text-[12px] leading-5 text-slate-600">
+            <SystemIcon className={`system-icon mt-0.5 shrink-0 ${cfg.accent}`} name="check" size={13} />
+            <span>
+              <strong className="font-semibold text-slate-800">建议动作：</strong>{item.action}
+            </span>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="mt-3 flex items-center justify-between border-t border-slate-200/80 pt-3">

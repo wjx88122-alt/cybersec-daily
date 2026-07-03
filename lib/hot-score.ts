@@ -16,6 +16,11 @@ export const SECURITY_KEYWORDS: Array<[RegExp, number]> = [
   [/(勒索软件|ransomware|数据泄露|data breach|供应链|supply chain)/i, 10],
   [/(apt|后门|backdoor|botnet|僵尸网络|恶意软件)/i, 8],
   [/(cisa|msrc|advisory|补丁|patch|fortinet|cisco|microsoft)/i, 6],
+  [/(acqui(?:re|sition)|merger|\bm&a\b|并购|收购)/i, 14],
+  [/(funding|raises?\s+\$|series\s+[a-e]\b|ipo|融资|上市)/i, 13],
+  [/(launches?|general availability|\bga\b|unveils?|发布|上线)/i, 8],
+  [/(gartner|idc|forrester|magic quadrant|market (?:share|size|forecast)|市场规模)/i, 8],
+  [/(partnership|alliance|渠道|合作伙伴|集成)/i, 6],
 ];
 export const AI_KEYWORDS: Array<[RegExp, number]> = [
   // AI 安全高信号：提示注入 / 越狱 / 在野利用

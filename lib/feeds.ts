@@ -409,6 +409,18 @@ export const FEED_SOURCES_A = [
     category: "威胁情报",
     description: "防御视角安全播客，聚焦蓝队、事件响应与安全运营。",
   },
+  {
+    name: "Cybersecurity Ventures",
+    url: "https://cybersecurityventures.com/feed/",
+    category: "市场与资本",
+    description: "安全市场研究与统计,覆盖市场规模、并购与厂商动态。",
+  },
+  {
+    name: "Crunchbase News Cybersecurity",
+    url: "https://news.crunchbase.com/sections/cybersecurity/feed/",
+    category: "市场与资本",
+    description: "Crunchbase 网络安全板块,聚焦融资、并购与创业公司动态。",
+  },
 ];
 
 export const FEED_SOURCES_B = [
